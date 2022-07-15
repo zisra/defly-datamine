@@ -1,3 +1,88 @@
+! function(a) {
+    function b(a) {
+        if (x = q(b), !(a < e + l)) {
+            for (d += a - e, e = a, t(a, d), a > i + h && (f = g * j * 1e3 / (a - i) + (1 - g) * f, i = a, j = 0), j++, k = 0; d >= c;)
+                if (u(c), d -= c, ++k >= 240) {
+                    o = !0;
+                    break
+                } v(d / c), w(f, o), o = !1
+        }
+    }
+    var c = 1e3 / 60,
+        d = 0,
+        e = 0,
+        f = 60,
+        g = .9,
+        h = 1e3,
+        i = 0,
+        j = 0,
+        k = 0,
+        l = 0,
+        m = !1,
+        n = !1,
+        o = !1,
+        p = "object" == typeof window ? window : a,
+        q = p.requestAnimationFrame || function() {
+            var a = Date.now(),
+                b, d;
+            return function(e) {
+                return b = Date.now(), d = Math.max(0, c - (b - a)), a = b + d, setTimeout(function() {
+                    e(b + d)
+                }, d)
+            }
+        }(),
+        r = p.cancelAnimationFrame || clearTimeout,
+        s = function() {},
+        t = s,
+        u = s,
+        v = s,
+        w = s,
+        x;
+    a.MainLoop = {
+        getSimulationTimestep: function() {
+            return c
+        },
+        setSimulationTimestep: function(a) {
+            return c = a, this
+        },
+        getFPS: function() {
+            return f
+        },
+        getMaxAllowedFPS: function() {
+            return 1e3 / l
+        },
+        setMaxAllowedFPS: function(a) {
+            return "undefined" == typeof a && (a = 1 / 0), 0 === a ? this.stop() : l = 1e3 / a, this
+        },
+        resetFrameDelta: function() {
+            var a = d;
+            return d = 0, a
+        },
+        setBegin: function(a) {
+            return t = a || t, this
+        },
+        setUpdate: function(a) {
+            return u = a || u, this
+        },
+        setDraw: function(a) {
+            return v = a || v, this
+        },
+        setEnd: function(a) {
+            return w = a || w, this
+        },
+        start: function() {
+            return n || (n = !0, x = q(function(a) {
+                v(1), m = !0, e = a, i = a, j = 0, x = q(b)
+            })), this
+        },
+        stop: function() {
+            return m = !1, n = !1, r(x), this
+        },
+        isRunning: function() {
+            return m
+        }
+    }, "function" == typeof define && define.amd ? define(a.MainLoop) : "object" == typeof module && null !== module && "object" == typeof module.exports && (module.exports = a.MainLoop)
+}(this);
 ! function(t) {
     if ("object" == typeof exports && "undefined" != typeof module) module.exports = t();
     else if ("function" == typeof define && define.amd) define([], t);
@@ -15182,87 +15267,6 @@ var $jscomp$this = this;
         });
     f.saveAs = a.saveAs = a, "undefined" != typeof module && (module.exports = a)
 });
-! function(root) {
-    var rafHandle, now, timeout, lastTimestamp, raw, simulationTimestep = 1e3 / 60,
-        frameDelta = 0,
-        lastFrameTimeMs = 0,
-        fps = 60,
-        fpsAlpha = .9,
-        fpsUpdateInterval = 1e3,
-        lastFpsUpdate = 0,
-        framesSinceLastFpsUpdate = 0,
-        numUpdateSteps = 0,
-        minFrameDelay = 0,
-        running = !1,
-        started = !1,
-        panic = !1,
-        windowOrRoot = "object" == typeof window ? window : root,
-        requestAnimationFrame = 84 != (!!(raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)) && parseInt(raw[2], 10)) && windowOrRoot.requestAnimationFrame || (lastTimestamp = Date.now(), function(callback) {
-            return now = Date.now(), timeout = Math.max(0, simulationTimestep - (now - lastTimestamp)), lastTimestamp = now + timeout, setTimeout(function() {
-                callback(now + timeout)
-            }, timeout)
-        }),
-        cancelAnimationFrame = windowOrRoot.cancelAnimationFrame || clearTimeout,
-        NOOP = function() {},
-        begin = NOOP,
-        update = NOOP,
-        draw = NOOP,
-        end = NOOP;
-
-    function animate(timestamp) {
-        if (rafHandle = requestAnimationFrame(animate), !(timestamp < lastFrameTimeMs + minFrameDelay)) {
-            for (frameDelta += timestamp - lastFrameTimeMs, lastFrameTimeMs = timestamp, begin(timestamp, frameDelta), timestamp > lastFpsUpdate + fpsUpdateInterval && (fps = fpsAlpha * framesSinceLastFpsUpdate * 1e3 / (timestamp - lastFpsUpdate) + (1 - fpsAlpha) * fps, lastFpsUpdate = timestamp, framesSinceLastFpsUpdate = 0), framesSinceLastFpsUpdate++, numUpdateSteps = 0; frameDelta >= simulationTimestep;)
-                if (update(simulationTimestep), frameDelta -= simulationTimestep, ++numUpdateSteps >= 240) {
-                    panic = !0;
-                    break
-                } draw(frameDelta / simulationTimestep), end(fps, panic), panic = !1
-        }
-    }
-    root.MainLoop = {
-        getSimulationTimestep: function() {
-            return simulationTimestep
-        },
-        setSimulationTimestep: function(timestep) {
-            return simulationTimestep = timestep, this
-        },
-        getFPS: function() {
-            return fps
-        },
-        getMaxAllowedFPS: function() {
-            return 1e3 / minFrameDelay
-        },
-        setMaxAllowedFPS: function(fps) {
-            return void 0 === fps && (fps = 1 / 0), 0 === fps ? this.stop() : minFrameDelay = 1e3 / fps, this
-        },
-        resetFrameDelta: function() {
-            var oldFrameDelta = frameDelta;
-            return frameDelta = 0, oldFrameDelta
-        },
-        setBegin: function(fun) {
-            return begin = fun || begin, this
-        },
-        setUpdate: function(fun) {
-            return update = fun || update, this
-        },
-        setDraw: function(fun) {
-            return draw = fun || draw, this
-        },
-        setEnd: function(fun) {
-            return end = fun || end, this
-        },
-        start: function() {
-            return started || (started = !0, rafHandle = requestAnimationFrame(function(timestamp) {
-                draw(1), running = !0, lastFrameTimeMs = timestamp, lastFpsUpdate = timestamp, framesSinceLastFpsUpdate = 0, rafHandle = requestAnimationFrame(animate)
-            })), this
-        },
-        stop: function() {
-            return running = !1, started = !1, cancelAnimationFrame(rafHandle), this
-        },
-        isRunning: function() {
-            return running
-        }
-    }, "function" == typeof define && define.amd ? define(root.MainLoop) : "object" == typeof module && null !== module && "object" == typeof module.exports && (module.exports = root.MainLoop)
-}(this);
 ! function(global, factory) {
     "object" == typeof module && "object" == typeof module.exports ? module.exports = global.document ? factory(global, !0) : function(w) {
         if (!w.document) throw new Error("jQuery requires a window with a document");
@@ -19545,128 +19549,128 @@ var $jscomp$this = this;
 });
 "use strict";
 var defly = function() {
-    var I, s, x, C, W, Z, u, o, N, i, t, a, e, G, S, J, A, F, g, E, d, r, v, U, R, f, m, k, V, K, p, _, z, q, Y, b, T, D, B, h, O, X, P, c, M = "http://s.defly.io",
-        n = "192.168.0.12:3000",
-        H = {},
-        w = {},
-        Q = !1,
-        j = 0,
-        L = !1,
-        l = 1,
-        II = 0,
-        sI = 0,
-        xI = [],
-        CI = 0,
-        WI = 0,
-        ZI = 0,
-        uI = [],
-        oI = [],
-        NI = 0,
-        iI = 0,
-        tI = 0,
-        aI = 0,
-        eI = {},
-        GI = !1,
-        SI = 20,
-        JI = [],
-        AI = [],
-        FI = [],
-        gI = 0,
-        EI = 0,
-        dI = -1,
-        rI = 0,
-        vI = !1,
-        UI = 0,
-        RI = {},
-        fI = {},
-        mI = {},
-        kI = 1,
-        yI = -1,
-        VI = !0,
-        KI = !1,
-        pI = !1,
-        _I = !1,
-        zI = 0,
-        qI = 0,
-        YI = 0,
-        bI = 0,
-        TI = !1,
-        DI = 0,
-        BI = [8, 8, 8, 8, 8, 8, 8],
-        hI = 0,
-        OI = 0;
-    var $I, XI, PI, cI, MI, nI, HI, wI, QI, jI, LI, lI, Is, ss = !1,
-        xs = !1,
-        Cs = !1,
-        Ws = !1,
-        Zs = !1,
-        us = !1,
-        os = 2,
-        Ns = !1,
-        is = !1,
-        ts = !1,
-        as = !1,
-        es = !1,
-        Gs = null,
-        Ss = !1,
-        Js = !1,
-        As = !1,
-        Fs = !1,
-        gs = !1,
-        Es = !1,
-        ds = 0,
-        rs = !1,
-        vs = -1,
-        Us = 2,
-        Rs = 9,
-        fs = 48,
-        ms = 24,
-        ks = .6763066483560869,
-        ys = .1,
-        Vs = 0,
-        Ks = 0,
-        ps = 0,
-        _s = !1,
-        zs = {},
-        qs = {},
-        Ys = {},
-        bs = {},
-        Ts = -1,
-        Ds = -1,
-        Bs = -1,
-        hs = {},
-        Os = {},
-        $s = 0,
-        Xs = 0,
-        Ps = 4,
-        cs = ks / .5036440950091954,
-        Ms = [4021759, 9587711, 16144895, 16736174, 16594229, 16747050, 9698816, 1630751, 32823, 65468, 5625343],
-        ns = [4021759, 16594229, 32823, 16747050, 9587711, 5625343, 1630751, 16144895, 16252714, 16736174, 9698816, 65468],
-        Hs = ns.slice(),
-        ws = [5066061, 4021759, 16594229],
-        Qs = ["Blue", "Red", "Dark Green", "Orange", "Purple", "Sky Blue", "Green", "Pink", "Yellow", "Rose", "Lime", "Turquoise"],
-        js = Qs.slice(),
-        Ls = !1,
-        ls = ["", "Blue", "Red"],
-        Ix = ["Dual Fire", "Speed Boost", "Clone", "Shield", "Flashbang", "Teleport", "Grenade"],
-        sx = [10, 10, 10, 10, 10, 1, 10],
-        xx = [30, 30, 30, 30, 30, 30, 30],
-        Cx = {};
+    var Z, S, Y, _, o, J, R, r, w, E, m, K, O, j, X, a, s, k, N, C, T, v, g, B, V, U, p, t, I, i, z, e, x, u, L, n, c, H, b, F, D, M, P, Q, G = "http://s.defly.io",
+        W = "192.168.0.12:3000",
+        d = {},
+        l = {},
+        q = !1,
+        A = 0,
+        f = !1,
+        h = 1,
+        ZZ = 0,
+        SZ = 0,
+        YZ = [],
+        _Z = 0,
+        oZ = 0,
+        JZ = 0,
+        RZ = [],
+        rZ = [],
+        wZ = 0,
+        EZ = 0,
+        mZ = 0,
+        KZ = 0,
+        OZ = {},
+        jZ = !1,
+        XZ = 20,
+        aZ = [],
+        sZ = [],
+        kZ = [],
+        NZ = 0,
+        CZ = 0,
+        TZ = -1,
+        vZ = 0,
+        gZ = !1,
+        BZ = 0,
+        VZ = {},
+        UZ = {},
+        pZ = {},
+        $Z = 1,
+        tZ = -1,
+        IZ = !0,
+        iZ = !1,
+        zZ = !1,
+        eZ = !1,
+        xZ = 0,
+        uZ = 0,
+        LZ = 0,
+        nZ = 0,
+        cZ = !1,
+        HZ = 0,
+        yZ = [8, 8, 8, 8, 8, 8, 8],
+        bZ = 0,
+        FZ = 0;
+    var DZ, MZ, PZ, QZ, GZ, WZ, dZ, lZ, qZ, AZ, fZ, hZ, ZS, SS = !1,
+        YS = !1,
+        _S = !1,
+        oS = !1,
+        JS = !1,
+        RS = !1,
+        rS = 2,
+        wS = !1,
+        ES = !1,
+        mS = !1,
+        KS = !1,
+        OS = !1,
+        jS = null,
+        XS = !1,
+        aS = !1,
+        sS = !1,
+        kS = !1,
+        NS = !1,
+        CS = !1,
+        TS = 0,
+        vS = !1,
+        gS = -1,
+        BS = 2,
+        VS = 9,
+        US = 48,
+        pS = 24,
+        $S = .6763066483560869,
+        tS = .1,
+        IS = 0,
+        iS = 0,
+        zS = 0,
+        eS = !1,
+        xS = {},
+        uS = {},
+        LS = {},
+        nS = {},
+        cS = -1,
+        HS = -1,
+        yS = -1,
+        bS = {},
+        FS = {},
+        DS = 0,
+        MS = 0,
+        PS = 4,
+        QS = $S / .5036440950091954,
+        GS = [4021759, 9587711, 16144895, 16736174, 16594229, 16747050, 9698816, 1630751, 32823, 65468, 5625343],
+        WS = [4021759, 16594229, 32823, 16747050, 9587711, 5625343, 1630751, 16144895, 16252714, 16736174, 9698816, 65468],
+        dS = WS.slice(),
+        lS = [5066061, 4021759, 16594229],
+        qS = ["Blue", "Red", "Dark Green", "Orange", "Purple", "Sky Blue", "Green", "Pink", "Yellow", "Rose", "Lime", "Turquoise"],
+        AS = qS.slice(),
+        fS = !1,
+        hS = ["", "Blue", "Red"],
+        ZY = ["Dual Fire", "Speed Boost", "Clone", "Shield", "Flashbang", "Teleport", "Grenade"],
+        SY = [10, 10, 10, 10, 10, 1, 10],
+        YY = [30, 30, 30, 30, 30, 30, 30],
+        _Y = {};
 
-    function Wx(I) {
-        if (Cx[I]) return Cx[I];
-        if (hs[I]) return Cx[I] = Hs[hs[I] - 1], Cx[I];
-        if (I == Ts && yI >= 0) return Cx[I] = Ms[yI], Cx[I];
+    function oY(Z) {
+        if (_Y[Z]) return _Y[Z];
+        if (bS[Z]) return _Y[Z] = dS[bS[Z] - 1], _Y[Z];
+        if (Z == cS && tZ >= 0) return _Y[Z] = GS[tZ], _Y[Z];
         do {
-            var s = Ms[Math.floor(Math.random() * Ms.length)]
-        } while (I != Ts && Cx[Ts] == s);
-        return Cx[I] = s, s
+            var S = GS[Math.floor(Math.random() * GS.length)]
+        } while (Z != cS && _Y[cS] == S);
+        return _Y[Z] = S, S
     }
 
-    function Zx(I) {
-        return Hs[I - 1]
+    function JY(Z) {
+        return dS[Z - 1]
     }
-    var ux = {
+    var RY = {
         EU1: "Europe",
         EU2: "Europe Central",
         USE1: "US East",
@@ -19678,262 +19682,262 @@ var defly = function() {
         AU: "Australia"
     };
 
-    function ox(I) {
-        return I
+    function rY(Z) {
+        return Z
     }
-    var Nx, ix = (Nx = document.createElement("canvas").getContext("2d"), (window.devicePixelRatio || 1) / (Nx.webkitBackingStorePixelRatio || Nx.mozBackingStorePixelRatio || Nx.msBackingStorePixelRatio || Nx.oBackingStorePixelRatio || Nx.backingStorePixelRatio || 1));
+    var wY, EY = (wY = document.createElement("canvas").getContext("2d"), (window.devicePixelRatio || 1) / (wY.webkitBackingStorePixelRatio || wY.mozBackingStorePixelRatio || wY.msBackingStorePixelRatio || wY.oBackingStorePixelRatio || wY.backingStorePixelRatio || 1));
 
-    function tx() {
-        var I = {
+    function mY() {
+        var Z = {
             dpi: 96,
             dpcm: 96 / 2.54
         };
 
-        function s() {
-            return "undefined" == typeof window ? 0 : +window.devicePixelRatio || Math.sqrt(screen.deviceXDPI * screen.deviceYDPI) / I.dpi || 0
+        function S() {
+            return "undefined" == typeof window ? 0 : +window.devicePixelRatio || Math.sqrt(screen.deviceXDPI * screen.deviceYDPI) / Z.dpi || 0
         }
         return {
-            dppx: s,
+            dppx: S,
             dpi: function() {
-                return s() * I.dpi
+                return S() * Z.dpi
             },
             dpcm: function() {
-                return s() * I.dpcm
+                return S() * Z.dpcm
             }
         }
     }
-    var ax = tx().dpcm();
+    var KY = mY().dpcm();
 
-    function ex(I) {
-        l = I, 1 == I ? document.getElementById("button-quality-high").classList.remove("unselected") : document.getElementById("button-quality-high").classList.add("unselected"), .8 == I ? document.getElementById("button-quality-medium").classList.remove("unselected") : document.getElementById("button-quality-medium").classList.add("unselected"), .6 == I ? document.getElementById("button-quality-low").classList.remove("unselected") : document.getElementById("button-quality-low").classList.add("unselected");
+    function OY(Z) {
+        h = Z, 1 == Z ? document.getElementById("button-quality-high").classList.remove("unselected") : document.getElementById("button-quality-high").classList.add("unselected"), .8 == Z ? document.getElementById("button-quality-medium").classList.remove("unselected") : document.getElementById("button-quality-medium").classList.add("unselected"), .6 == Z ? document.getElementById("button-quality-low").classList.remove("unselected") : document.getElementById("button-quality-low").classList.add("unselected");
         try {
-            "undefined" != typeof Storage && localStorage.setItem("quality", I)
-        } catch (I) {}
-        a && (a.resolution = l * ix, a.rootRenderTarget && (a.rootRenderTarget.resolution = l * ix), TZ())
+            "undefined" != typeof Storage && localStorage.setItem("quality", Z)
+        } catch (Z) {}
+        K && (K.resolution = h * EY, K.rootRenderTarget && (K.rootRenderTarget.resolution = h * EY), HJ())
     }
 
-    function Gx(I, s) {
-        var x = s < 0 ? 0 : 255,
-            C = s < 0 ? -1 * s : s,
-            W = I >> 16,
-            Z = I >> 8 & 255,
-            u = 255 & I;
-        return 65536 * (Math.round((x - W) * C) + W) + 256 * (Math.round((x - Z) * C) + Z) + (Math.round((x - u) * C) + u)
+    function jY(Z, S) {
+        var Y = S < 0 ? 0 : 255,
+            _ = S < 0 ? -1 * S : S,
+            o = Z >> 16,
+            J = Z >> 8 & 255,
+            R = 255 & Z;
+        return 65536 * (Math.round((Y - o) * _) + o) + 256 * (Math.round((Y - J) * _) + J) + (Math.round((Y - R) * _) + R)
     }
 
-    function Sx(I) {
-        return I.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
+    function XY(Z) {
+        return Z.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
     }
-    var Jx = ["4r5e", "5h1t", "5hit", "a_s_s", "a55", "analbead", "anal", "analconda", "anus", "ar5e", "arrse", "arse", "arsehole", "ass", "ass fuck", "asses", "assfucker", "ass-fucker", "assfukka", "asshole", "assholes", "assmucus", "asswhole", "b!tch", "b00bs", "b17ch", "b1tch", "ballbag", "balls", "bangmywife", "ballsack", "bastard", "bastards", "beastial", "beastiality", "bellend", "bestial", "bestiality", "bi+ch", "biatch", "bitch", "bitcher", "bitchers", "bitches", "bitchin", "bitching", "bloody", "blow job", "blowjob", "blowjobs", "blumpkin", "boiolas", "bollock", "bollocks", "bollok", "boner", "boob", "boobs", "booobs", "boooobs", "booooobs", "booooooobs", "breasts", "buceta", "bugger", "buggery", "bum", "bunny fucker", "butt", "butthole", "buttmuch", "buttplug", "c0ck", "c0cksucker", "carpet muncher", "cawk", "chink", "cipa", "cl1t", "clit", "clitoris", "clits", "cnut", "cock", "cockface", "cockhead", "cockmunch", "cockmuncher", "cocks", "cocksuck", "cocksucked", "cocksucker", "cock-sucker", "cocksucker", "cocksucking", "cocksucks", "cocksuka", "cocksukka", "cok", "cokmuncher", "coksucka", "coon", "cox", "crap", "cum", "cum freak", "cumdump", "cumjunkie", "cummer", "cumming", "cums", "cumshot", "cunilingus", "cunillingus", "cunnilingus", "cunt", "cuntbag", "cuntlick", "cuntlicker", "cuntlicking", "cunts", "cuntsicle", "cyalis", "cyberfuc", "cyberfuck", "cyberfucked", "cyberfucker", "cyberfuckers", "cyberfucking", "d1ck", "damn", "darn", "dick", "dickhead", "dildo", "dildos", "dink", "dinks", "dirsa", "dlck", "dog-fucker", "doggin", "dogging", "donkeyribber", "doosh", "douche", "duche", "dyke", "ejaculate", "ejaculated", "ejaculates", "ejaculating", "ejaculatings", "ejaculation", "ejakulate", "f u c k", "f u c k e r", "f_u_c_k", "f4nny", "facialize", "fag", "fagging", "faggitt", "faggot", "faggs", "fagot", "fagots", "fags", "fanny", "fannyflaps", "fannyfucker", "fanyy", "fart", "fatass", "fcuk", "fcuker", "fcuking", "feck", "fecker", "felch", "felching", "fellate", "fellatio", "fingerfuck", "fingerfucked", "fingerfucker", "fingerfuckers", "fingerfucking", "fingerfucks", "fistfuck", "fistfucked", "fistfucker", "fistfuckers", "fistfucking", "fistfuckings", "fistfucks", "flange", "fook", "fooker", "fuck", "fucka", "fuck-bitch", "fucked", "fucker", "fuckers", "fuckhead", "fuckheads", "fuckin", "fucking", "fucking ", "fuckings", "fuckingshitmotherfucker", "fuckme", "fuckmeat", "fucks", "fucktoy", "fuckwhit", "fuckwit", "fudge packer", "fudgepacker", "fuk", "fuker", "fukker", "fukkin", "fuks", "fukwhit", "fukwit", "fux", "fux0r", "gangbang", "gangbang", "gangbanged", "gangbangs", "gaylord", "gaysex", "goatse", "God", "god-dam", "goddamn", "goddamned", "god-damned", "hardcoresex", "heshe", "hoar", "hoare", "hoer", "homo", "hore", "horniest", "horny", "hotsex", "jackoff", "jack-off", "jap", "jerk-off", "jism", "jiz", "jizm", "jizz", "kawk", "knob", "knobead", "knobed", "knobend", "knobhead", "knobjocky", "knobjokey", "kock", "kondum", "kondums", "kum", "kummer", "kumming", "kums", "kunilingus", "l3i+ch", "l3itch", "labia", "liter", "lust", "lusting", "m0f0", "m0fo", "m45terbate", "ma5terb8", "ma5terbate", "masochist", "masterb8", "masterbat*", "masterbat3", "masterbate", "master-bate", "masterbation", "masterbations", "masturbate", "mof0", "mofo", "mo-fo", "mothafuck", "mothafucka", "mothafuckas", "mothafuckaz", "mothafucked", "mothafucker", "mothafuckers", "mothafuckin", "mothafucking", "mothafuckings", "mothafucks", "mother fucker", "motherfuck", "motherfucked", "motherfucker", "motherfucker", "motherfuckers", "motherfuckin", "motherfucking", "motherfucking", "motherfuckings", "motherfuckka", "motherfucks", "muff", "mutha", "muthafecker", "muthafuckker", "muther", "mutherfucker", "n1gga", "n1gger", "nazi", "nigg3r", "nigg4h", "nigga", "niggah", "niggas", "niggaz", "nigger", "niggers", "nlgger", "nlggers", "nob", "nob jokey", "nobhead", "nobjocky", "nobjokey", "numbnuts", "nutsack", "orgasim", "orgasims", "orgasm", "orgasms", "p0rn", "pawn", "pecker", "penis", "penisfucker", "phonesex", "phuck", "phuk", "phuked", "phuking", "phukked", "phukking", "phuks", "phuq", "pigfucker", "pimpis", "piss", "pissed", "pisser", "pissers", "pisses", "pissflaps", "pissin", "pissing", "pissoff", "poop", "porn", "porno", "pornography", "pornos", "prick", "pricks", "pron", "pube", "pusse", "pussi", "pussies", "pussy", "pussys", "rapist", "rectum", "retard", "rimjaw", "rimming", "s hit", "s_h_i_t", "sadist", "schlong", "screwing", "scroat", "scrote", "scrotum", "semen", "sex", "sh!+", "sh!t", "sh1t", "shag", "shagger", "shaggin", "shagging", "shemale", "shi+", "shit", "shit ass", "shitass", "shitdick", "shite", "shited", "shitey", "shitfuck", "shitfull", "shithead", "shiting", "shitings", "shits", "shitted", "shitter", "shitters", "shitting", "shittings", "shitty", "skank", "skullfuck", "slaptard", "slich", "slut", "sluts", "smegma", "smut", "snatch", "sob", "son-of-a-bitch", "spac", "spunk", "sucker", "suckmydick", "suckmydlck", "t1tt1e5", "t1tties", "teets", "teez", "testical", "testicle", "tit", "titfuck", "tits", "titt", "tittie5", "tittiefucker", "titties", "tittyfuck", "tittywank", "titwank", "tosser", "turd", "tw4t", "twat", "twathead", "twatty", "twunt", "twunter", "v14gra", "v1gra", "vagina", "viagra", "vulva", "w00se", "wang", "wank", "wanker", "wanky", "whoar", "whore", "willies", "willy", "xrated", "xxx", "rape"],
-        Ax = {};
+    var aY = ["4r5e", "5h1t", "5hit", "a_s_s", "a55", "analbead", "anal", "analconda", "anus", "ar5e", "arrse", "arse", "arsehole", "ass", "ass fuck", "asses", "assfucker", "ass-fucker", "assfukka", "asshole", "assholes", "assmucus", "asswhole", "b!tch", "b00bs", "b17ch", "b1tch", "ballbag", "balls", "bangmywife", "ballsack", "bastard", "bastards", "beastial", "beastiality", "bellend", "bestial", "bestiality", "bi+ch", "biatch", "bitch", "bitcher", "bitchers", "bitches", "bitchin", "bitching", "bloody", "blow job", "blowjob", "blowjobs", "blumpkin", "boiolas", "bollock", "bollocks", "bollok", "boner", "boob", "boobs", "booobs", "boooobs", "booooobs", "booooooobs", "breasts", "buceta", "bugger", "buggery", "bum", "bunny fucker", "butt", "butthole", "buttmuch", "buttplug", "c0ck", "c0cksucker", "carpet muncher", "cawk", "chink", "cipa", "cl1t", "clit", "clitoris", "clits", "cnut", "cock", "cockface", "cockhead", "cockmunch", "cockmuncher", "cocks", "cocksuck", "cocksucked", "cocksucker", "cock-sucker", "cocksucker", "cocksucking", "cocksucks", "cocksuka", "cocksukka", "cok", "cokmuncher", "coksucka", "coon", "cox", "crap", "cum", "cum freak", "cumdump", "cumjunkie", "cummer", "cumming", "cums", "cumshot", "cunilingus", "cunillingus", "cunnilingus", "cunt", "cuntbag", "cuntlick", "cuntlicker", "cuntlicking", "cunts", "cuntsicle", "cyalis", "cyberfuc", "cyberfuck", "cyberfucked", "cyberfucker", "cyberfuckers", "cyberfucking", "d1ck", "damn", "darn", "dick", "dickhead", "dildo", "dildos", "dink", "dinks", "dirsa", "dlck", "dog-fucker", "doggin", "dogging", "donkeyribber", "doosh", "douche", "duche", "dyke", "ejaculate", "ejaculated", "ejaculates", "ejaculating", "ejaculatings", "ejaculation", "ejakulate", "f u c k", "f u c k e r", "f_u_c_k", "f4nny", "facialize", "fag", "fagging", "faggitt", "faggot", "faggs", "fagot", "fagots", "fags", "fanny", "fannyflaps", "fannyfucker", "fanyy", "fart", "fatass", "fcuk", "fcuker", "fcuking", "feck", "fecker", "felch", "felching", "fellate", "fellatio", "fingerfuck", "fingerfucked", "fingerfucker", "fingerfuckers", "fingerfucking", "fingerfucks", "fistfuck", "fistfucked", "fistfucker", "fistfuckers", "fistfucking", "fistfuckings", "fistfucks", "flange", "fook", "fooker", "fuck", "fucka", "fuck-bitch", "fucked", "fucker", "fuckers", "fuckhead", "fuckheads", "fuckin", "fucking", "fucking ", "fuckings", "fuckingshitmotherfucker", "fuckme", "fuckmeat", "fucks", "fucktoy", "fuckwhit", "fuckwit", "fudge packer", "fudgepacker", "fuk", "fuker", "fukker", "fukkin", "fuks", "fukwhit", "fukwit", "fux", "fux0r", "gangbang", "gangbang", "gangbanged", "gangbangs", "gaylord", "gaysex", "goatse", "God", "god-dam", "goddamn", "goddamned", "god-damned", "hardcoresex", "heshe", "hoar", "hoare", "hoer", "homo", "hore", "horniest", "horny", "hotsex", "jackoff", "jack-off", "jap", "jerk-off", "jism", "jiz", "jizm", "jizz", "kawk", "knob", "knobead", "knobed", "knobend", "knobhead", "knobjocky", "knobjokey", "kock", "kondum", "kondums", "kum", "kummer", "kumming", "kums", "kunilingus", "l3i+ch", "l3itch", "labia", "liter", "lust", "lusting", "m0f0", "m0fo", "m45terbate", "ma5terb8", "ma5terbate", "masochist", "masterb8", "masterbat*", "masterbat3", "masterbate", "master-bate", "masterbation", "masterbations", "masturbate", "mof0", "mofo", "mo-fo", "mothafuck", "mothafucka", "mothafuckas", "mothafuckaz", "mothafucked", "mothafucker", "mothafuckers", "mothafuckin", "mothafucking", "mothafuckings", "mothafucks", "mother fucker", "motherfuck", "motherfucked", "motherfucker", "motherfucker", "motherfuckers", "motherfuckin", "motherfucking", "motherfucking", "motherfuckings", "motherfuckka", "motherfucks", "muff", "mutha", "muthafecker", "muthafuckker", "muther", "mutherfucker", "n1gga", "n1gger", "nazi", "nigg3r", "nigg4h", "nigga", "niggah", "niggas", "niggaz", "nigger", "niggers", "nlgger", "nlggers", "nob", "nob jokey", "nobhead", "nobjocky", "nobjokey", "numbnuts", "nutsack", "orgasim", "orgasims", "orgasm", "orgasms", "p0rn", "pawn", "pecker", "penis", "penisfucker", "phonesex", "phuck", "phuk", "phuked", "phuking", "phukked", "phukking", "phuks", "phuq", "pigfucker", "pimpis", "piss", "pissed", "pisser", "pissers", "pisses", "pissflaps", "pissin", "pissing", "pissoff", "poop", "porn", "porno", "pornography", "pornos", "prick", "pricks", "pron", "pube", "pusse", "pussi", "pussies", "pussy", "pussys", "rapist", "rectum", "retard", "rimjaw", "rimming", "s hit", "s_h_i_t", "sadist", "schlong", "screwing", "scroat", "scrote", "scrotum", "semen", "sex", "sh!+", "sh!t", "sh1t", "shag", "shagger", "shaggin", "shagging", "shemale", "shi+", "shit", "shit ass", "shitass", "shitdick", "shite", "shited", "shitey", "shitfuck", "shitfull", "shithead", "shiting", "shitings", "shits", "shitted", "shitter", "shitters", "shitting", "shittings", "shitty", "skank", "skullfuck", "slaptard", "slich", "slut", "sluts", "smegma", "smut", "snatch", "sob", "son-of-a-bitch", "spac", "spunk", "sucker", "suckmydick", "suckmydlck", "t1tt1e5", "t1tties", "teets", "teez", "testical", "testicle", "tit", "titfuck", "tits", "titt", "tittie5", "tittiefucker", "titties", "tittyfuck", "tittywank", "titwank", "tosser", "turd", "tw4t", "twat", "twathead", "twatty", "twunt", "twunter", "v14gra", "v1gra", "vagina", "viagra", "vulva", "w00se", "wang", "wank", "wanker", "wanky", "whoar", "whore", "willies", "willy", "xrated", "xxx", "rape"],
+        sY = {};
 
-    function Fx(I, s) {
-        for (var x = (I = I.replace(/[█⸻卍卐﷽௵ဪ\u00AD\u200A\u200B\u200C\u200D\u200E\u200F\u2060\ufeffּ\u05BC]/g, "").replace(/🖕/g, "").replace(/\u0391/g, "A").replace(/\u0392/g, "B").replace(/\u0395/g, "E").replace(/\u0396/g, "Z").replace(/\u0397/g, "H").replace(/\u039A/g, "K").replace(/\u039C/g, "M").replace(/\u039D/g, "N").replace(/\u039F/g, "O").replace(/\u03A1/g, "P").replace(/\u03A4/g, "T").replace(/\u03A5/g, "Y").replace(/\u03A7/g, "X").replace(/\u03BF/g, "o").replace(/\u0415/g, "E").replace(/\u0405/g, "S").replace(/\u0410/g, "A").replace(/\u0412/g, "B").replace(/\u041A/g, "K").replace(/\u041C/g, "M").replace(/\u041D/g, "H").replace(/\u041E/g, "O").replace(/\u0420/g, "P").replace(/\u0421/g, "C").replace(/\u0422/g, "T").replace(/\u0425/g, "X")).split(" "), C = 0; C < x.length; C++) {
-            var W = x[C].toUpperCase(),
-                Z = (W.match(/[a-zA-Z0-9]/) || []).pop();
-            if (void 0 !== Ax[Z])
-                for (var u = 0; u < Ax[Z].length; u++) {
-                    var o = Ax[Z][u]; - 1 != W.indexOf(o) && (x[C] = s)
+    function kY(Z, S) {
+        for (var Y = (Z = Z.replace(/[█⸻卍卐﷽௵ဪ\u00AD\u200A\u200B\u200C\u200D\u200E\u200F\u2060\ufeffּ\u05BC]/g, "").replace(/🖕/g, "").replace(/\u0391/g, "A").replace(/\u0392/g, "B").replace(/\u0395/g, "E").replace(/\u0396/g, "Z").replace(/\u0397/g, "H").replace(/\u039A/g, "K").replace(/\u039C/g, "M").replace(/\u039D/g, "N").replace(/\u039F/g, "O").replace(/\u03A1/g, "P").replace(/\u03A4/g, "T").replace(/\u03A5/g, "Y").replace(/\u03A7/g, "X").replace(/\u03BF/g, "o").replace(/\u0415/g, "E").replace(/\u0405/g, "S").replace(/\u0410/g, "A").replace(/\u0412/g, "B").replace(/\u041A/g, "K").replace(/\u041C/g, "M").replace(/\u041D/g, "H").replace(/\u041E/g, "O").replace(/\u0420/g, "P").replace(/\u0421/g, "C").replace(/\u0422/g, "T").replace(/\u0425/g, "X")).split(" "), _ = 0; _ < Y.length; _++) {
+            var o = Y[_].toUpperCase(),
+                J = (o.match(/[a-zA-Z0-9]/) || []).pop();
+            if (void 0 !== sY[J])
+                for (var R = 0; R < sY[J].length; R++) {
+                    var r = sY[J][R]; - 1 != o.indexOf(r) && (Y[_] = S)
                 }
         }
-        I = x.join(" ");
-        for (u = 0; u < Ax[" "].length; u++) {
-            o = Ax[" "][u]; - 1 !== I.toUpperCase().indexOf(o.toUpperCase()) && (I = I.replace(new RegExp(Ax[" "][u], "ig"), s))
+        Z = Y.join(" ");
+        for (R = 0; R < sY[" "].length; R++) {
+            r = sY[" "][R]; - 1 !== Z.toUpperCase().indexOf(r.toUpperCase()) && (Z = Z.replace(new RegExp(sY[" "][R], "ig"), S))
         }
-        return I
+        return Z
     }! function() {
-        for (var I = 0; I < Jx.length; I++) {
-            var s = Jx[I].toUpperCase(),
-                x = s.charAt(0); - 1 !== s.indexOf(" ") && (x = " "), void 0 === Ax[x] && (Ax[x] = []), Ax[x].push(s)
+        for (var Z = 0; Z < aY.length; Z++) {
+            var S = aY[Z].toUpperCase(),
+                Y = S.charAt(0); - 1 !== S.indexOf(" ") && (Y = " "), void 0 === sY[Y] && (sY[Y] = []), sY[Y].push(S)
         }
     }();
-    var gx = !1;
-    var Ex = function() {
-            var I = navigator.userAgent || navigator.vendor || window.opera;
-            return !(!/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(I) && !/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(I.substr(0, 4)))
+    var NY = !1;
+    var CY = function() {
+            var Z = navigator.userAgent || navigator.vendor || window.opera;
+            return !(!/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(Z) && !/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(Z.substr(0, 4)))
         }() || "MacIntel" === navigator.platform && void 0 !== navigator.maxTouchPoints && navigator.maxTouchPoints > 1,
-        dx = -1 !== navigator.userAgent.indexOf("Safari") && -1 === navigator.userAgent.indexOf("Chrome") && -1 === navigator.userAgent.indexOf("Chromium"),
-        rx = Ex && dx,
-        vx = -1 !== document.referrer.indexOf("kongregate.com"),
-        Ux = -1 !== document.referrer.indexOf("newgrounds.com"),
-        Rx = -1 !== document.referrer.indexOf("crazygames.com") || -1 !== document.referrer.indexOf("speelspelletjes.nl") || -1 !== document.referrer.indexOf("gioca.re") || -1 !== document.referrer.indexOf(" onlinegame.co.id") || -1 !== document.referrer.indexOf("1001juegos.com") || -1 !== document.referrer.indexOf("crazygames.fr") || -1 !== document.referrer.indexOf("crazygames.ru") || -1 !== document.referrer.indexOf("crazygames.com.br"),
-        fx = -1 !== document.referrer.indexOf("pacogames.com") || -1 !== document.referrer.indexOf("gamearter.com");
+        TY = -1 !== navigator.userAgent.indexOf("Safari") && -1 === navigator.userAgent.indexOf("Chrome") && -1 === navigator.userAgent.indexOf("Chromium"),
+        vY = CY && TY,
+        gY = -1 !== document.referrer.indexOf("kongregate.com"),
+        BY = -1 !== document.referrer.indexOf("newgrounds.com"),
+        VY = -1 !== document.referrer.indexOf("crazygames.com") || -1 !== document.referrer.indexOf("speelspelletjes.nl") || -1 !== document.referrer.indexOf("gioca.re") || -1 !== document.referrer.indexOf(" onlinegame.co.id") || -1 !== document.referrer.indexOf("1001juegos.com") || -1 !== document.referrer.indexOf("crazygames.fr") || -1 !== document.referrer.indexOf("crazygames.ru") || -1 !== document.referrer.indexOf("crazygames.com.br"),
+        UY = -1 !== document.referrer.indexOf("pacogames.com") || -1 !== document.referrer.indexOf("gamearter.com");
 
-    function mx(I) {
-        return "https:" === window.location.protocol.toLowerCase() || M.startsWith("https") ? "wss://" + I.replace(":", "/") : "ws://" + I
+    function pY(Z) {
+        return "https:" === window.location.protocol.toLowerCase() || G.startsWith("https") ? "wss://" + Z.replace(":", "/") : "ws://" + Z
     }
 
-    function kx(s) {
-        H[s] = new WebSocket(mx(W[s].uri)), H[s].binaryType = "arraybuffer", H[s].pings = [], H[s].sendPing = function() {
+    function $Y(S) {
+        d[S] = new WebSocket(pY(o[S].uri)), d[S].binaryType = "arraybuffer", d[S].pings = [], d[S].sendPing = function() {
             this.lastPingTime = (new Date).getTime();
-            var I = new Uint8Array(1);
-            I.set([99], 0), this.send(I)
-        }, H[s].addEventListener("open", function(I) {
-            I.target.sendPing()
-        }), H[s].addEventListener("error", function(I) {
-            this.cancelled || kC((new Date).toLocaleTimeString() + " - Error reaching server in " + s + " " + I.type + " " + I.code, "")
-        }), H[s].addEventListener("close", function(I) {}), H[s].addEventListener("message", function(x) {
-            var W = new DataView(x.data).getUint8(0);
-            99 == W ? (x.target.pings.push((new Date).getTime() - x.target.lastPingTime), x.target.pings.length >= 3 ? (x.target.close(), delete H[s], w[s] = Math.min.apply(Math, x.target.pings), console.log("Best ping for region", s, w[s]), function() {
-                var s = 999999,
-                    x = "";
-                for (var W in w) w[W] < s && (s = w[W], C != W && console.log("Best region", W), C = W), x += '<option value="' + W + '" data-ping="' + w[W] + '">' + ux[W] + "</option>";
-                I || (document.getElementById("server-block").style.display = "block"), document.getElementById("server").innerHTML = x, document.getElementById("server").value = C, $("#server").selectmenu("refresh"), Js && gs && _x()
-            }()) : x.target.sendPing()) : console.log("unexpected code from server", W)
+            var Z = new Uint8Array(1);
+            Z.set([99], 0), this.send(Z)
+        }, d[S].addEventListener("open", function(Z) {
+            Z.target.sendPing()
+        }), d[S].addEventListener("error", function(Z) {
+            this.cancelled || $_((new Date).toLocaleTimeString() + " - Error reaching server in " + S + " " + Z.type + " " + Z.code, "")
+        }), d[S].addEventListener("close", function(Z) {}), d[S].addEventListener("message", function(Y) {
+            var o = new DataView(Y.data).getUint8(0);
+            99 == o ? (Y.target.pings.push((new Date).getTime() - Y.target.lastPingTime), Y.target.pings.length >= 3 ? (Y.target.close(), delete d[S], l[S] = Math.min.apply(Math, Y.target.pings), console.log("Best ping for region", S, l[S]), function() {
+                var S = 999999,
+                    Y = "";
+                for (var o in l) l[o] < S && (S = l[o], _ != o && console.log("Best region", o), _ = o), Y += '<option value="' + o + '" data-ping="' + l[o] + '">' + RY[o] + "</option>";
+                Z || (document.getElementById("server-block").style.display = "block"), document.getElementById("server").innerHTML = Y, document.getElementById("server").value = _, $("#server").selectmenu("refresh"), aS && NS && eY()
+            }()) : Y.target.sendPing()) : console.log("unexpected code from server", o)
         })
     }
-    var yx, Vx, Kx = 0;
+    var tY, IY, iY = 0;
 
-    function px() {
-        W && (! function() {
-            for (var I in W) H[I] && (H[I].cancelled = !0, H[I].close()), delete H[I];
-            w = [], document.getElementById("server").innerHTML = "<option>Loading...</option>", $("#server").selectmenu("refresh")
-        }(), clearTimeout(yx));
-        var I = new XMLHttpRequest;
-        I.onreadystatechange = function() {
-            if (4 == I.readyState && 200 == I.status) try {
-                var s = I.responseText.split("\n");
-                W = JSON.parse(s[0]), Js ? W = {
-                    TR: W.TR
-                } : delete W.TR;
-                var x = !1;
-                for (var C in W) W[C] && (kx(C), x = !0);
-                if (x || (yx = setTimeout(px, 3e3), Js ? kC((new Date).toLocaleTimeString() + " - Please wait, tournament is opening... ") : kC((new Date).toLocaleTimeString() + " - Downloaded server list was empty", "error")), s.length > 1)
-                    for (var Z = 1; Z < s.length; Z++) {
-                        var u = s[Z];
-                        if (u.startsWith("event=")) {
-                            u = u.slice(6);
-                            var o = JSON.parse(u),
-                                N = new Date(o.ts ? parseInt(o.ts) : o.date).getTime(),
-                                i = (new Date).getTime(),
-                                t = N - i,
-                                a = document.getElementById("event-placeholder");
-                            if (a) {
-                                if (t >= -864e5) {
-                                    var e = document.createElement("div");
-                                    e.className = "event", e.innerHTML = "<span>" + Sx(o.title) + '</span> - <span class="date">' + o.date + "</span> - <a onclick=\"document.getElementById('event-popup').style.display='block';\">click for details</a>", a.parentNode.replaceChild(e, a), document.getElementById("event-title").innerHTML = Sx(o.title) + '<span class="date">' + o.date + "</span>", document.getElementById("event-content").innerHTML = Sx(o.details)
+    function zY() {
+        o && (! function() {
+            for (var Z in o) d[Z] && (d[Z].cancelled = !0, d[Z].close()), delete d[Z];
+            l = [], document.getElementById("server").innerHTML = "<option>Loading...</option>", $("#server").selectmenu("refresh")
+        }(), clearTimeout(tY));
+        var Z = new XMLHttpRequest;
+        Z.onreadystatechange = function() {
+            if (4 == Z.readyState && 200 == Z.status) try {
+                var S = Z.responseText.split("\n");
+                o = JSON.parse(S[0]), aS ? o = {
+                    TR: o.TR
+                } : delete o.TR;
+                var Y = !1;
+                for (var _ in o) o[_] && ($Y(_), Y = !0);
+                if (Y || (tY = setTimeout(zY, 3e3), aS ? $_((new Date).toLocaleTimeString() + " - Please wait, tournament is opening... ") : $_((new Date).toLocaleTimeString() + " - Downloaded server list was empty", "error")), S.length > 1)
+                    for (var J = 1; J < S.length; J++) {
+                        var R = S[J];
+                        if (R.startsWith("event=")) {
+                            R = R.slice(6);
+                            var r = JSON.parse(R),
+                                w = new Date(r.ts ? parseInt(r.ts) : r.date).getTime(),
+                                E = (new Date).getTime(),
+                                m = w - E,
+                                K = document.getElementById("event-placeholder");
+                            if (K) {
+                                if (m >= -864e5) {
+                                    var O = document.createElement("div");
+                                    O.className = "event", O.innerHTML = "<span>" + XY(r.title) + '</span> - <span class="date">' + r.date + "</span> - <a onclick=\"document.getElementById('event-popup').style.display='block';\">click for details</a>", K.parentNode.replaceChild(O, K), document.getElementById("event-title").innerHTML = XY(r.title) + '<span class="date">' + r.date + "</span>", document.getElementById("event-content").innerHTML = XY(r.details)
                                 }
-                                if (t >= -36e5) {
-                                    var G = function() {
-                                        var I = (new Date).getTime(),
-                                            s = N - I,
-                                            x = Math.floor(s / 864e5),
-                                            C = Math.floor(s % 864e5 / 36e5),
-                                            W = Math.floor(s % 36e5 / 6e4),
-                                            Z = Math.floor(s % 6e4 / 1e3);
-                                        document.getElementById("tourney-countdown").innerHTML = '<button class="button back disabled" onclick="defly.joinTourney()">Tourney starts in ' + (x > 0 ? x + "d " : "") + (x > 0 || C > 0 ? C + "h " : "") + (x > 0 || C > 0 || W > 0 ? W + "m " : "") + Z + "s </button><a onclick=\"document.getElementById('event-popup').style.display='block'\"> ?</a>", s < -36e5 ? document.getElementById("tourney-countdown").style.display = "none" : s < 0 && (clearInterval(c), document.getElementById("tourney-countdown").innerHTML = '<button class="orange button animated pulse" onclick="defly.joinTourney()">Join the tournament</button>')
+                                if (m >= -36e5) {
+                                    var j = function() {
+                                        var Z = (new Date).getTime(),
+                                            S = w - Z,
+                                            Y = Math.floor(S / 864e5),
+                                            _ = Math.floor(S % 864e5 / 36e5),
+                                            o = Math.floor(S % 36e5 / 6e4),
+                                            J = Math.floor(S % 6e4 / 1e3);
+                                        document.getElementById("tourney-countdown").innerHTML = '<button class="button back disabled" onclick="defly.joinTourney()">Tourney starts in ' + (Y > 0 ? Y + "d " : "") + (Y > 0 || _ > 0 ? _ + "h " : "") + (Y > 0 || _ > 0 || o > 0 ? o + "m " : "") + J + "s </button><a onclick=\"document.getElementById('event-popup').style.display='block'\"> ?</a>", S < -36e5 ? document.getElementById("tourney-countdown").style.display = "none" : S < 0 && (clearInterval(Q), document.getElementById("tourney-countdown").innerHTML = '<button class="orange button animated pulse" onclick="defly.joinTourney()">Join the tournament</button>')
                                     };
-                                    c = setInterval(G, 1e3), G()
+                                    Q = setInterval(j, 1e3), j()
                                 }
                             }
                         }
                     }
-            } catch (s) {
-                console.error(s), ++Kx < 100 && (yx = setTimeout(px, 3e3)), kC((new Date).toLocaleTimeString() + " - Downloaded server list was invalid: " + I.responseText, "error")
-            } else 4 == I.readyState && 200 != I.status && I.onerror(I.status)
-        }, I.onerror = function(I) {
-            kC((new Date).toLocaleTimeString() + " - Error downloading server list", "error"), ++Kx < 100 && (yx = setTimeout(px, 3e3))
-        }, I.open("GET", M + "/servers?m=" + aI, !0), I.send(null)
+            } catch (S) {
+                console.error(S), ++iY < 100 && (tY = setTimeout(zY, 3e3)), $_((new Date).toLocaleTimeString() + " - Downloaded server list was invalid: " + Z.responseText, "error")
+            } else 4 == Z.readyState && 200 != Z.status && Z.onerror(Z.status)
+        }, Z.onerror = function(Z) {
+            $_((new Date).toLocaleTimeString() + " - Error downloading server list", "error"), ++iY < 100 && (tY = setTimeout(zY, 3e3))
+        }, Z.open("GET", G + "/servers?m=" + KZ, !0), Z.send(null)
     }
 
-    function _x() {
-        if (clearTimeout(Vx), document.getElementById("play-button").style.display = "none", document.getElementById("play-spinner").style.display = "block", C) {
-            var W = document.getElementById("server").value ? document.getElementById("server").value : C,
-                Z = document.getElementById("username").value.substring(0, 14),
-                u = new XMLHttpRequest;
-            u.onreadystatechange = function() {
-                if (4 == u.readyState && 200 == u.status)
-                    if (-1 != u.responseText.indexOf("LOGIN_ERROR")) alert("The session has expired, please reload the page and try again"), document.location.reload();
-                    else if (-1 != u.responseText.indexOf("ERROR")) I ? (alert("Can't connect to the specified server, it's probably not open right now"), history.replaceState("", document.title, window.location.pathname + window.location.search), ro(), document.getElementById("play-button").style.display = "block", document.getElementById("play-spinner").style.display = "none", L = !1) : (Vx = setTimeout(_x, 3e3), kC((new Date).toLocaleTimeString() + " - Error selecting server: " + u.responseText, "error"));
-                else if (-1 != u.responseText.indexOf("RESERVED_NICKNAME")) document.getElementById("play-button").style.display = "block", document.getElementById("play-spinner").style.display = "none", L = !1, alert("This nickname is reserved by a premium account, please choose another one"), document.getElementById("username").value = "";
+    function eY() {
+        if (clearTimeout(IY), document.getElementById("play-button").style.display = "none", document.getElementById("play-spinner").style.display = "block", _) {
+            var o = document.getElementById("server").value ? document.getElementById("server").value : _,
+                J = document.getElementById("username").value.substring(0, 14),
+                R = new XMLHttpRequest;
+            R.onreadystatechange = function() {
+                if (4 == R.readyState && 200 == R.status)
+                    if (-1 != R.responseText.indexOf("LOGIN_ERROR")) alert("The session has expired, please reload the page and try again"), document.location.reload();
+                    else if (-1 != R.responseText.indexOf("ERROR")) Z ? (alert("Can't connect to the specified server, it's probably not open right now"), history.replaceState("", document.title, window.location.pathname + window.location.search), vr(), document.getElementById("play-button").style.display = "block", document.getElementById("play-spinner").style.display = "none", f = !1) : (IY = setTimeout(eY, 3e3), $_((new Date).toLocaleTimeString() + " - Error selecting server: " + R.responseText, "error"));
+                else if (-1 != R.responseText.indexOf("RESERVED_NICKNAME")) document.getElementById("play-button").style.display = "block", document.getElementById("play-spinner").style.display = "none", f = !1, alert("This nickname is reserved by a premium account, please choose another one"), document.getElementById("username").value = "";
                 else {
-                    var C = u.responseText.split(" ");
-                    if (n = C[0], x = C[1], C.length >= 3 && (aI = parseInt(C[2])), "undefined" != typeof Storage) try {
-                        localStorage.setItem("sessionId", x)
-                    } catch (I) {
-                        console.log(I)
+                    var _ = R.responseText.split(" ");
+                    if (W = _[0], Y = _[1], _.length >= 3 && (KZ = parseInt(_[2])), "undefined" != typeof Storage) try {
+                        localStorage.setItem("sessionId", Y)
+                    } catch (Z) {
+                        console.log(Z)
                     }
-                    console.log("Server", n, "reservationKey", s), zx()
-                } else 4 == u.readyState && 200 != u.status && u.onerror(u.status)
-            }, u.onerror = function(I) {
-                kC((new Date).toLocaleTimeString() + " - Error selecting server", "error"), Vx = setTimeout(_x, 3e3)
-            }, u.open("POST", M + "?r=" + (W || "") + "&m=" + aI + "&u=" + encodeURIComponent(Z) + "&fu=" + encodeURIComponent(Fx(Z)) + "&s=" + (x || "") + (KI ? "&a=1" : "") + (!KI && pI ? "&a=2" : "") + (I ? "&p=" + encodeURIComponent(I) : ""), !0), KI ? u.send(Su) : pI ? u.send(Ju) : u.send(null)
-        } else Vx = setTimeout(_x, 3e3)
+                    console.log("Server", W, "reservationKey", S), xY()
+                } else 4 == R.readyState && 200 != R.status && R.onerror(R.status)
+            }, R.onerror = function(Z) {
+                $_((new Date).toLocaleTimeString() + " - Error selecting server", "error"), IY = setTimeout(eY, 3e3)
+            }, R.open("POST", G + "?r=" + (o || "") + "&m=" + KZ + "&u=" + encodeURIComponent(J) + "&fu=" + encodeURIComponent(kY(J)) + "&s=" + (Y || "") + (iZ ? "&a=1" : "") + (!iZ && zZ ? "&a=2" : "") + (Z ? "&p=" + encodeURIComponent(Z) : ""), !0), iZ ? R.send(aR) : zZ ? R.send(sR) : R.send(null)
+        } else IY = setTimeout(eY, 3e3)
     }
 
-    function zx() {
-        i ? console.error("Already connected to server") : (document.getElementById("play-button").style.display = "none", document.getElementById("play-spinner").style.display = "block", Cx = {}, mI = {}, (i = new WebSocket(mx(n))).binaryType = "arraybuffer", i.addEventListener("open", function(I) {
+    function xY() {
+        E ? console.error("Already connected to server") : (document.getElementById("play-button").style.display = "none", document.getElementById("play-spinner").style.display = "block", _Y = {}, pZ = {}, (E = new WebSocket(pY(W))).binaryType = "arraybuffer", E.addEventListener("open", function(Z) {
             console.log("socket connected"),
                 function() {
-                    0 == (t = document.getElementById("username").value.substring(0, 14)).length && (t = "Player");
+                    0 == (m = document.getElementById("username").value.substring(0, 14)).length && (m = "Player");
                     if ("undefined" != typeof Storage) try {
-                        localStorage.setItem("username", t)
-                    } catch (I) {
-                        console.log(I)
+                        localStorage.setItem("username", m)
+                    } catch (Z) {
+                        console.log(Z)
                     }
-                    var I = x || "",
-                        s = new DataView(new ArrayBuffer(2 + 2 * t.length + 1 + 2 * I.length + 4 + 4));
-                    s.setUint8(0, 1), Hx(s, 1, t), Hx(s, 2 + 2 * t.length, I), s.setInt32(2 + 2 * t.length + 1 + 2 * I.length, kI), s.setInt32(2 + 2 * t.length + 1 + 2 * I.length + 4, iI), i.send(s.buffer)
+                    var Z = Y || "",
+                        S = new DataView(new ArrayBuffer(2 + 2 * m.length + 1 + 2 * Z.length + 4 + 4));
+                    S.setUint8(0, 1), dY(S, 1, m), dY(S, 2 + 2 * m.length, Z), S.setInt32(2 + 2 * m.length + 1 + 2 * Z.length, $Z), S.setInt32(2 + 2 * m.length + 1 + 2 * Z.length + 4, EZ), E.send(S.buffer)
                 }()
-        }), i.addEventListener("error", function(I) {
-            console.error(I), kC((new Date).toLocaleTimeString() + " - Websocket error " + I.type + " " + I.code, "error"), I.type
-        }), i.addEventListener("close", function(I) {
-            if (console.log("socket closed", I), !Q)
-                if (0 == j) _I ? alert("You have been kicked out for inactivity.") : (alert("Connection to the server failed. Please try again in a few minutes and contact us if the problem persists."), I.code), document.location.reload();
+        }), E.addEventListener("error", function(Z) {
+            console.error(Z), $_((new Date).toLocaleTimeString() + " - Websocket error " + Z.type + " " + Z.code, "error"), Z.type
+        }), E.addEventListener("close", function(Z) {
+            if (console.log("socket closed", Z), !q)
+                if (0 == A) eZ ? alert("You have been kicked out for inactivity.") : (alert("Connection to the server failed. Please try again in a few minutes and contact us if the problem persists."), Z.code), document.location.reload();
                 else {
-                    if (I.code, bs[Ts] && !R) {
-                        var s = new DataView(new ArrayBuffer(10));
-                        s.setUint8(0, 10), s.setInt32(1, Ts), s.setUint8(5, 0), s.setInt32(6, 0), kW(s)
+                    if (Z.code, nS[cS] && !V) {
+                        var S = new DataView(new ArrayBuffer(10));
+                        S.setUint8(0, 10), S.setInt32(1, cS), S.setUint8(5, 0), S.setInt32(6, 0), $o(S)
                     }
-                    _I ? alert("You have been kicked out for inactivity.") : alert("The connection to the server has been lost."), document.getElementById("internet-issue").style.display = "none", document.getElementById("respawn-buttons").style.display = "none", document.getElementById("respawn-buttons-gm2").style.display = "none", MainLoop.stop(), 4 == aI && document.location.reload()
-                } i = null, Q = !1, 0, uI = []
-        }), i.addEventListener("message", cx))
+                    eZ ? alert("You have been kicked out for inactivity.") : alert("The connection to the server has been lost."), document.getElementById("internet-issue").style.display = "none", document.getElementById("respawn-buttons").style.display = "none", document.getElementById("respawn-buttons-gm2").style.display = "none", MainLoop.stop(), 4 == KZ && document.location.reload()
+                } E = null, q = !1, 0, RZ = []
+        }), E.addEventListener("message", QY))
     }
 
-    function qx() {
-        document.getElementById("tuto-checkbox").checked = !VI, document.getElementById("homepage").classList.add("blurred"), document.getElementById("tuto-popup").style.display = "table-row", document.getElementById("tuto-video").currentTime = 0, document.getElementById("tuto-video").play()
+    function uY() {
+        document.getElementById("tuto-checkbox").checked = !IZ, document.getElementById("homepage").classList.add("blurred"), document.getElementById("tuto-popup").style.display = "table-row", document.getElementById("tuto-video").currentTime = 0, document.getElementById("tuto-video").play()
     }
-    var Yx, bx = !1;
+    var LY, nY = !1;
 
-    function Tx() {
-        L = !0, window.DEFLY_SERVER_URL ? (n = window.DEFLY_SERVER_URL, zx()) : _x()
+    function cY() {
+        f = !0, window.DEFLY_SERVER_URL ? (W = window.DEFLY_SERVER_URL, xY()) : eY()
     }
 
-    function Dx() {
-        if (!L) {
-            if (Ex && !rx) {
+    function HY() {
+        if (!f) {
+            if (CY && !vY) {
                 document.body.requestFullscreen ? document.body.requestFullscreen() : document.body.mozRequestFullScreen ? document.body.mozRequestFullScreen() : document.body.webkitRequestFullscreen ? document.body.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT) : document.body.msRequestFullscreen && document.body.msRequestFullscreen();
                 try {
                     screen.orientation.lock("landscape")
-                } catch (I) {}
+                } catch (Z) {}
             }
-            Yx = Tx, (2 == aI || 2 == iI || iI > 2 && (iI - 2) % 2 == 0) && Ox() ? "undefined" != typeof gtag && gtag("event", "StartGame", {
+            LY = cY, (2 == KZ || 2 == EZ || EZ > 2 && (EZ - 2) % 2 == 0) && FY() ? "undefined" != typeof gtag && gtag("event", "StartGame", {
                 event_category: "Click",
                 event_label: "VideoAd",
-                playerSkin: kI,
-                playerSkinColor: yI
-            }) : (Tx(), "undefined" != typeof gtag && gtag("event", "StartGame", {
+                playerSkin: $Z,
+                playerSkinColor: tZ
+            }) : (cY(), "undefined" != typeof gtag && gtag("event", "StartGame", {
                 event_category: "Click",
                 event_label: "NoVideoAd",
-                playerSkin: kI,
-                playerSkinColor: yI
+                playerSkin: $Z,
+                playerSkinColor: tZ
             }))
         }
     }
 
-    function Bx() {
-        for (var I = 0; I <= 4; I++) document.getElementById("gamemode-" + I) && (aI == I ? document.getElementById("gamemode-" + I).classList.add("selected") : document.getElementById("gamemode-" + I).classList.remove("selected"))
+    function yY() {
+        for (var Z = 0; Z <= 4; Z++) document.getElementById("gamemode-" + Z) && (KZ == Z ? document.getElementById("gamemode-" + Z).classList.add("selected") : document.getElementById("gamemode-" + Z).classList.remove("selected"))
     }
-    var hx = !1;
+    var bY = !1;
 
-    function Ox() {
-        if (pu || Fs) return !1;
+    function FY() {
+        if (eR || kS) return !1;
         try {
-            if (hx = !0, window.famobi) window.famobi.showAd($x), "undefined" != typeof gtag && gtag("event", "ShowFamobiVideo", {
+            if (bY = !0, window.famobi) window.famobi.showAd(DY), "undefined" != typeof gtag && gtag("event", "ShowFamobiVideo", {
                 event_category: "Ads"
             });
             else {
-                if ("undefined" == typeof aiptag || !aiptag.cmd.player.push || 0 != aiptag.cmd.player.length) return hx = !1, "undefined" != typeof gtag && gtag("event", "BlockedAdInPlayVideo", {
+                if ("undefined" == typeof aiptag || !aiptag.cmd.player.push || 0 != aiptag.cmd.player.length) return bY = !1, "undefined" != typeof gtag && gtag("event", "BlockedAdInPlayVideo", {
                     event_category: "Ads"
                 }), !1;
                 aiptag.cmd.player.push(function() {
@@ -19943,1115 +19947,1115 @@ var defly = function() {
                 }), document.getElementById("defly-io_300x250").style.display = "none"
             }
             return !0
-        } catch (I) {
-            return console.error(I), hx = !1, !1
+        } catch (Z) {
+            return console.error(Z), bY = !1, !1
         }
     }
 
-    function $x() {
-        hx && (hx = !1, OI = Date.now(), Yx(), document.getElementById("defly-io_300x250").style.display = "block")
+    function DY() {
+        bY && (bY = !1, FZ = Date.now(), LY(), document.getElementById("defly-io_300x250").style.display = "block")
     }
 
-    function Xx() {
-        MainLoop.stop(), i && 1 == i.readyState && (Q = !0, i.close()), document.getElementById("fps").style.display = "none", a.view.style.display = "none", j = 0, "undefined" != typeof gtag && gtag("event", "BackToHomepage", {
+    function MY() {
+        MainLoop.stop(), E && 1 == E.readyState && (q = !0, E.close()), document.getElementById("fps").style.display = "none", K.view.style.display = "none", A = 0, "undefined" != typeof gtag && gtag("event", "BackToHomepage", {
             event_category: "Click"
         }), history.replaceState("", document.title, window.location.pathname + window.location.search), window.location.reload()
     }
-    var Px = 0;
+    var PY = 0;
 
-    function cx(I) {
-        var s = new DataView(I.data),
-            x = s.getUint8(0);
-        switch (x) {
+    function QY(Z) {
+        var S = new DataView(Z.data),
+            Y = S.getUint8(0);
+        switch (Y) {
             case 1:
-                console.error("received map unavailable"), Px++, 0 != aI && 1 != aI && 3 != aI || 1 != j ? 1 == aI && -1 != KW ? setTimeout(function() {
-                    pW(KW)
-                }, 250) : (Q = !0, i.close(), Vx = setTimeout(_x, 250)) : setTimeout(xZ, 250), Px >= 20 && (document.getElementById("spawn-warning").style.display = "block");
+                console.error("received map unavailable"), PY++, 0 != KZ && 1 != KZ && 3 != KZ || 1 != A ? 1 == KZ && -1 != io ? setTimeout(function() {
+                    zo(io)
+                }, 250) : (q = !0, E.close(), IY = setTimeout(eY, 250)) : setTimeout(_J, 250), PY >= 20 && (document.getElementById("spawn-warning").style.display = "block");
                 break;
             case 2:
-                ! function(I) {
+                ! function(Z) {
                     try {
-                        var s = document.getElementById("cp-iframe");
-                        s.parentNode.replaceChild(s.cloneNode(), s)
-                    } catch (I) {}
-                    G.removeChildren(), S.removeChildren(), E.removeChildren(), F.removeChildren(), A.removeChildren(), J.removeChildren(), g.removeChildren(), d.removeChildren(), r.removeChildren(), z.removeChildren(), Px = 0, bs = {}, zs = {}, qs = {}, eI = {}, Ys = {}, R = null, Ks = 0, m = 0, k = 0, AI = [0, 0, 0, 0, 0, 0, 0], FI = [0, 0, 0, 0, 0, 0, 0], SI = 0, U = {
+                        var S = document.getElementById("cp-iframe");
+                        S.parentNode.replaceChild(S.cloneNode(), S)
+                    } catch (Z) {}
+                    j.removeChildren(), X.removeChildren(), C.removeChildren(), k.removeChildren(), s.removeChildren(), a.removeChildren(), N.removeChildren(), T.removeChildren(), v.removeChildren(), x.removeChildren(), PY = 0, nS = {}, xS = {}, uS = {}, OZ = {}, LS = {}, V = null, iS = 0, p = 0, t = 0, sZ = [0, 0, 0, 0, 0, 0, 0], kZ = [0, 0, 0, 0, 0, 0, 0], XZ = 0, B = {
                         shooting: !1,
                         moving: !1,
                         aimDirection: 0,
                         moveDirection: 0
-                    }, oI = [], xI = [], qC = [], $Z = null, dI = -1, vI = !1, UI = 0, sI = 0, II = 0, tu = 60, Ts = I.getInt32(1), sI = I.getInt32(5), HI = I.getFloat32(9), wI = I.getFloat32(13), cI = I.getFloat32(17), cI *= cs, MI = I.getFloat32(21), nI = I.getFloat32(25), ks = I.getFloat32(29), ys = I.getFloat32(33), 84 * ys / 128, Rs = I.getFloat32(37), fs = I.getFloat32(41), ms = I.getFloat32(45), I.getFloat32(49), LI = I.getFloat32(53), QI = I.getFloat32(57), jI = I.getFloat32(61);
-                    var x = I.getFloat32(65),
-                        C = I.getFloat32(69);
-                    I.byteLength >= 76 && (Bs = I.getInt32(73), hs[Ts] = Bs);
-                    I.byteLength >= 80 && (Xs = I.getInt32(77));
-                    I.byteLength >= 82 && (ZI = I.getUint8(81), (0 == aI || 3 == aI || 4 == aI) && ZI >= 1 && (Cx[1] = 5066061));
-                    if (I.byteLength >= 83) {
-                        var W = I.getUint8(82);
-                        Es = (1 & W) > 0, rs = (2 & W) > 0, _s = 2 != aI && (4 & W) > 0
+                    }, rZ = [], YZ = [], u_ = [], MJ = null, TZ = -1, gZ = !1, BZ = 0, SZ = 0, ZZ = 0, KR = 60, cS = Z.getInt32(1), SZ = Z.getInt32(5), dZ = Z.getFloat32(9), lZ = Z.getFloat32(13), QZ = Z.getFloat32(17), QZ *= QS, GZ = Z.getFloat32(21), WZ = Z.getFloat32(25), $S = Z.getFloat32(29), tS = Z.getFloat32(33), 84 * tS / 128, VS = Z.getFloat32(37), US = Z.getFloat32(41), pS = Z.getFloat32(45), Z.getFloat32(49), fZ = Z.getFloat32(53), qZ = Z.getFloat32(57), AZ = Z.getFloat32(61);
+                    var Y = Z.getFloat32(65),
+                        _ = Z.getFloat32(69);
+                    Z.byteLength >= 76 && (yS = Z.getInt32(73), bS[cS] = yS);
+                    Z.byteLength >= 80 && (MS = Z.getInt32(77));
+                    Z.byteLength >= 82 && (JZ = Z.getUint8(81), (0 == KZ || 3 == KZ || 4 == KZ) && JZ >= 1 && (_Y[1] = 5066061));
+                    if (Z.byteLength >= 83) {
+                        var o = Z.getUint8(82);
+                        CS = (1 & o) > 0, vS = (2 & o) > 0, eS = 2 != KZ && (4 & o) > 0
                     }
-                    if (I.byteLength >= 83 + BI.length)
-                        for (var u = 0; u < BI.length; u++) BI[u] = I.getUint8(83 + u);
-                    var o = !1;
-                    if (I.byteLength >= 83 + BI.length + 1) {
-                        for (var N = 83 + BI.length, e = I.getUint8(N), f = "<tr>", y = "<tr>", u = 0; u < e; u++) {
-                            var K = I.getUint8(N + 1 + u);
-                            f += "<td>" + Ix[K] + "</td>", y += '<td><div class="icon" onclick="defly.selectSuperpower(' + K + ');"><img src="img/sp' + K + '.png"></div></td>'
+                    if (Z.byteLength >= 83 + yZ.length)
+                        for (var R = 0; R < yZ.length; R++) yZ[R] = Z.getUint8(83 + R);
+                    var r = !1;
+                    if (Z.byteLength >= 83 + yZ.length + 1) {
+                        for (var w = 83 + yZ.length, O = Z.getUint8(w), U = "<tr>", $ = "<tr>", R = 0; R < O; R++) {
+                            var i = Z.getUint8(w + 1 + R);
+                            U += "<td>" + ZY[i] + "</td>", $ += '<td><div class="icon" onclick="defly.selectSuperpower(' + i + ');"><img src="img/sp' + i + '.png"></div></td>'
                         }
-                        if (f += "</tr>", y += "</tr>", document.getElementById("choose-superpower").getElementsByTagName("table")[0].innerHTML = f + y, o = !0, N += 1 + e, I.byteLength >= N + 1)
-                            for (var p = I.getUint8(N), u = 0; u < p; u++) sx[u] = I.getFloat32(N + 1 + 8 * u + 0), xx[u] = I.getFloat32(N + 1 + 8 * u + 4)
+                        if (U += "</tr>", $ += "</tr>", document.getElementById("choose-superpower").getElementsByTagName("table")[0].innerHTML = U + $, r = !0, w += 1 + O, Z.byteLength >= w + 1)
+                            for (var z = Z.getUint8(w), R = 0; R < z; R++) SY[R] = Z.getFloat32(w + 1 + 8 * R + 0), YY[R] = Z.getFloat32(w + 1 + 8 * R + 4)
                     }
-                    iC(), 0 == aI || 1 == aI ? (O = new XZ(HI, wI, 2), X = new XZ(HI, wI, 2)) : 3 == aI && (O = new XZ(HI, wI, 2), X = new XZ(HI, wI, 2), P = new XZ(HI, wI, 2));
-                    4 != aI && (RI[Ts] = t);
-                    mI[Ts] = kI, CC(Ts);
-                    var _ = Cx[Ts],
-                        q = {};
-                    for (var Y in Cx) Y != Ts && Cx[Y] == _ && (q[Y] = !0);
-                    for (var Y in q) delete Cx[Y];
-                    bs[Ts].x = x, bs[Ts].y = C, ($I = new PIXI.Sprite(v["wall-line"])).anchor.set(.5), $I.height = ys, $I.alpha = .2, $I.tint = Wx(Ts), $I.visible = !1, A.addChild($I), (XI = new PIXI.Sprite(v.dot1)).anchor.set(.5), XI.width = 2 * MI, XI.height = 2 * MI, XI.alpha = .2, XI.tint = Wx(Ts), XI.visible = !1, J.addChild(XI), j = 1, TZ(), xI = [], MainLoop.start(), a.view.style.display = "block", (b = document.getElementById("defly-io_300x250")) && !pu && (b.parentElement.removeChild(b), document.getElementById("respawn-promo" + (2 == aI ? "-gm2" : 4 == aI ? "-gm4" : "")).appendChild(b));
-                    if (2 == aI && !pu) {
-                        var b = document.getElementById("defly-io_728x90");
-                        b && (b.parentElement.removeChild(b), document.getElementById("curse-promo-gm2").appendChild(b))
+                    E_(), 0 == KZ || 1 == KZ ? (D = new PJ(dZ, lZ, 2), M = new PJ(dZ, lZ, 2)) : 3 == KZ && (D = new PJ(dZ, lZ, 2), M = new PJ(dZ, lZ, 2), P = new PJ(dZ, lZ, 2));
+                    4 != KZ && (VZ[cS] = m);
+                    pZ[cS] = $Z, __(cS);
+                    var e = _Y[cS],
+                        u = {};
+                    for (var L in _Y) L != cS && _Y[L] == e && (u[L] = !0);
+                    for (var L in u) delete _Y[L];
+                    nS[cS].x = Y, nS[cS].y = _, (DZ = new PIXI.Sprite(g["wall-line"])).anchor.set(.5), DZ.height = tS, DZ.alpha = .2, DZ.tint = oY(cS), DZ.visible = !1, s.addChild(DZ), (MZ = new PIXI.Sprite(g.dot1)).anchor.set(.5), MZ.width = 2 * GZ, MZ.height = 2 * GZ, MZ.alpha = .2, MZ.tint = oY(cS), MZ.visible = !1, a.addChild(MZ), A = 1, HJ(), YZ = [], MainLoop.start(), K.view.style.display = "block", (n = document.getElementById("defly-io_300x250")) && !eR && (n.parentElement.removeChild(n), document.getElementById("respawn-promo" + (2 == KZ ? "-gm2" : 4 == KZ ? "-gm4" : "")).appendChild(n));
+                    if (2 == KZ && !eR) {
+                        var n = document.getElementById("defly-io_728x90");
+                        n && (n.parentElement.removeChild(n), document.getElementById("curse-promo-gm2").appendChild(n))
                     }
-                    if (1 == aI) {
-                        for (var T = "", u = 0; u < $s; u++) {
-                            var D = Hs[u + (ZI >= 1 ? 1 : 0)];
-                            16252714 == D && (D = 13817893);
-                            var B = Gx(D, .2);
-                            T += '<div class="bar" ' + (Bs == u + 1 + (ZI >= 1 ? 1 : 0) ? 'id="map-control-bar-value"' : 'id="map-control-bar-team-' + ((ZI >= 1 ? 2 : 0) + u) + '"') + ' style="background: linear-gradient(to bottom, ' + mu(D) + ", " + mu(B) + ');"></div>'
+                    if (1 == KZ) {
+                        for (var c = "", R = 0; R < DS; R++) {
+                            var H = dS[R + (JZ >= 1 ? 1 : 0)];
+                            16252714 == H && (H = 13817893);
+                            var y = jY(H, .2);
+                            c += '<div class="bar" ' + (yS == R + 1 + (JZ >= 1 ? 1 : 0) ? 'id="map-control-bar-value"' : 'id="map-control-bar-team-' + ((JZ >= 1 ? 2 : 0) + R) + '"') + ' style="background: linear-gradient(to bottom, ' + $R(H) + ", " + $R(y) + ');"></div>'
                         }
-                        document.getElementById("score-bars").innerHTML = T
+                        document.getElementById("score-bars").innerHTML = c
                     }
                     document.getElementById("play-button").style.display = "block", document.getElementById("play-spinner").style.display = "none", document.getElementById("respawn-button").style.display = "inline-block", document.getElementById("respawn-spinner").style.display = "none", document.getElementById("spawn-warning").style.display = "none", document.getElementById("homepage").style.display = "none", document.getElementById("respawn").style.display = "none", document.getElementById("upgrade-block").style.display = "none", document.getElementById("choose-team-popup") && (document.getElementById("choose-team-popup").style.display = "none");
-                    2 != aI && (document.getElementById("xp-block").style.display = "block");
-                    if (4 == aI) {
-                        var h = document.getElementById("xp-block");
-                        h.getElementsByClassName("score-bar")[0].style.display = "none", document.getElementById("xp-bar").style.display = "none"
+                    2 != KZ && (document.getElementById("xp-block").style.display = "block");
+                    if (4 == KZ) {
+                        var b = document.getElementById("xp-block");
+                        b.getElementsByClassName("score-bar")[0].style.display = "none", document.getElementById("xp-bar").style.display = "none"
                     }
-                    if (document.getElementById("level-value").innerHTML = 0, document.getElementById("xp-value").style.width = "0%", document.getElementById("upgrade-points").innerHTML = "0", document.getElementById("superpower-fuel").style.display = "none", document.getElementById("choose-superpower").style.display = "none", document.getElementById("lb-player-points").innerHTML = 0, document.getElementById("lb-player-name").innerHTML = t, document.getElementById("fps").style.display = "block", document.getElementById("hide-xp-block").style.display = "none", HI > wI) {
-                        var $ = Math.ceil(96 / HI * wI);
-                        V.width = 96, V.height = $
-                    } else if (wI > HI) {
-                        var M = Math.ceil(96 / wI * HI);
-                        document.getElementById("minimap").style.width = M + "px", V.width = M, V.height = 96
-                    } else V.width = 96, V.height = 96;
-                    if (document.getElementById("minimap").style.width = V.width + "px", document.getElementById("minimap").style.height = V.height + "px", 2 == aI) {
-                        var H = document.getElementById("minimap-target-positions");
-                        H || ((H = document.createElement("div")).setAttribute("id", "minimap-target-positions"), document.getElementById("minimap").insertBefore(H, document.getElementById("minimap-team-positions"))), H.innerHTML = ""
+                    if (document.getElementById("level-value").innerHTML = 0, document.getElementById("xp-value").style.width = "0%", document.getElementById("upgrade-points").innerHTML = "0", document.getElementById("superpower-fuel").style.display = "none", document.getElementById("choose-superpower").style.display = "none", document.getElementById("lb-player-points").innerHTML = 0, document.getElementById("lb-player-name").innerHTML = m, document.getElementById("fps").style.display = "block", document.getElementById("hide-xp-block").style.display = "none", dZ > lZ) {
+                        var F = Math.ceil(96 / dZ * lZ);
+                        I.width = 96, I.height = F
+                    } else if (lZ > dZ) {
+                        var G = Math.ceil(96 / lZ * dZ);
+                        document.getElementById("minimap").style.width = G + "px", I.width = G, I.height = 96
+                    } else I.width = 96, I.height = 96;
+                    if (document.getElementById("minimap").style.width = I.width + "px", document.getElementById("minimap").style.height = I.height + "px", 2 == KZ) {
+                        var d = document.getElementById("minimap-target-positions");
+                        d || ((d = document.createElement("div")).setAttribute("id", "minimap-target-positions"), document.getElementById("minimap").insertBefore(d, document.getElementById("minimap-team-positions"))), d.innerHTML = ""
                     }
-                    1 == Xs ? document.getElementById("minimap").style.clipPath = "polygon(0 50%, 25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%)" : 2 == Xs && (document.getElementById("minimap").style.borderRadius = "50%");
-                    EW(), 4 != aI && (document.getElementById("minimap").style.display = "block");
-                    Ex && (document.getElementById("minimap").style.right = "unset", document.getElementById("minimap").style.left = "4px", document.getElementById("minimap").style.transformOrigin = "bottom left", 1 != aI && 2 != aI || !document.getElementById("chat-button") || (document.getElementById("chat-button").style.display = "inline-block"));
+                    1 == MS ? document.getElementById("minimap").style.clipPath = "polygon(0 50%, 25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%)" : 2 == MS && (document.getElementById("minimap").style.borderRadius = "50%");
+                    Co(), 4 != KZ && (document.getElementById("minimap").style.display = "block");
+                    CY && (document.getElementById("minimap").style.right = "unset", document.getElementById("minimap").style.left = "4px", document.getElementById("minimap").style.transformOrigin = "bottom left", 1 != KZ && 2 != KZ || !document.getElementById("chat-button") || (document.getElementById("chat-button").style.display = "inline-block"));
                     document.getElementById("score").style.display = "block";
-                    for (var u = 0; u < 7; u++) document.getElementById("skill-plus-" + u).style.display = "block";
+                    for (var R = 0; R < 7; R++) document.getElementById("skill-plus-" + R).style.display = "block";
                     document.getElementById("map-vote") && (document.getElementById("map-vote").style.display = "none");
                     (function() {
-                        Z = (new Date).getTime();
-                        var I = new Uint8Array(1);
-                        I.set([99], 0), i.send(I)
-                    })(), 1 != aI && 2 != aI || Ex || (_C("Welcome to Team " + js[Bs - 1] + ". Press TAB to show your teammates positions", Ws ? "info-dark" : "info"), Zs || _C(KI || pI ? "Press ENTER to chat with your teammates" : "Chat is disabled for anonymous players. Sign-in with an account to use the chat.", Ws ? "info-dark" : "info"));
-                    if (2 == aI) document.getElementById("buy-screen").style.display = "block";
-                    else if (!o && 3 == aI) {
-                        var w = document.getElementById("choose-superpower"),
-                            Q = w.getElementsByTagName("td");
-                        Q[3].innerHTML = "Grenade", Q[9].innerHTML = '<div class="icon" onclick="defly.selectSuperpower(6);"><img src="img/sp6.png"></div>'
+                        J = (new Date).getTime();
+                        var Z = new Uint8Array(1);
+                        Z.set([99], 0), E.send(Z)
+                    })(), 1 != KZ && 2 != KZ || CY || (e_("Welcome to Team " + AS[yS - 1] + ". Press TAB to show your teammates positions", oS ? "info-dark" : "info"), JS || e_(iZ || zZ ? "Press ENTER to chat with your teammates" : "Chat is disabled for anonymous players. Sign-in with an account to use the chat.", oS ? "info-dark" : "info"));
+                    if (2 == KZ) document.getElementById("buy-screen").style.display = "block";
+                    else if (!r && 3 == KZ) {
+                        var l = document.getElementById("choose-superpower"),
+                            q = l.getElementsByTagName("td");
+                        q[3].innerHTML = "Grenade", q[9].innerHTML = '<div class="icon" onclick="defly.selectSuperpower(6);"><img src="img/sp6.png"></div>'
                     }
-                    eC(), JC = (new Date).getTime(), WZ && (bs[Ts].visible = $I.visible = XI.visible = !1, R = bs[Ts].position, clearTimeout(yW));
-                    Js || (window.location.hash = "#" + aI + "-" + n.replace(".defly.io", ""));
-                    WZ || !Fs || 0 != aI && 3 != aI || (ZZ(1, window.prompt("?", "")), ZZ(5), uC = setInterval(function() {
-                        ZZ(5)
+                    O_(), a_ = (new Date).getTime(), JJ && (nS[cS].visible = DZ.visible = MZ.visible = !1, V = nS[cS].position, clearTimeout(to));
+                    aS || (window.location.hash = "#" + KZ + "-" + W.replace(".defly.io", ""));
+                    JJ || !kS || 0 != KZ && 3 != KZ || (RJ(1, window.prompt("?", "")), RJ(5), R_ = setInterval(function() {
+                        RJ(5)
                     }, 6e4));
-                    c && (clearInterval(c), c = null);
-                    if (4 == aI)
-                        if (0 != ds) {
-                            document.getElementById("spectate-1v1-ui").style.display = "none", document.getElementById("gm-1v1-lobby").style.display = "none", document.getElementById("chat-block").classList.remove("typing"), document.getElementById("chat-block").classList.remove("gm-1v1-lobby"), document.getElementById("chat-input").blur(), U.moving = !1, fZ[0] = !1, fZ[1] = !1, fZ[2] = !1, fZ[3] = !1;
-                            var L = document.createElement("div");
-                            L.setAttribute("id", "countdown-1v1"), L.innerText = "5", document.body.appendChild(L);
-                            let I = Date.now(),
-                                s = setInterval(function() {
-                                    let x = Date.now() - I;
-                                    x >= 5e3 ? (clearInterval(s), L.innerText = "GO!", anime({
-                                        targets: L,
+                    Q && (clearInterval(Q), Q = null);
+                    if (4 == KZ)
+                        if (0 != TS) {
+                            document.getElementById("spectate-1v1-ui").style.display = "none", document.getElementById("gm-1v1-lobby").style.display = "none", document.getElementById("chat-block").classList.remove("typing"), document.getElementById("chat-block").classList.remove("gm-1v1-lobby"), document.getElementById("chat-input").blur(), B.moving = !1, pJ[0] = !1, pJ[1] = !1, pJ[2] = !1, pJ[3] = !1;
+                            var f = document.createElement("div");
+                            f.setAttribute("id", "countdown-1v1"), f.innerText = "5", document.body.appendChild(f);
+                            let Z = Date.now(),
+                                S = setInterval(function() {
+                                    let Y = Date.now() - Z;
+                                    Y >= 5e3 ? (clearInterval(S), f.innerText = "GO!", anime({
+                                        targets: f,
                                         easing: "linear",
                                         duration: 1e3,
                                         opacity: 0,
                                         complete: function() {
-                                            document.body.removeChild(L)
+                                            document.body.removeChild(f)
                                         }
-                                    })) : L.innerText = Math.ceil((5e3 - x) / 1e3)
+                                    })) : f.innerText = Math.ceil((5e3 - Y) / 1e3)
                                 }, 100)
-                        } else R = bs[Ts].position, bs[Ts].visible = !1
-                }(s);
+                        } else V = nS[cS].position, nS[cS].visible = !1
+                }(S);
                 break;
             case 3:
-                Mx((new Date).getTime() - uI.shift());
+                GY((new Date).getTime() - RZ.shift());
                 break;
             case 4:
-                ! function(I) {
-                    JC = (new Date).getTime();
-                    var s = I.getInt32(1);
-                    if (sI - (II = s) >= 4) {
-                        var x = Math.max(1, Math.ceil((sI - II) / 10));
-                        0, sI -= Math.max(1, Math.ceil((sI - II) / 10)), bW(-x)
+                ! function(Z) {
+                    a_ = (new Date).getTime();
+                    var S = Z.getInt32(1);
+                    if (SZ - (ZZ = S) >= 4) {
+                        var Y = Math.max(1, Math.ceil((SZ - ZZ) / 10));
+                        0, SZ -= Math.max(1, Math.ceil((SZ - ZZ) / 10)), no(-Y)
                     }
-                    if (II - sI >= 4) {
-                        var x = Math.max(1, Math.ceil((II - sI) / 10));
-                        0, sI += x, bW(x)
+                    if (ZZ - SZ >= 4) {
+                        var Y = Math.max(1, Math.ceil((ZZ - SZ) / 10));
+                        0, SZ += Y, no(Y)
                     }
-                    if (II > sI) return void xI.push({
-                        turn: II,
-                        dv: I
+                    if (ZZ > SZ) return void YZ.push({
+                        turn: ZZ,
+                        dv: Z
                     });
-                    if (SC(I), sI - II > 0)
-                        for (var C = 0; C < Math.min(60, sI - II); C++) 2 == aI && 1 == Ks || 4 == aI && sI < 300 || (jZ(!0, !1), bs[Ts] && MZ(bs[Ts], !0))
-                }(s);
+                    if (X_(Z), SZ - ZZ > 0)
+                        for (var _ = 0; _ < Math.min(60, SZ - ZZ); _++) 2 == KZ && 1 == iS || 4 == KZ && SZ < 300 || (fJ(!0, !1), nS[cS] && WJ(nS[cS], !0))
+                }(S);
                 break;
             case 5:
-                ! function(I) {
-                    var s = I.getUint8(1);
-                    if (3 == s) return;
-                    if (2 == s && ++rC > 10) return;
-                    var x = document.getElementById("user-error");
-                    x || ((x = document.createElement("div")).setAttribute("class", "user-error"), x.setAttribute("id", "user-error"), window.document.body.appendChild(x));
-                    x.innerHTML = dC[s - 1], x.style.opacity = 1, clearTimeout(AC), clearInterval(FC), AC = setTimeout(function() {
-                        var I = (new Date).getTime();
-                        FC = setInterval(function() {
-                            var s = (new Date).getTime() - I;
-                            s > 500 ? (clearInterval(FC), window.document.body.removeChild(x)) : x.style.opacity = 1 - s / 500
+                ! function(Z) {
+                    var S = Z.getUint8(1);
+                    if (3 == S) return;
+                    if (2 == S && ++v_ > 10) return;
+                    var Y = document.getElementById("user-error");
+                    Y || ((Y = document.createElement("div")).setAttribute("class", "user-error"), Y.setAttribute("id", "user-error"), window.document.body.appendChild(Y));
+                    Y.innerHTML = T_[S - 1], Y.style.opacity = 1, clearTimeout(s_), clearInterval(k_), s_ = setTimeout(function() {
+                        var Z = (new Date).getTime();
+                        k_ = setInterval(function() {
+                            var S = (new Date).getTime() - Z;
+                            S > 500 ? (clearInterval(k_), window.document.body.removeChild(Y)) : Y.style.opacity = 1 - S / 500
                         }, 20)
                     }, 1e3)
-                }(s);
+                }(S);
                 break;
             case 6:
-                IW(s);
+                Zo(S);
                 break;
             case 49:
-                ! function(I) {
-                    for (var s = MI, x = I.getInt16(1), C = 3, W = 0; W < x; W++) {
-                        var Z = I.getInt32(C),
-                            u = I.getInt32(C + 4),
-                            o = I.getFloat32(C + 8),
-                            N = I.getFloat32(C + 12),
-                            i = I.getUint8(C + 16),
-                            t = I.getUint8(C + 17),
-                            a = I.getFloat32(C + 18),
-                            e = I.getInt32(C + 22);
-                        if (C += 26, zs[Z]) 0;
+                ! function(Z) {
+                    for (var S = GZ, Y = Z.getInt16(1), _ = 3, o = 0; o < Y; o++) {
+                        var J = Z.getInt32(_),
+                            R = Z.getInt32(_ + 4),
+                            r = Z.getFloat32(_ + 8),
+                            w = Z.getFloat32(_ + 12),
+                            E = Z.getUint8(_ + 16),
+                            m = Z.getUint8(_ + 17),
+                            K = Z.getFloat32(_ + 18),
+                            O = Z.getInt32(_ + 22);
+                        if (_ += 26, xS[J]) 0;
                         else {
-                            var G = xW(u, i, t),
-                                S = new PIXI.Sprite(v[G]);
-                            S.x = o, S.y = N, S.width = 2 * s, S.height = 2 * s, S.size = s, S.anchor.set(.5), S.owner = u, S.hp = i, S.maxHP = t, S.creationTurn = e, S.alpha = 1, S.tint = 1 == aI || 2 == aI ? Zx(u) : Wx(u), es && 1 == u && o >= Gs.x1 && o <= Gs.x2 && N >= Gs.y1 && N <= Gs.y2 && v["tower-kh"] && (S.texture = v["tower-kh"], S.tint = 15642415), S.lines = [], S.dotId = Z, J.addChild(S), zs[Z] = S, S.hp != S.maxHP && 3 != aI && (S.healthBar = AW(S), g.addChild(S.healthBar), S.healthBar.outer.width = S.healthBar.width * S.hp / S.maxHP), a > 0 && sW(S, a), 0 != aI && 3 != aI || u != Ts || (Wu = !0), O && (O.add(S, S.position), 3 == aI && tW(S))
+                            var j = Yo(R, E, m),
+                                X = new PIXI.Sprite(g[j]);
+                            X.x = r, X.y = w, X.width = 2 * S, X.height = 2 * S, X.size = S, X.anchor.set(.5), X.owner = R, X.hp = E, X.maxHP = m, X.creationTurn = O, X.alpha = 1, X.tint = 1 == KZ || 2 == KZ ? JY(R) : oY(R), OS && 1 == R && r >= jS.x1 && r <= jS.x2 && w >= jS.y1 && w <= jS.y2 && g["tower-kh"] && (X.texture = g["tower-kh"], X.tint = 15642415), X.lines = [], X.dotId = J, a.addChild(X), xS[J] = X, X.hp != X.maxHP && 3 != KZ && (X.healthBar = so(X), N.addChild(X.healthBar), X.healthBar.outer.width = X.healthBar.width * X.hp / X.maxHP), K > 0 && So(X, K), 0 != KZ && 3 != KZ || R != cS || (JR = !0), D && (D.add(X, X.position), 3 == KZ && mo(X))
                         }
                     }
-                }(s);
+                }(S);
                 break;
             case 7:
-                CW(s);
+                _o(S);
                 break;
             case 50:
-                ! function(I) {
-                    for (var s = I.getInt16(1), x = 3, C = 0; C < s; C++) {
-                        var W = I.getInt32(x),
-                            Z = I.getInt32(x + 4),
-                            u = I.getInt32(x + 8),
-                            o = I.getInt32(x + 12),
-                            N = I.getInt32(x + 16),
-                            i = I.getInt32(x + 20);
-                        x += 24;
-                        var t = zs[u],
-                            a = zs[o];
-                        if (t || console.error("could not find dot", u), a || console.error("could not find dot", o), qs[W]) 0;
+                ! function(Z) {
+                    for (var S = Z.getInt16(1), Y = 3, _ = 0; _ < S; _++) {
+                        var o = Z.getInt32(Y),
+                            J = Z.getInt32(Y + 4),
+                            R = Z.getInt32(Y + 8),
+                            r = Z.getInt32(Y + 12),
+                            w = Z.getInt32(Y + 16),
+                            E = Z.getInt32(Y + 20);
+                        Y += 24;
+                        var m = xS[R],
+                            K = xS[r];
+                        if (m || console.error("could not find dot", R), K || console.error("could not find dot", r), uS[o]) 0;
                         else {
-                            var e = wx(t, a);
-                            e.lineId = W, e.owner = Z, e.tint = 1 == aI || 2 == aI ? Zx(Z) : Wx(Z), es && 15642415 == t.tint && (e.tint = 15642415), e.dot1 = t, e.dot2 = a, e.leftZoneId = N, e.rightZoneId = i, A.addChild(e), qs[W] = e, X && X.addLine(e, t.position, a.position), s < 20 ? (e.alpha = 0, anime({
-                                targets: e,
-                                alpha: 3 == aI && t.isCaptured ? .6 : 1,
+                            var O = lY(m, K);
+                            O.lineId = o, O.owner = J, O.tint = 1 == KZ || 2 == KZ ? JY(J) : oY(J), OS && 15642415 == m.tint && (O.tint = 15642415), O.dot1 = m, O.dot2 = K, O.leftZoneId = w, O.rightZoneId = E, s.addChild(O), uS[o] = O, M && M.addLine(O, m.position, K.position), S < 20 ? (O.alpha = 0, anime({
+                                targets: O,
+                                alpha: 3 == KZ && m.isCaptured ? .6 : 1,
                                 duration: 250,
                                 easing: "linear"
-                            })) : 3 == aI && t.isCaptured && (e.alpha = .6)
+                            })) : 3 == KZ && m.isCaptured && (O.alpha = .6)
                         }
                     }
-                }(s);
+                }(S);
                 break;
             case 8:
-                uW(s, !0);
+                Ro(S, !0);
                 break;
             case 20:
-                uW(s, !1);
+                Ro(S, !1);
                 break;
             case 51:
-                ! function(I) {
-                    for (var s = I.getInt16(1), x = 3, C = 0; C < s; C++) x = oW(I, x, !1, !1);
-                    var W = I.getInt16(x);
-                    x += 2;
-                    for (var C = 0; C < W; C++) x = oW(I, x, !1, !0);
-                    var Z = I.getInt16(x);
-                    x += 2;
-                    for (var C = 0; C < Z; C++) {
-                        var u = 0 == I.getUint8(x);
-                        x = oW(I, ++x, !0, u)
+                ! function(Z) {
+                    for (var S = Z.getInt16(1), Y = 3, _ = 0; _ < S; _++) Y = ro(Z, Y, !1, !1);
+                    var o = Z.getInt16(Y);
+                    Y += 2;
+                    for (var _ = 0; _ < o; _++) Y = ro(Z, Y, !1, !0);
+                    var J = Z.getInt16(Y);
+                    Y += 2;
+                    for (var _ = 0; _ < J; _++) {
+                        var R = 0 == Z.getUint8(Y);
+                        Y = ro(Z, ++Y, !0, R)
                     }
-                }(s);
+                }(S);
                 break;
             case 9:
-                rW(s);
+                vo(S);
                 break;
             case 10:
-                kW(s);
+                $o(S);
                 break;
             case 52:
-                ! function(I) {
-                    fW(I.getInt32(1))
-                }(s);
+                ! function(Z) {
+                    Uo(Z.getInt32(1))
+                }(S);
                 break;
             case 11:
-                ! function(I) {
-                    var s = I.getInt16(1),
-                        x = I.getInt16(3),
-                        C = I.getInt32(5),
-                        W = I.getFloat32(9);
-                    W < 0 && (W = 0);
-                    for (var Z = I.getUint8(21), u = [], o = 22, N = "", i = 0; i < Z; i++) {
-                        u[i] = {
-                            id: I.getInt32(o),
-                            points: I.getInt32(o + 4)
-                        }, o += 8;
-                        var t = x == i;
-                        if (!Ex || i < 5) {
-                            var a = 1 == aI || 2 == aI ? Zx(hs[u[i].id]) : Wx(u[i].id);
-                            N += '<div class="lb-item' + (t ? " is-self" : "") + '"><span class="color" style="background-color: ' + mu(a) + '"></span><span class="rank">' + (i + 1) + '.</span><span class="player-name' + (i + 1 >= 10 ? " l" : "") + '">' + Sx(RI[u[i].id]) + '</span><span class="points">' + u[i].points + "</span></div>"
+                ! function(Z) {
+                    var S = Z.getInt16(1),
+                        Y = Z.getInt16(3),
+                        _ = Z.getInt32(5),
+                        o = Z.getFloat32(9);
+                    o < 0 && (o = 0);
+                    for (var J = Z.getUint8(21), R = [], r = 22, w = "", E = 0; E < J; E++) {
+                        R[E] = {
+                            id: Z.getInt32(r),
+                            points: Z.getInt32(r + 4)
+                        }, r += 8;
+                        var m = Y == E;
+                        if (!CY || E < 5) {
+                            var K = 1 == KZ || 2 == KZ ? JY(bS[R[E].id]) : oY(R[E].id);
+                            w += '<div class="lb-item' + (m ? " is-self" : "") + '"><span class="color" style="background-color: ' + $R(K) + '"></span><span class="rank">' + (E + 1) + '.</span><span class="player-name' + (E + 1 >= 10 ? " l" : "") + '">' + XY(VZ[R[E].id]) + '</span><span class="points">' + R[E].points + "</span></div>"
                         }
                     }
-                    if (document.getElementById("lb-top").innerHTML = N, document.getElementById("player-count").innerHTML = s, document.getElementById("lb-player-rank").innerHTML = x + 1, document.getElementById("lb-player-points").innerHTML = C, document.getElementById("lb-player-line").style.display = x < (Ex ? 5 : u.length) ? "none" : "block", !WZ) {
-                        var e = 100 * W / NC;
-                        1 != aI && (document.getElementById("map-control-value").innerHTML = qW(e > 99.9 ? 100 : e), document.getElementById("map-control-bar-value").style.width = e + "%"), 2 != aI && 3 != aI && YW < 80 && e >= 80 && !LC && vC("You reached 80%, now kill everyone to win!", 2e4), YW = e
+                    if (document.getElementById("lb-top").innerHTML = w, document.getElementById("player-count").innerHTML = S, document.getElementById("lb-player-rank").innerHTML = Y + 1, document.getElementById("lb-player-points").innerHTML = _, document.getElementById("lb-player-line").style.display = Y < (CY ? 5 : R.length) ? "none" : "block", !JJ) {
+                        var O = 100 * o / w_;
+                        1 != KZ && (document.getElementById("map-control-value").innerHTML = uo(O > 99.9 ? 100 : O), document.getElementById("map-control-bar-value").style.width = O + "%"), 2 != KZ && 3 != KZ && Lo < 80 && O >= 80 && !f_ && g_("You reached 80%, now kill everyone to win!", 2e4), Lo = O
                     }
-                    4 != aI && (document.getElementById("leaderboard-block").style.display = R && !WZ ? "none" : "block")
-                }(s);
+                    4 != KZ && (document.getElementById("leaderboard-block").style.display = V && !JJ ? "none" : "block")
+                }(S);
                 break;
             case 12:
-                ! function(I) {
-                    var s = I.getInt32(1);
-                    if (0 == s) $Z = null, $I.visible = !1;
+                ! function(Z) {
+                    var S = Z.getInt32(1);
+                    if (0 == S) MJ = null, DZ.visible = !1;
                     else {
-                        var x = zs[s];
-                        $Z = x
+                        var Y = xS[S];
+                        MJ = Y
                     }
-                }(s);
+                }(S);
                 break;
             case 13:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getInt32(5),
-                        C = I.getInt32(9),
-                        W = I.getInt32(13),
-                        Z = I.getFloat32(17),
-                        u = I.getFloat32(21),
-                        o = I.getFloat32(25),
-                        N = I.getFloat32(29),
-                        i = I.getInt32(33);
-                    if (eI[x]) var t = eI[x];
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getInt32(5),
+                        _ = Z.getInt32(9),
+                        o = Z.getInt32(13),
+                        J = Z.getFloat32(17),
+                        R = Z.getFloat32(21),
+                        r = Z.getFloat32(25),
+                        w = Z.getFloat32(29),
+                        E = Z.getInt32(33);
+                    if (OZ[Y]) var m = OZ[Y];
                     else {
-                        if (!Ss || 1 != aI && 2 != aI || C == Bs)
-                            if (Ss && 0 == aI && C != Ts) var a = "shoot-enemy";
-                            else var a = "shoot";
-                        else var a = "shoot-enemy";
-                        var t = new PIXI.Sprite(v[a]);
-                        t.width = 2 * nI * (Ns ? 1.1 : 1), t.height = 2 * nI * (Ns ? 1.1 : 1), t.anchor.set(.5), t.owner = C, t.creator = W, t.tint = Gx(1 == aI || 2 == aI ? Zx(C) : Wx(C), "shoot-enemy" == a ? 0 : -.2), d.addChild(t), t.shootId = x, eI[x] = t
+                        if (!XS || 1 != KZ && 2 != KZ || _ == yS)
+                            if (XS && 0 == KZ && _ != cS) var K = "shoot-enemy";
+                            else var K = "shoot";
+                        else var K = "shoot-enemy";
+                        var m = new PIXI.Sprite(g[K]);
+                        m.width = 2 * WZ * (wS ? 1.1 : 1), m.height = 2 * WZ * (wS ? 1.1 : 1), m.anchor.set(.5), m.owner = _, m.creator = o, m.tint = jY(1 == KZ || 2 == KZ ? JY(_) : oY(_), "shoot-enemy" == K ? 0 : -.2), T.addChild(m), m.shootId = Y, OZ[Y] = m
                     }
-                    t.x = Z, t.y = u, t.sx = o, t.sy = N, (ts || as) && (t.rotation = Math.atan2(N, o));
-                    t.initialTurn = s, t.initialX = Z, t.initialY = u, t.lifetime = i;
-                    var e = sI - s;
-                    TW(t, e), 0
-                }(s);
+                    m.x = J, m.y = R, m.sx = r, m.sy = w, (mS || KS) && (m.rotation = Math.atan2(w, r));
+                    m.initialTurn = S, m.initialX = J, m.initialY = R, m.lifetime = E;
+                    var O = SZ - S;
+                    co(m, O), 0
+                }(S);
                 break;
             case 14:
-                ! function(I) {
-                    var s = I.getInt32(1);
-                    if (eI[s]) {
-                        var x = eI[s];
-                        delete eI[s], d.removeChild(x)
+                ! function(Z) {
+                    var S = Z.getInt32(1);
+                    if (OZ[S]) {
+                        var Y = OZ[S];
+                        delete OZ[S], T.removeChild(Y)
                     }
-                }(s);
+                }(S);
                 break;
             case 15:
-                DW(s);
+                Ho(S);
                 break;
             case 32:
-                DW(s, !0);
+                Ho(S, !0);
                 break;
             case 16:
-                BW(s, !0, !1);
+                yo(S, !0, !1);
                 break;
             case 17:
-                BW(s, !0, !0);
+                yo(S, !0, !0);
                 break;
             case 18:
-                BW(s, !1, !1);
+                yo(S, !1, !1);
                 break;
             case 19:
-                BW(s, !1, !0);
+                yo(S, !1, !0);
                 break;
             case 21:
-                ! function(I) {
-                    var s = m;
-                    m = I.getUint8(1);
-                    k = I.getFloat32(2), SI = I.getUint8(6);
-                    for (var x = 0, C = 0; C < AI.length; C++) AI[C] = I.getUint8(7 + C), x += AI[C], document.getElementById("skill-bar-" + C).innerHTML = hW('<span class="full"></span>', AI[C]) + hW("<span></span>", BI[C] - AI[C]), document.getElementById("skill-plus-" + C).style.display = 0 == SI || AI[C] >= BI[C] ? "none" : "block";
+                ! function(Z) {
+                    var S = p;
+                    p = Z.getUint8(1);
+                    t = Z.getFloat32(2), XZ = Z.getUint8(6);
+                    for (var Y = 0, _ = 0; _ < sZ.length; _++) sZ[_] = Z.getUint8(7 + _), Y += sZ[_], document.getElementById("skill-bar-" + _).innerHTML = bo('<span class="full"></span>', sZ[_]) + bo("<span></span>", yZ[_] - sZ[_]), document.getElementById("skill-plus-" + _).style.display = 0 == XZ || sZ[_] >= yZ[_] ? "none" : "block";
                     (function() {
-                        for (let I = 0; I < AI.length; I++) AI[I] != FI[I] && JI.push(I), FI[I] = AI[I]
-                    })(), SI > 0 ? (document.getElementById("upgrade-points").innerHTML = SI, document.getElementById("upgrade-block").style.display = "block", anime({
+                        for (let Z = 0; Z < sZ.length; Z++) sZ[Z] != kZ[Z] && aZ.push(Z), kZ[Z] = sZ[Z]
+                    })(), XZ > 0 ? (document.getElementById("upgrade-points").innerHTML = XZ, document.getElementById("upgrade-block").style.display = "block", anime({
                         targets: "#upgrade-block",
                         easing: "easeInQuad",
                         left: "16px",
                         duration: 250,
                         complete: function() {
-                            SI <= 0 && (document.getElementById("upgrade-block").style.left = "-264px", document.getElementById("upgrade-block").style.display = "none")
+                            XZ <= 0 && (document.getElementById("upgrade-block").style.left = "-264px", document.getElementById("upgrade-block").style.display = "none")
                         }
-                    })) : document.getElementById("upgrade-points").innerHTML = SI;
-                    SI > 0 && 0 == x && function() {
-                        if (JI.length > 0) {
+                    })) : document.getElementById("upgrade-points").innerHTML = XZ;
+                    XZ > 0 && 0 == Y && function() {
+                        if (aZ.length > 0) {
                             document.getElementById("upgrade-block").classList.add("ask-redo");
-                            for (var I = [], s = 0; s < AI.length; s++) document.getElementById("skill-plus-" + s).style.display = "none", I[s] = 0;
-                            for (var x = 0, s = 0; s < JI.length && !(I[JI[s]] < BI[JI[s]] && (I[JI[s]]++, ++x >= SI)); s++);
-                            for (var s = 0; s < AI.length; s++) document.getElementById("skill-bar-" + s).innerHTML = hW('<span class="full"></span>', I[s]) + hW("<span></span>", BI[s] - I[s])
+                            for (var Z = [], S = 0; S < sZ.length; S++) document.getElementById("skill-plus-" + S).style.display = "none", Z[S] = 0;
+                            for (var Y = 0, S = 0; S < aZ.length && !(Z[aZ[S]] < yZ[aZ[S]] && (Z[aZ[S]]++, ++Y >= XZ)); S++);
+                            for (var S = 0; S < sZ.length; S++) document.getElementById("skill-bar-" + S).innerHTML = bo('<span class="full"></span>', Z[S]) + bo("<span></span>", yZ[S] - Z[S])
                         }
                     }();
-                    var W = s == m ? k : 1,
-                        Z = !0,
-                        u = 1e3 / (m - s + 1),
-                        o = function() {
-                            !Z && s < m && (document.getElementById("xp-value").style.width = "0%", s++, document.getElementById("level-value").innerHTML = s, W = s == m ? k : 1), Z = !1;
-                            var I = {
+                    var o = S == p ? t : 1,
+                        J = !0,
+                        R = 1e3 / (p - S + 1),
+                        r = function() {
+                            !J && S < p && (document.getElementById("xp-value").style.width = "0%", S++, document.getElementById("level-value").innerHTML = S, o = S == p ? t : 1), J = !1;
+                            var Z = {
                                 targets: "#xp-value",
-                                width: [document.getElementById("xp-value").style.width, 100 * W + "%"],
+                                width: [document.getElementById("xp-value").style.width, 100 * o + "%"],
                                 easing: "linear",
-                                duration: u
+                                duration: R
                             };
-                            s < m && (I.complete = o), anime(I)
+                            S < p && (Z.complete = r), anime(Z)
                         };
-                    o();
-                    m > s && m >= 32 ? (document.getElementById("hide-xp-block").style.display = "block", PW = (new Date).getTime()) : s >= 32 && (new Date).getTime() - PW > 6e4 && (document.getElementById("xp-bar").style.display = "none");
-                    uu = x > 0
-                }(s);
+                    r();
+                    p > S && p >= 32 ? (document.getElementById("hide-xp-block").style.display = "block", Po = (new Date).getTime()) : S >= 32 && (new Date).getTime() - Po > 6e4 && (document.getElementById("xp-bar").style.display = "none");
+                    rR = Y > 0
+                }(S);
                 break;
             case 22:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getInt32(5);
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getInt32(5);
                     0;
-                    if (eI[x]) {
-                        var C = eI[x];
-                        delete eI[x], d.removeChild(C)
+                    if (OZ[Y]) {
+                        var _ = OZ[Y];
+                        delete OZ[Y], T.removeChild(_)
                     }
-                    if (zs[s]) {
-                        var W = zs[s];
-                        W.healthBar || 3 == aI || (W.healthBar = AW(W), g.addChild(W.healthBar)), W.hp -= 1, 3 == aI ? W.texture = v["dot" + W.hp + "-" + W.maxHP] : W.healthBar.outer.width = W.healthBar.width * W.hp / W.maxHP
+                    if (xS[S]) {
+                        var o = xS[S];
+                        o.healthBar || 3 == KZ || (o.healthBar = so(o), N.addChild(o.healthBar)), o.hp -= 1, 3 == KZ ? o.texture = g["dot" + o.hp + "-" + o.maxHP] : o.healthBar.outer.width = o.healthBar.width * o.hp / o.maxHP
                     }
-                }(s);
+                }(S);
                 break;
             case 30:
-                ! function(I) {
-                    var s = I.getInt32(1);
+                ! function(Z) {
+                    var S = Z.getInt32(1);
                     0;
-                    if (zs[s]) {
-                        var x = zs[s];
-                        if (I.byteLength >= 10) {
-                            x.maxHP = I.getUint8(5);
-                            var C = I.getFloat32(6);
-                            x.shield || sW(x, C), x.shield.appearPercent = C, x.shield.lastAppearTurn = -1e3, x.shield.state = 0, x.shield.alpha = 0
+                    if (xS[S]) {
+                        var Y = xS[S];
+                        if (Z.byteLength >= 10) {
+                            Y.maxHP = Z.getUint8(5);
+                            var _ = Z.getFloat32(6);
+                            Y.shield || So(Y, _), Y.shield.appearPercent = _, Y.shield.lastAppearTurn = -1e3, Y.shield.state = 0, Y.shield.alpha = 0
                         }
-                        x.hp = x.maxHP, 3 == aI ? x.texture = v["dot" + x.hp + "-" + x.maxHP] : x.healthBar && (g.removeChild(x.healthBar), delete x.healthBar)
+                        Y.hp = Y.maxHP, 3 == KZ ? Y.texture = g["dot" + Y.hp + "-" + Y.maxHP] : Y.healthBar && (N.removeChild(Y.healthBar), delete Y.healthBar)
                     }
-                }(s);
+                }(S);
                 break;
             case 23:
                 document.getElementById("choose-superpower").style.display = "block";
                 break;
             case 24:
-                ! function(I) {
-                    rI = I.getFloat32(1);
-                    var s = vI;
-                    vI = 1 == I.getUint8(5), cW(), !s && vI && 4 != dI && 6 != dI && anime({
+                ! function(Z) {
+                    vZ = Z.getFloat32(1);
+                    var S = gZ;
+                    gZ = 1 == Z.getUint8(5), Qo(), !S && gZ && 4 != TZ && 6 != TZ && anime({
                         targets: "#superpower-fuel-value",
                         width: ["100%", "0%"],
                         easing: "linear",
-                        duration: 1e3 * sx[dI]
+                        duration: 1e3 * SY[TZ]
                     })
-                }(s);
+                }(S);
                 break;
             case 25:
-                var C = s.getInt32(1),
-                    W = s.getInt32(5);
-                Cx[W] || Wx(W), Cx[C] = Cx[W], W == Ts && (Ds = C);
+                var _ = S.getInt32(1),
+                    o = S.getInt32(5);
+                _Y[o] || oY(o), _Y[_] = _Y[o], o == cS && (HS = _);
                 break;
             case 26:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getFloat32(5),
-                        C = I.getFloat32(9),
-                        W = I.getFloat32(13),
-                        Z = I.getFloat32(17),
-                        u = new PIXI.Sprite(v.flashbang);
-                    u.anchor.set(.5), u.position.set(x, C), u.width = .75 * cI, u.height = .75 * cI, d.addChild(u);
-                    var o = 0;
-                    s == Ts ? o = .5 : 1 == aI && hs[s] == Bs ? o = .5 : R && (o = .5);
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getFloat32(5),
+                        _ = Z.getFloat32(9),
+                        o = Z.getFloat32(13),
+                        J = Z.getFloat32(17),
+                        R = new PIXI.Sprite(g.flashbang);
+                    R.anchor.set(.5), R.position.set(Y, _), R.width = .75 * QZ, R.height = .75 * QZ, T.addChild(R);
+                    var r = 0;
+                    S == cS ? r = .5 : 1 == KZ && bS[S] == yS ? r = .5 : V && (r = .5);
                     anime({
-                        targets: u,
+                        targets: R,
                         duration: 1500,
-                        x: W,
-                        y: Z,
+                        x: o,
+                        y: J,
                         rotation: 2 * Math.PI,
                         easing: "easeOutCubic",
-                        complete: function(I) {
+                        complete: function(Z) {
                             return function() {
-                                d.removeChild(I), anime({
-                                    targets: e,
-                                    alpha: [o, 1],
+                                T.removeChild(Z), anime({
+                                    targets: O,
+                                    alpha: [r, 1],
                                     easing: "easeInQuint",
                                     duration: 5e3
                                 })
                             }
-                        }(u)
+                        }(R)
                     })
-                }(s);
+                }(S);
                 break;
             case 43:
-                ! function(I) {
-                    I.getInt32(1);
-                    var s = I.getFloat32(5),
-                        x = I.getFloat32(9),
-                        C = I.getFloat32(13),
-                        W = I.getFloat32(17),
-                        Z = new PIXI.Sprite(v.emp);
-                    Z.anchor.set(.5), Z.position.set(s, x), Z.width = .75 * cI, Z.height = .75 * cI, d.addChild(Z), anime({
-                        targets: Z,
+                ! function(Z) {
+                    Z.getInt32(1);
+                    var S = Z.getFloat32(5),
+                        Y = Z.getFloat32(9),
+                        _ = Z.getFloat32(13),
+                        o = Z.getFloat32(17),
+                        J = new PIXI.Sprite(g.emp);
+                    J.anchor.set(.5), J.position.set(S, Y), J.width = .75 * QZ, J.height = .75 * QZ, T.addChild(J), anime({
+                        targets: J,
                         duration: 1500,
-                        x: C,
-                        y: W,
+                        x: _,
+                        y: o,
                         rotation: 2 * Math.PI,
                         easing: "easeOutCubic",
-                        complete: function(I) {
+                        complete: function(Z) {
                             return function() {
                                 setTimeout(function() {
-                                    d.removeChild(I), vW(I.x, I.y, 6)
+                                    T.removeChild(Z), go(Z.x, Z.y, 6)
                                 }, 1400)
                             }
-                        }(Z)
+                        }(J)
                     })
-                }(s);
+                }(S);
                 break;
             case 53:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getFloat32(5),
-                        C = I.getFloat32(9),
-                        W = I.getFloat32(13),
-                        Z = I.getFloat32(17),
-                        u = new PIXI.Sprite(v.grenade);
-                    u.tint = Wx(s), u.anchor.set(.5), u.position.set(x, C), u.width = cI, u.height = cI, d.addChild(u), anime({
-                        targets: u,
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getFloat32(5),
+                        _ = Z.getFloat32(9),
+                        o = Z.getFloat32(13),
+                        J = Z.getFloat32(17),
+                        R = new PIXI.Sprite(g.grenade);
+                    R.tint = oY(S), R.anchor.set(.5), R.position.set(Y, _), R.width = QZ, R.height = QZ, T.addChild(R), anime({
+                        targets: R,
                         duration: 1500,
-                        x: W,
-                        y: Z,
+                        x: o,
+                        y: J,
                         rotation: 2 * Math.PI,
                         easing: "easeOutCubic",
-                        complete: function(I) {
+                        complete: function(Z) {
                             return function() {
                                 setTimeout(function() {
-                                    d.removeChild(I), vW(I.x, I.y, 6)
+                                    T.removeChild(Z), go(Z.x, Z.y, 6)
                                 }, 1400)
                             }
-                        }(u)
+                        }(R)
                     })
-                }(s);
+                }(S);
                 break;
             case 27:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getFloat32(5),
-                        C = I.getFloat32(9),
-                        W = new PIXI.Sprite(v.portal1);
-                    W.width = 2 * cI, W.height = 2 * cI, W.anchor.set(.5), bs[s] ? W.position.set(bs[s].position.x, bs[s].position.y) : W.position.set(-1e4, -1e4);
-                    r.addChildAt(W, 0);
-                    var Z = new PIXI.Sprite(v.portal2);
-                    Z.width = 2 * cI, Z.height = 2 * cI, Z.anchor.set(.5), Z.position.set(x, C), r.addChildAt(Z, 1);
-                    var u = bs[s] ? bs[s].scale.x : 1,
-                        o = bs[s] ? bs[s].scale.y : 1;
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getFloat32(5),
+                        _ = Z.getFloat32(9),
+                        o = new PIXI.Sprite(g.portal1);
+                    o.width = 2 * QZ, o.height = 2 * QZ, o.anchor.set(.5), nS[S] ? o.position.set(nS[S].position.x, nS[S].position.y) : o.position.set(-1e4, -1e4);
+                    v.addChildAt(o, 0);
+                    var J = new PIXI.Sprite(g.portal2);
+                    J.width = 2 * QZ, J.height = 2 * QZ, J.anchor.set(.5), J.position.set(Y, _), v.addChildAt(J, 1);
+                    var R = nS[S] ? nS[S].scale.x : 1,
+                        r = nS[S] ? nS[S].scale.y : 1;
                     anime({
-                        targets: bs[s] ? bs[s].scale : {
+                        targets: nS[S] ? nS[S].scale : {
                             x: 1,
                             y: 1
                         },
                         x: 0,
                         y: 0,
                         easing: "easeInCubic",
-                        duration: 500 * sx[5],
-                        complete: function(I, W) {
+                        duration: 500 * SY[5],
+                        complete: function(Z, o) {
                             return function() {
-                                r.removeChild(I), bs[s] ? (bs[s] && bs[s].position.set(x, C), anime({
-                                    targets: bs[s] ? bs[s].scale : {
+                                v.removeChild(Z), nS[S] ? (nS[S] && nS[S].position.set(Y, _), anime({
+                                    targets: nS[S] ? nS[S].scale : {
                                         x: 0,
                                         y: 0
                                     },
-                                    x: u,
-                                    y: o,
+                                    x: R,
+                                    y: r,
                                     easing: "easeOutCubic",
-                                    duration: 500 * sx[5],
-                                    complete: function(I) {
+                                    duration: 500 * SY[5],
+                                    complete: function(Z) {
                                         return function() {
-                                            r.removeChild(I), bs[s] && bs[s].scale.set(1, 1)
+                                            v.removeChild(Z), nS[S] && nS[S].scale.set(1, 1)
                                         }
-                                    }(W)
-                                })) : r.removeChild(W)
+                                    }(o)
+                                })) : v.removeChild(o)
                             }
-                        }(W, Z)
+                        }(o, J)
                     })
-                }(s);
+                }(S);
                 break;
             case 28:
-                ! function(I) {
-                    UI = I.getInt32(1), 2 != aI || R ? 4 == aI && 0 != UI && (bs[Ts] && (bs[Ts].visible = !1), document.getElementById("gm-1v1-lobby").style.display = "none", document.getElementById("chat-block").classList.remove("typing"), document.getElementById("chat-block").classList.remove("gm-1v1-lobby"), document.getElementById("chat-input").blur(), document.getElementById("spectate-1v1-ui").style.display = "block") : ((R = bs[Ts].position) || (R = {
-                        x: HI / 2,
-                        y: wI / 2
-                    }), f = -1e3, bs[Ts].visible = !1, bI = -1, document.getElementById("buy-screen").style.display = "none", vC("You are spectating until end of round", 1e4), OW = setTimeout(function() {
-                        2 == Ks && vC((Ex ? "Tap" : "Click") + " anywhere to spectate next teammate", 1e4), OW = null
+                ! function(Z) {
+                    BZ = Z.getInt32(1), 2 != KZ || V ? 4 == KZ && 0 != BZ && (nS[cS] && (nS[cS].visible = !1), document.getElementById("gm-1v1-lobby").style.display = "none", document.getElementById("chat-block").classList.remove("typing"), document.getElementById("chat-block").classList.remove("gm-1v1-lobby"), document.getElementById("chat-input").blur(), document.getElementById("spectate-1v1-ui").style.display = "block") : ((V = nS[cS].position) || (V = {
+                        x: dZ / 2,
+                        y: lZ / 2
+                    }), U = -1e3, nS[cS].visible = !1, nZ = -1, document.getElementById("buy-screen").style.display = "none", g_("You are spectating until end of round", 1e4), Fo = setTimeout(function() {
+                        2 == iS && g_((CY ? "Tap" : "Click") + " anywhere to spectate next teammate", 1e4), Fo = null
                     }, 1e4));
-                    Fs && uC && WZ && 0 == UI && setTimeout(function() {
-                        ZZ(2)
+                    kS && R_ && JJ && 0 == BZ && setTimeout(function() {
+                        RJ(2)
                     }, 3e3)
-                }(s);
+                }(S);
                 break;
             case 29:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = nx(I, 5),
-                        C = I.getInt32(6 + 2 * x.length),
-                        W = -1;
-                    I.byteLength >= 6 + 2 * x.length + 4 + 4 - 1 && (W = I.getInt32(6 + 2 * x.length + 4));
-                    var Z = 0;
-                    I.byteLength >= 6 + 2 * x.length + 4 + 4 + 1 && (Z = I.getUint8(6 + 2 * x.length + 4 + 4), fI[s] = Z);
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = WY(Z, 5),
+                        _ = Z.getInt32(6 + 2 * Y.length),
+                        o = -1;
+                    Z.byteLength >= 6 + 2 * Y.length + 4 + 4 - 1 && (o = Z.getInt32(6 + 2 * Y.length + 4));
+                    var J = 0;
+                    Z.byteLength >= 6 + 2 * Y.length + 4 + 4 + 1 && (J = Z.getUint8(6 + 2 * Y.length + 4 + 4), UZ[S] = J);
                     0;
-                    RI[s] = Fx(Sx(x), " ").substring(0, 12), (s != Ts || "?skin-editor" !== window.location.search) && (mI[s] = C);
-                    bs[s] && (bs[s].usernameText.text = RI[s]); - 1 != W && (hs[s] = W, s == Ts && (Bs = W));
-                    2 == aI && (delete Cx[s], s == Ts && ($I.tint = Wx(Ts), XI.tint = Wx(Ts)), bs[s] && HW(s));
-                    Z > 0 && s == Ts && s > 0 && bs[Ts] && HW(s)
-                }(s);
+                    VZ[S] = kY(XY(Y), " ").substring(0, 12), (S != cS || "?skin-editor" !== window.location.search) && (pZ[S] = _);
+                    nS[S] && (nS[S].usernameText.text = VZ[S]); - 1 != o && (bS[S] = o, S == cS && (yS = o));
+                    2 == KZ && (delete _Y[S], S == cS && (DZ.tint = oY(cS), MZ.tint = oY(cS)), nS[S] && lo(S));
+                    J > 0 && S == cS && S > 0 && nS[cS] && lo(S)
+                }(S);
                 break;
             case 31:
-                ! function(I) {
-                    var s = I.getInt32(1);
-                    if (0 != s) var x = 1 == aI || 2 == aI ? Zx(s) : Wx(s),
-                        C = (16711680 & x) >> 16,
-                        W = (65280 & x) >> 8,
-                        Z = 255 & x,
-                        u = 255;
-                    else var C = 0,
-                        W = 0,
-                        Z = 0,
-                        u = 0;
-                    var o = 5,
-                        N = [];
-                    for (; o + 3 <= I.byteLength;) {
-                        var i = I.getUint8(o),
-                            t = I.getUint8(o + 1),
-                            a = I.getUint8(o + 2);
-                        N.push({
-                            y: i,
-                            x1: t,
-                            x2: a
-                        }), o += 3
+                ! function(Z) {
+                    var S = Z.getInt32(1);
+                    if (0 != S) var Y = 1 == KZ || 2 == KZ ? JY(S) : oY(S),
+                        _ = (16711680 & Y) >> 16,
+                        o = (65280 & Y) >> 8,
+                        J = 255 & Y,
+                        R = 255;
+                    else var _ = 0,
+                        o = 0,
+                        J = 0,
+                        R = 0;
+                    var r = 5,
+                        w = [];
+                    for (; r + 3 <= Z.byteLength;) {
+                        var E = Z.getUint8(r),
+                            m = Z.getUint8(r + 1),
+                            K = Z.getUint8(r + 2);
+                        w.push({
+                            y: E,
+                            x1: m,
+                            x2: K
+                        }), r += 3
                     }
-                    0 != s || WZ || _.data.set(p.data);
-                    (function(I, s, x, C, W, Z) {
-                        for (var u = 0; u < I.length; u++)
-                            for (var o = I[u].x1; o <= I[u].x2; o++) {
-                                var N = 4 * (I[u].y * p.width + o);
-                                Z && 0 == p.data[N + 0] && 0 == p.data[N + 1] && 0 == p.data[N + 2] && 255 == p.data[N + 3] || (p.data[N + 0] = s, p.data[N + 1] = x, p.data[N + 2] = C, p.data[N + 3] = W)
+                    0 != S || JJ || e.data.set(z.data);
+                    (function(Z, S, Y, _, o, J) {
+                        for (var R = 0; R < Z.length; R++)
+                            for (var r = Z[R].x1; r <= Z[R].x2; r++) {
+                                var w = 4 * (Z[R].y * z.width + r);
+                                J && 0 == z.data[w + 0] && 0 == z.data[w + 1] && 0 == z.data[w + 2] && 255 == z.data[w + 3] || (z.data[w + 0] = S, z.data[w + 1] = Y, z.data[w + 2] = _, z.data[w + 3] = o)
                             }
-                    })(N, C, W, Z, u, rs), $W && clearTimeout($W);
-                    $W = setTimeout(function() {
-                        if (K.putImageData(p, 0, 0), XW && clearInterval(XW), 0 == s && !WZ) {
-                            var I = 0;
-                            XW = setInterval(function() {
-                                I++, K.putImageData(I % 2 == 0 ? p : _, 0, 0), I >= 10 && clearInterval(XW)
+                    })(w, _, o, J, R, vS), Do && clearTimeout(Do);
+                    Do = setTimeout(function() {
+                        if (i.putImageData(z, 0, 0), Mo && clearInterval(Mo), 0 == S && !JJ) {
+                            var Z = 0;
+                            Mo = setInterval(function() {
+                                Z++, i.putImageData(Z % 2 == 0 ? z : e, 0, 0), Z >= 10 && clearInterval(Mo)
                             }, 250)
                         }
                     }, 100)
-                }(s);
+                }(S);
                 break;
             case 34:
-                ! function(I) {
-                    I.getUint8(1);
-                    var s = I.getFloat32(2),
-                        x = I.getFloat32(6),
-                        C = I.getFloat32(10),
-                        W = (I.getFloat32(14), 100 * s / NC);
-                    1 == aI && document.getElementById("respawn-max-control-label") && (document.getElementById("respawn-max-control-label").innerHTML = "Territory  built by you: ");
-                    2 != aI && (document.getElementById("respawn-max-control").innerHTML = qW(W), document.getElementById("respawn-max-score").innerHTML = Math.floor(x));
-                    document.getElementById("respawn-earned-coins" + (2 == aI ? "-gm2" : "")).innerHTML = KI || pI || C < 1 ? Math.floor(C) : '<span style="text-decoration: line-through;">' + Math.floor(C) + "</span> 0";
-                    document.getElementById("respawn-panel-earnings" + (2 == aI ? "-gm2" : "")).style.display = "table-cell", gx && !pu && (document.getElementById("respawn-promo" + (2 == aI ? "-gm2" : "")).innerHTML = '<img style="cursor: pointer;" onclick="defly.showMyAccount();" src="img/premium-inc.png">', document.getElementById("respawn-promo" + (2 == aI ? "-gm2" : "")).style.backgroundColor = "transparent");
-                    if (!pu && (KI || pI) && !gx && iI > 5) {
-                        var Z = Math.random() < .5;
-                        document.getElementById("respawn-feedback" + (2 == aI ? "-gm2" : "")).style.display = Z ? "none" : "block", document.getElementById("respawn-get-premium" + (2 == aI ? "-gm2" : "")).style.display = Z ? "block" : "none"
+                ! function(Z) {
+                    Z.getUint8(1);
+                    var S = Z.getFloat32(2),
+                        Y = Z.getFloat32(6),
+                        _ = Z.getFloat32(10),
+                        o = (Z.getFloat32(14), 100 * S / w_);
+                    1 == KZ && document.getElementById("respawn-max-control-label") && (document.getElementById("respawn-max-control-label").innerHTML = "Territory  built by you: ");
+                    2 != KZ && (document.getElementById("respawn-max-control").innerHTML = uo(o), document.getElementById("respawn-max-score").innerHTML = Math.floor(Y));
+                    document.getElementById("respawn-earned-coins" + (2 == KZ ? "-gm2" : "")).innerHTML = iZ || zZ || _ < 1 ? Math.floor(_) : '<span style="text-decoration: line-through;">' + Math.floor(_) + "</span> 0";
+                    document.getElementById("respawn-panel-earnings" + (2 == KZ ? "-gm2" : "")).style.display = "table-cell", NY && !eR && (document.getElementById("respawn-promo" + (2 == KZ ? "-gm2" : "")).innerHTML = '<img style="cursor: pointer;" onclick="defly.showMyAccount();" src="img/premium-inc.png">', document.getElementById("respawn-promo" + (2 == KZ ? "-gm2" : "")).style.backgroundColor = "transparent");
+                    if (!eR && (iZ || zZ) && !NY && EZ > 5) {
+                        var J = Math.random() < .5;
+                        document.getElementById("respawn-feedback" + (2 == KZ ? "-gm2" : "")).style.display = J ? "none" : "block", document.getElementById("respawn-get-premium" + (2 == KZ ? "-gm2" : "")).style.display = J ? "block" : "none"
                     }
-                }(s);
+                }(S);
                 break;
             case 35:
-                ! function(I) {
-                    var s = WZ && 1 == j;
-                    2 == aI && (Hs = ws, js = ls);
-                    var x = I.getUint8(1);
-                    $s = I.getUint8(2);
-                    for (var C = 3, W = {}, Z = 0; Z < $s; Z++) {
-                        var u = I.getInt32(C);
-                        2 != aI && !VW && 0 == Z && u > 1 && (Hs.splice(0, 0, 5066061), js.splice(0, 0, "Walls"), VW = !0);
-                        var o = I.getFloat32(C + 4);
-                        o < 0 && (o = 0);
-                        var N = 1 == I.getUint8(C + 8),
-                            i = I.getUint8(C + 9);
-                        C += 10;
-                        for (var t = [], a = 0; a < i; a++) {
-                            var e = I.getInt32(C);
-                            C += 4, t.push(e)
+                ! function(Z) {
+                    var S = JJ && 1 == A;
+                    2 == KZ && (dS = lS, AS = hS);
+                    var Y = Z.getUint8(1);
+                    DS = Z.getUint8(2);
+                    for (var _ = 3, o = {}, J = 0; J < DS; J++) {
+                        var R = Z.getInt32(_);
+                        2 != KZ && !Io && 0 == J && R > 1 && (dS.splice(0, 0, 5066061), AS.splice(0, 0, "Walls"), Io = !0);
+                        var r = Z.getFloat32(_ + 4);
+                        r < 0 && (r = 0);
+                        var w = 1 == Z.getUint8(_ + 8),
+                            E = Z.getUint8(_ + 9);
+                        _ += 10;
+                        for (var m = [], K = 0; K < E; K++) {
+                            var O = Z.getInt32(_);
+                            _ += 4, m.push(O)
                         }
-                        W[u] = {
-                            mapPercent: o,
-                            members: t,
-                            available: N
+                        o[R] = {
+                            mapPercent: r,
+                            members: m,
+                            available: w
                         }
                     }
-                    var G = '<tr class="team-name">';
-                    for (var S in W) {
-                        var J = Hs[S - 1];
-                        16252714 == J && (J = 13817893), G += "<td" + (s ? ' style="background-color: ' + mu(J) + ';"' : "") + ">" + js[S - 1] + "</td>"
+                    var j = '<tr class="team-name">';
+                    for (var X in o) {
+                        var a = dS[X - 1];
+                        16252714 == a && (a = 13817893), j += "<td" + (S ? ' style="background-color: ' + $R(a) + ';"' : "") + ">" + AS[X - 1] + "</td>"
                     }
-                    if (1 == aI)
-                        for (var S in G += '</tr><tr class="map-percent">', W) {
-                            var A = W[S];
-                            G += "<td>" + qW(A.mapPercent ? A.mapPercent : 0) + "%</td>"
+                    if (1 == KZ)
+                        for (var X in j += '</tr><tr class="map-percent">', o) {
+                            var s = o[X];
+                            j += "<td>" + uo(s.mapPercent ? s.mapPercent : 0) + "%</td>"
                         }
-                    if (!s)
-                        for (var S in G += '</tr><tr class="player-count">', W) W[S].members || console.error(W, S, W[S]), G += "<td>" + W[S].members.length + "/" + x + " players</td>";
-                    for (var S in G += '</tr><tr class="player-names">', W) {
-                        var A = W[S];
-                        if (G += "<td>", Fs && s && A.members.length > 6) {
-                            for (var F = [], Z = 0; Z < 7; Z++) {
-                                var g;
+                    if (!S)
+                        for (var X in j += '</tr><tr class="player-count">', o) o[X].members || console.error(o, X, o[X]), j += "<td>" + o[X].members.length + "/" + Y + " players</td>";
+                    for (var X in j += '</tr><tr class="player-names">', o) {
+                        var s = o[X];
+                        if (j += "<td>", kS && S && s.members.length > 6) {
+                            for (var k = [], J = 0; J < 7; J++) {
+                                var N;
                                 do {
-                                    g = Math.floor(Math.random() * A.members.length)
-                                } while (-1 !== F.indexOf(g));
-                                F.push(g)
+                                    N = Math.floor(Math.random() * s.members.length)
+                                } while (-1 !== k.indexOf(N));
+                                k.push(N)
                             }
-                            for (var E = [], Z = 0; Z < F.length; Z++) E.push(A.members[F[Z]]);
-                            A.members = E
+                            for (var C = [], J = 0; J < k.length; J++) C.push(s.members[k[J]]);
+                            s.members = C
                         }
-                        for (var Z = 0; Z < Math.min(A.members.length, 6); Z++) {
-                            var d = A.members[Z],
-                                r = RI[d] ? RI[d] : "Unknown";
-                            Z > 0 && (G += "<br />"), G += Sx(r)
+                        for (var J = 0; J < Math.min(s.members.length, 6); J++) {
+                            var T = s.members[J],
+                                v = VZ[T] ? VZ[T] : "Unknown";
+                            J > 0 && (j += "<br />"), j += XY(v)
                         }
-                        A.members.length > 6 && (G += "<br />..."), G += "</td>"
+                        s.members.length > 6 && (j += "<br />..."), j += "</td>"
                     }
-                    if (G += "</tr><tr>", !s) {
-                        for (var S in G += '<tr id="team-choice-buttons">', W) {
-                            var J = Hs[S - 1];
-                            16252714 == J && (J = 13817893), W[S].available ? G += '<td><button class="button" style="background-color: ' + mu(J) + '" onclick="defly.selectTeam(' + S + ');">Select</button></td>' : G += '<td><button class="button disabled" style="background-color: ' + mu(J) + '">Unavailable</button></td>'
+                    if (j += "</tr><tr>", !S) {
+                        for (var X in j += '<tr id="team-choice-buttons">', o) {
+                            var a = dS[X - 1];
+                            16252714 == a && (a = 13817893), o[X].available ? j += '<td><button class="button" style="background-color: ' + $R(a) + '" onclick="defly.selectTeam(' + X + ');">Select</button></td>' : j += '<td><button class="button disabled" style="background-color: ' + $R(a) + '">Unavailable</button></td>'
                         }
-                        G += "</tr>"
+                        j += "</tr>"
                     }
-                    if (s) {
-                        var v = document.createElement("table");
-                        v.setAttribute("id", "admin-player-list"), v.innerHTML = G, document.body.appendChild(v)
-                    } else document.getElementById("team-choice-table").innerHTML = G, document.getElementById("team-choice-loading").style.display = "none", document.getElementById("choose-team-popup").style.display = "block", clearTimeout(yW), yW = setTimeout(_W, As ? 1e3 : 1e4), document.getElementById("youtube-live") && (document.getElementById("youtube-live").style.display = "none");
-                    !WZ && Fs && (ZZ(1, window.prompt("?", "")), uC = setInterval(function() {
-                        ZZ(5)
-                    }, 6e4), oC = setInterval(function() {
-                        ZZ(8), setTimeout(function() {
+                    if (S) {
+                        var g = document.createElement("table");
+                        g.setAttribute("id", "admin-player-list"), g.innerHTML = j, document.body.appendChild(g)
+                    } else document.getElementById("team-choice-table").innerHTML = j, document.getElementById("team-choice-loading").style.display = "none", document.getElementById("choose-team-popup").style.display = "block", clearTimeout(to), to = setTimeout(eo, sS ? 1e3 : 1e4), document.getElementById("youtube-live") && (document.getElementById("youtube-live").style.display = "none");
+                    !JJ && kS && (RJ(1, window.prompt("?", "")), R_ = setInterval(function() {
+                        RJ(5)
+                    }, 6e4), r_ = setInterval(function() {
+                        RJ(8), setTimeout(function() {
                             document.body.removeChild(document.getElementById("admin-player-list"))
                         }, 1e4)
                     }, 6e4))
-                }(s);
+                }(S);
                 break;
             case 36:
-                dW(s);
+                To(S);
                 break;
             case 37:
-                dW(s, !0);
+                To(S, !0);
                 break;
             case 38:
-                ! function(I) {
-                    var s = 1,
-                        x = ZI >= 1 ? 2 : 1;
-                    for (; s + 4 <= I.byteLength;) {
-                        var C = I.getFloat32(s);
-                        1 != aI || x != Bs || WZ || (document.getElementById("map-control-value").innerHTML = qW(C > 99.9 ? 100 : C), document.getElementById("map-control-bar-value").style.width = C + "%"), s += 4;
-                        var W = document.getElementById("map-control-bar-team-" + (x - (ZI >= 1 ? 0 : 1)));
-                        W && (W.style.width = C + "%"), x++
+                ! function(Z) {
+                    var S = 1,
+                        Y = JZ >= 1 ? 2 : 1;
+                    for (; S + 4 <= Z.byteLength;) {
+                        var _ = Z.getFloat32(S);
+                        1 != KZ || Y != yS || JJ || (document.getElementById("map-control-value").innerHTML = uo(_ > 99.9 ? 100 : _), document.getElementById("map-control-bar-value").style.width = _ + "%"), S += 4;
+                        var o = document.getElementById("map-control-bar-team-" + (Y - (JZ >= 1 ? 0 : 1)));
+                        o && (o.style.width = _ + "%"), Y++
                     }
-                }(s);
+                }(S);
                 break;
             case 39:
-                ! function(I) {
-                    if (us) return;
-                    var s = Sx(Fx(nx(I, 1), ""));
-                    if (WZ) {
-                        var x = s.match(/^(.* joined the game in team )#([1-9])$/);
-                        x && (s = x[1] + js[parseInt(x[2]) - 1])
+                ! function(Z) {
+                    if (RS) return;
+                    var S = XY(kY(WY(Z, 1), ""));
+                    if (JJ) {
+                        var Y = S.match(/^(.* joined the game in team )#([1-9])$/);
+                        Y && (S = Y[1] + AS[parseInt(Y[2]) - 1])
                     }
-                    _C(s, Ws ? "info-dark" : "info")
-                }(s);
+                    e_(S, oS ? "info-dark" : "info")
+                }(S);
                 break;
             case 40:
-                ! function(I) {
-                    if (4 == aI) {
-                        var s = I.getInt32(1),
-                            x = I.getInt32(5);
-                        document.getElementById("gm-1v1-result-title").innerHTML = 0 == s ? "No winner, rematch?" : s == Ts ? "You defeated " + RI[x] : "You lost to " + RI[s], document.getElementById("respawn-earned-coins-gm4").innerHTML = s == Ts ? 10 : 0, document.getElementById("respawn-total-earned-coins-gm4").innerHTML = 10 * zI
+                ! function(Z) {
+                    if (4 == KZ) {
+                        var S = Z.getInt32(1),
+                            Y = Z.getInt32(5);
+                        document.getElementById("gm-1v1-result-title").innerHTML = 0 == S ? "No winner, rematch?" : S == cS ? "You defeated " + VZ[Y] : "You lost to " + VZ[S], document.getElementById("respawn-earned-coins-gm4").innerHTML = S == cS ? 10 : 0, document.getElementById("respawn-total-earned-coins-gm4").innerHTML = 10 * xZ
                     } else {
                         document.getElementById("game-won") && document.body.removeChild(document.getElementById("game-won"));
-                        var C = Math.round(1 * I.getInt32(1) / 60),
-                            W = document.createElement("div");
-                        W.setAttribute("id", "game-won"), Ws && (W.style.color = "white"), document.body.appendChild(W), LC = !0;
-                        var Z = W;
-                        if (!R) {
-                            Z = document.createElement("div");
-                            var u = document.createElement("div");
-                            u.className = "table-container";
-                            var o = document.createElement("table"),
-                                N = document.getElementById("lb-player-points").innerHTML,
-                                i = document.getElementById("map-control-value").innerHTML + "%",
-                                t = sI / 60;
-                            tI = t;
-                            var a = Math.floor(t / 60),
-                                e = Math.floor(t % 60),
-                                G = (a > 0 ? a + " min. " : "") + e + " s";
-                            o.innerHTML = '<tr><td class="stat">Score:</td><td class="value" >' + N + '</td></tr><tr><td class="stat">Map controlled:</td><td class="value">' + i + '</td></tr><tr><td class="stat">Time Alive:</td><td class="value">' + G + '</td></tr><tr><td class="stat">Kills:</td><td class="value">' + zI + "</td></tr>", (KI || pI) && (o.innerHTML += '<tr><td class="stat">Coins earned:</td><td class="value"><span>' + Zo(aI, N) + '</span> <img src="img/coin.png"></td></tr>'), W.appendChild(Z), u.appendChild(o), W.appendChild(u);
-                            var S = document.createElement("div");
-                            S.className = "buttons";
-                            var J = document.createElement("button"),
-                                A = document.createElement("button");
-                            J.setAttribute("type", "button"), A.setAttribute("type", "button"), J.className = "back button", A.className = "button homepage", J.innerHTML = "Keep playing", A.innerHTML = "Back to homepage", S.appendChild(J), S.appendChild(A), W.appendChild(S), J.addEventListener("click", function() {
-                                u.style.display = "none", S.style.display = "none"
-                            }), A.addEventListener("click", Xx)
+                        var _ = Math.round(1 * Z.getInt32(1) / 60),
+                            o = document.createElement("div");
+                        o.setAttribute("id", "game-won"), oS && (o.style.color = "white"), document.body.appendChild(o), f_ = !0;
+                        var J = o;
+                        if (!V) {
+                            J = document.createElement("div");
+                            var R = document.createElement("div");
+                            R.className = "table-container";
+                            var r = document.createElement("table"),
+                                w = document.getElementById("lb-player-points").innerHTML,
+                                E = document.getElementById("map-control-value").innerHTML + "%",
+                                m = SZ / 60;
+                            mZ = m;
+                            var K = Math.floor(m / 60),
+                                O = Math.floor(m % 60),
+                                j = (K > 0 ? K + " min. " : "") + O + " s";
+                            r.innerHTML = '<tr><td class="stat">Score:</td><td class="value" >' + w + '</td></tr><tr><td class="stat">Map controlled:</td><td class="value">' + E + '</td></tr><tr><td class="stat">Time Alive:</td><td class="value">' + j + '</td></tr><tr><td class="stat">Kills:</td><td class="value">' + xZ + "</td></tr>", (iZ || zZ) && (r.innerHTML += '<tr><td class="stat">Coins earned:</td><td class="value"><span>' + Rr(KZ, w) + '</span> <img src="img/coin.png"></td></tr>'), o.appendChild(J), R.appendChild(r), o.appendChild(R);
+                            var X = document.createElement("div");
+                            X.className = "buttons";
+                            var a = document.createElement("button"),
+                                s = document.createElement("button");
+                            a.setAttribute("type", "button"), s.setAttribute("type", "button"), a.className = "back button", s.className = "button homepage", a.innerHTML = "Keep playing", s.innerHTML = "Back to homepage", X.appendChild(a), X.appendChild(s), o.appendChild(X), a.addEventListener("click", function() {
+                                R.style.display = "none", X.style.display = "none"
+                            }), s.addEventListener("click", MY)
                         }
                         anime({
-                            targets: W,
+                            targets: o,
                             delay: 1e3,
                             opacity: [0, 1],
                             easing: "linear",
                             duration: 500
                         }), setInterval(function() {
-                            C--, Z.innerHTML = (R ? "Game has been won!" : "Congratulations, You won the game !") + '<div class="sub"> (server will restart in ' + C + " seconds...)</div>"
-                        }, 1e3), R || (! function() {
-                            MC = new PIXI.Container;
+                            _--, J.innerHTML = (V ? "Game has been won!" : "Congratulations, You won the game !") + '<div class="sub"> (server will restart in ' + _ + " seconds...)</div>"
+                        }, 1e3), V || (! function() {
+                            G_ = new PIXI.Container;
                             window.innerWidth, window.innerHeight;
-                            for (var I = .05 * window.innerWidth, s = .12 * window.innerWidth, x = -Math.PI / 2, C = x - Math.PI / 8, W = x + Math.PI / 8, Z = 0; Z < 300; Z++) {
-                                var u = new PIXI.Sprite(v.confetti),
-                                    o = window.innerHeight / 40 * (a = 1.33, (t = .66) + Math.random() * (a - t));
-                                u.size = o, u.width = o, u.height = o / 2, u.x = Z < 150 ? .25 * window.innerWidth : .75 * window.innerWidth, u.y = window.innerHeight;
-                                var N = Math.random() * (W - C) + C + (Z < 150 ? 0 : 0 * -Math.PI / 2),
-                                    i = Math.random() * (s - I) + I;
-                                u.sx = Math.cos(N) * i, u.sy = Math.sin(N) * i, u.tint = (jC(30, 255) << 16) + (jC(30, 230) << 8) + jC(30, 230), u.r = o, u.d = 300 * Math.random() + 11, u.tilt = Math.floor(33 * Math.random()) - 11, u.tiltAngleIncremental = .07 * Math.random() + .05, u.tiltAngle = 0, u.anchor.set(.5), MC.addChild(u)
+                            for (var Z = .05 * window.innerWidth, S = .12 * window.innerWidth, Y = -Math.PI / 2, _ = Y - Math.PI / 8, o = Y + Math.PI / 8, J = 0; J < 300; J++) {
+                                var R = new PIXI.Sprite(g.confetti),
+                                    r = window.innerHeight / 40 * (K = 1.33, (m = .66) + Math.random() * (K - m));
+                                R.size = r, R.width = r, R.height = r / 2, R.x = J < 150 ? .25 * window.innerWidth : .75 * window.innerWidth, R.y = window.innerHeight;
+                                var w = Math.random() * (o - _) + _ + (J < 150 ? 0 : 0 * -Math.PI / 2),
+                                    E = Math.random() * (S - Z) + Z;
+                                R.sx = Math.cos(w) * E, R.sy = Math.sin(w) * E, R.tint = (A_(30, 255) << 16) + (A_(30, 230) << 8) + A_(30, 230), R.r = r, R.d = 300 * Math.random() + 11, R.tilt = Math.floor(33 * Math.random()) - 11, R.tiltAngleIncremental = .07 * Math.random() + .05, R.tiltAngle = 0, R.anchor.set(.5), G_.addChild(R)
                             }
-                            var t, a;
-                            clearInterval(nC), nC = setInterval(function() {
-                                for (var I = 0; I < MC.children.length; I++) {
-                                    var s = MC.children[I];
-                                    s.x += s.sx, s.y += s.sy, s.sx *= .9, s.sy *= .9, s.tiltAngle += s.tiltAngleIncremental, s.y += (Math.cos(s.d) + 3 + s.r / 2) / 2, s.tilt = 15 * Math.sin(s.tiltAngle - I / 3), s.rotation = s.tilt / 30 + Math.PI / 2, s.width = s.size * (.8 * Math.abs(Math.sin(s.tiltAngle)) + .2), s.height = s.size / 2 * (.8 * Math.abs(Math.cos(s.tiltAngle)) + .2)
+                            var m, K;
+                            clearInterval(W_), W_ = setInterval(function() {
+                                for (var Z = 0; Z < G_.children.length; Z++) {
+                                    var S = G_.children[Z];
+                                    S.x += S.sx, S.y += S.sy, S.sx *= .9, S.sy *= .9, S.tiltAngle += S.tiltAngleIncremental, S.y += (Math.cos(S.d) + 3 + S.r / 2) / 2, S.tilt = 15 * Math.sin(S.tiltAngle - Z / 3), S.rotation = S.tilt / 30 + Math.PI / 2, S.width = S.size * (.8 * Math.abs(Math.sin(S.tiltAngle)) + .2), S.height = S.size / 2 * (.8 * Math.abs(Math.cos(S.tiltAngle)) + .2)
                                 }
                             }, 20)
                         }(), setTimeout(function() {
-                            clearInterval(nC), MC = null
+                            clearInterval(W_), G_ = null
                         }, 1e4))
                     }
-                }(s);
+                }(S);
                 break;
             case 54:
-                ! function(I) {
-                    var s = I.getInt32(1);
-                    s == Ts ? vC("You reached 80%, now kill everyone to win!", 2e4, !0) : 0 == s || s == Ts || R ? 0 != s || 0 == lC || R || vC("Your position is no longer being shown!", 5e3, !0) : vC("A player reached 80%, your position is shown to them!", 2e4, !0);
-                    lC = s
-                }(s);
+                ! function(Z) {
+                    var S = Z.getInt32(1);
+                    S == cS ? g_("You reached 80%, now kill everyone to win!", 2e4, !0) : 0 == S || S == cS || V ? 0 != S || 0 == h_ || V || g_("Your position is no longer being shown!", 5e3, !0) : g_("A player reached 80%, your position is shown to them!", 2e4, !0);
+                    h_ = S
+                }(S);
                 break;
             case 41:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = nx(I, 5);
-                    if (-2 == s) return void vC(x, 5e3);
-                    if (4 == aI && 0 == s && x.startsWith("1v1RESULT/")) {
-                        var C = x.split("/"),
-                            W = parseInt(C[1]) > 0,
-                            Z = parseInt(C[2]),
-                            u = parseInt(C[3]),
-                            o = Z == Ts || u == Ts;
-                        return void _C(W ? (Z == Ts ? "You" : RI[Z]) + " and " + (u == Ts ? "you" : RI[u]) + " stupidly collided" : (u == Ts ? "You are " : RI[u] + " is ") + "victorious over " + (Z == Ts ? "you" : RI[Z]), o ? "bold" : Ws ? "info-dark" : "info")
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = WY(Z, 5);
+                    if (-2 == S) return void g_(Y, 5e3);
+                    if (4 == KZ && 0 == S && Y.startsWith("1v1RESULT/")) {
+                        var _ = Y.split("/"),
+                            o = parseInt(_[1]) > 0,
+                            J = parseInt(_[2]),
+                            R = parseInt(_[3]),
+                            r = J == cS || R == cS;
+                        return void e_(o ? (J == cS ? "You" : VZ[J]) + " and " + (R == cS ? "you" : VZ[R]) + " stupidly collided" : (R == cS ? "You are " : VZ[R] + " is ") + "victorious over " + (J == cS ? "you" : VZ[J]), r ? "bold" : oS ? "info-dark" : "info")
                     }
-                    0 == s ? x = Fx(x, "") : -1 != s && 0 != s && s != Ts && (x = Fx(x, "$#&@%")); - 1 != s && 0 != s && (x = Sx(x)); - 1 == s ? _C(x, "system") : 0 != s || us ? x.length > 0 && !Zs && _C('<span class="name">' + Sx(RI[s]) + ": </span><span>" + x + "</span>") : _C(x, Ws ? "info-dark" : "info")
-                }(s);
+                    0 == S ? Y = kY(Y, "") : -1 != S && 0 != S && S != cS && (Y = kY(Y, "$#&@%")); - 1 != S && 0 != S && (Y = XY(Y)); - 1 == S ? e_(Y, "system") : 0 != S || RS ? Y.length > 0 && !JS && e_('<span class="name">' + XY(VZ[S]) + ": </span><span>" + Y + "</span>") : e_(Y, oS ? "info-dark" : "info")
+                }(S);
                 break;
             case 42:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getFloat32(5),
-                        C = I.getFloat32(9),
-                        W = I.getFloat32(13);
-                    switch (s) {
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getFloat32(5),
+                        _ = Z.getFloat32(9),
+                        o = Z.getFloat32(13);
+                    switch (S) {
                         case 0:
-                            var Z = "capture-blue-A";
+                            var J = "capture-blue-A";
                             break;
                         case 1:
-                            var Z = "capture-blue-B"
+                            var J = "capture-blue-B"
                     }
-                    var u = new PIXI.Graphics;
-                    u.position.set(x, C), u.visible = !1, u.alpha = .5, J.addChild(u);
-                    var o = new PIXI.Sprite(v[Z]);
-                    o.position.set(x, C), o.width = 2 * W, o.height = 2 * W, o.anchor.set(.5), J.addChild(o), qC[s] = {
-                        x: x,
-                        y: C,
-                        type: s,
-                        radius: W,
-                        progress: u,
-                        sprite: o
+                    var R = new PIXI.Graphics;
+                    R.position.set(Y, _), R.visible = !1, R.alpha = .5, a.addChild(R);
+                    var r = new PIXI.Sprite(g[J]);
+                    r.position.set(Y, _), r.width = 2 * o, r.height = 2 * o, r.anchor.set(.5), a.addChild(r), u_[S] = {
+                        x: Y,
+                        y: _,
+                        type: S,
+                        radius: o,
+                        progress: R,
+                        sprite: r
                     };
-                    var N = document.getElementById("minimap-target-positions"),
-                        i = document.createElement("div");
-                    i.innerHTML = 0 == s ? "A" : "B", i.style.left = x / HI * 100 + "%", i.style.top = C / wI * 100 + "%", N.appendChild(i)
-                }(s);
+                    var w = document.getElementById("minimap-target-positions"),
+                        E = document.createElement("div");
+                    E.innerHTML = 0 == S ? "A" : "B", E.style.left = Y / dZ * 100 + "%", E.style.top = _ / lZ * 100 + "%", w.appendChild(E)
+                }(S);
                 break;
             case 44:
-                ! function(I) {
-                    var s = Ks;
-                    Ks = I.getUint8(1), ps = I.getFloat32(2), 0;
-                    if (document.getElementById("countdown").style.display = "block", QC(), s != Ks)
-                        if (1 == Ks) vC("Round will start shortly", 1e3 * (ps - 1)), WZ || (R = null, UI = 0, bs[Ts] && (bs[Ts].visible = !0), $Z = null, document.getElementById("respawn-gm2").style.display = "none", document.getElementById("bs-kills").innerHTML = zI, document.getElementById("bs-deaths").innerHTML = qI, document.getElementById("bs-rounds-won").innerHTML = YI + "/" + bI, document.getElementById("buy-screen").style.display = "block", fZ = [!1, !1, !1, !1], VZ());
-                        else if (2 == Ks) vC(2 == hs[Ts] ? "Protect the blue bomb spots or kill every red player to win" : "Plant the bomb at blue spots or kill every blue player to win", 1e4);
-                    else if (3 == Ks) {
-                        var x = I.getUint8(6),
-                            C = I.getUint8(7);
-                        2 == C && (TI = !0, DI = (new Date).getTime()), vC(YC[(x == Bs ? 0 : 4) + C], 5e3), x == Bs && YI++, bI++, document.getElementById("countdown-value").className = "", document.getElementById("countdown-bomb-message").style.display = "none", document.getElementById("respawn-gm2").style.display = "none", "undefined" != typeof gtag && gtag("event", "RoundEnded", {
+                ! function(Z) {
+                    var S = iS;
+                    iS = Z.getUint8(1), zS = Z.getFloat32(2), 0;
+                    if (document.getElementById("countdown").style.display = "block", q_(), S != iS)
+                        if (1 == iS) g_("Round will start shortly", 1e3 * (zS - 1)), JJ || (V = null, BZ = 0, nS[cS] && (nS[cS].visible = !0), MJ = null, document.getElementById("respawn-gm2").style.display = "none", document.getElementById("bs-kills").innerHTML = xZ, document.getElementById("bs-deaths").innerHTML = uZ, document.getElementById("bs-rounds-won").innerHTML = LZ + "/" + nZ, document.getElementById("buy-screen").style.display = "block", pJ = [!1, !1, !1, !1], iJ());
+                        else if (2 == iS) g_(2 == bS[cS] ? "Protect the blue bomb spots or kill every red player to win" : "Plant the bomb at blue spots or kill every blue player to win", 1e4);
+                    else if (3 == iS) {
+                        var Y = Z.getUint8(6),
+                            _ = Z.getUint8(7);
+                        2 == _ && (cZ = !0, HZ = (new Date).getTime()), g_(L_[(Y == yS ? 0 : 4) + _], 5e3), Y == yS && LZ++, nZ++, document.getElementById("countdown-value").className = "", document.getElementById("countdown-bomb-message").style.display = "none", document.getElementById("respawn-gm2").style.display = "none", "undefined" != typeof gtag && gtag("event", "RoundEnded", {
                             event_category: "Game",
-                            event_label: x == Bs ? "Win" : "Lose"
+                            event_label: Y == yS ? "Win" : "Lose"
                         })
-                    } else 4 == Ks && (vC(2 == hs[Ts] ? "The bomb has been planted! Defuse it by staying still inside the bomb spot" : "Your team planted the bomb, defend it until the countdown reaches 0", 1e4), document.getElementById("countdown-value").className = "animated pulse bigger", document.getElementById("countdown-bomb-message").style.display = "block");
-                    OW && (clearTimeout(OW), OW = null)
-                }(s);
+                    } else 4 == iS && (g_(2 == bS[cS] ? "The bomb has been planted! Defuse it by staying still inside the bomb spot" : "Your team planted the bomb, defend it until the countdown reaches 0", 1e4), document.getElementById("countdown-value").className = "animated pulse bigger", document.getElementById("countdown-bomb-message").style.display = "block");
+                    Fo && (clearTimeout(Fo), Fo = null)
+                }(S);
                 break;
             case 45:
-                ! function(I) {
-                    var s = I.getUint8(1),
-                        x = qC[I.getUint8(2)],
-                        C = I.getInt32(3),
-                        W = x.progress;
-                    0 == s ? (W.clear(), W.visible = !0, W.animInterval && clearInterval(W.animInterval), W.startTime = (new Date).getTime(), W.animInterval = setInterval(function() {
-                        var I = (new Date).getTime() - W.startTime;
-                        W.clear();
-                        var s = Math.min(I, C) / C;
-                        4 == Ks && (s = 1 - s), s > 0 && (W.beginFill(Hs[2]), W.arc(0, 0, x.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * s), W.lineTo(0, 0), W.endFill()), I > C && (clearInterval(W.animInterval), delete W.animInterval, delete W.startTime)
-                    }, 20)) : 1 == s ? x.progress.visible = !1 : 2 == s && (W.animInterval && clearInterval(W.animInterval), W.clear(), W.beginFill(Hs[2]), W.arc(0, 0, x.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI), W.lineTo(0, 0), W.endFill())
-                }(s);
+                ! function(Z) {
+                    var S = Z.getUint8(1),
+                        Y = u_[Z.getUint8(2)],
+                        _ = Z.getInt32(3),
+                        o = Y.progress;
+                    0 == S ? (o.clear(), o.visible = !0, o.animInterval && clearInterval(o.animInterval), o.startTime = (new Date).getTime(), o.animInterval = setInterval(function() {
+                        var Z = (new Date).getTime() - o.startTime;
+                        o.clear();
+                        var S = Math.min(Z, _) / _;
+                        4 == iS && (S = 1 - S), S > 0 && (o.beginFill(dS[2]), o.arc(0, 0, Y.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * S), o.lineTo(0, 0), o.endFill()), Z > _ && (clearInterval(o.animInterval), delete o.animInterval, delete o.startTime)
+                    }, 20)) : 1 == S ? Y.progress.visible = !1 : 2 == S && (o.animInterval && clearInterval(o.animInterval), o.clear(), o.beginFill(dS[2]), o.arc(0, 0, Y.radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI), o.lineTo(0, 0), o.endFill())
+                }(S);
                 break;
             case 46:
-                ! function(I) {
-                    var s = I.getFloat32(1);
-                    document.getElementById("money-left-gm2").innerHTML = s;
-                    var x = I.getFloat32(5);
-                    document.getElementById("money-spent-gm2").innerHTML = x;
-                    var C = I.getFloat32(9);
-                    document.getElementById("money-earned-gm2").innerHTML = C;
-                    for (var W = I.getUint8(13), Z = 0; Z <= 5; Z++) document.getElementById("vehicule-" + Z + "-gm2").className = W == Z ? "selected" : "";
-                    document.getElementById("gear-100-gm2").innerHTML = I.getUint8(14), document.getElementById("gear-101-gm2").innerHTML = I.getUint8(15), document.getElementById("gear-102-gm2").innerHTML = I.getUint8(16), document.getElementById("gear-103-gm2").innerHTML = I.getUint8(17), document.getElementById("gear-104-gm2").innerHTML = I.getUint8(18), RC()
-                }(s);
+                ! function(Z) {
+                    var S = Z.getFloat32(1);
+                    document.getElementById("money-left-gm2").innerHTML = S;
+                    var Y = Z.getFloat32(5);
+                    document.getElementById("money-spent-gm2").innerHTML = Y;
+                    var _ = Z.getFloat32(9);
+                    document.getElementById("money-earned-gm2").innerHTML = _;
+                    for (var o = Z.getUint8(13), J = 0; J <= 5; J++) document.getElementById("vehicule-" + J + "-gm2").className = o == J ? "selected" : "";
+                    document.getElementById("gear-100-gm2").innerHTML = Z.getUint8(14), document.getElementById("gear-101-gm2").innerHTML = Z.getUint8(15), document.getElementById("gear-102-gm2").innerHTML = Z.getUint8(16), document.getElementById("gear-103-gm2").innerHTML = Z.getUint8(17), document.getElementById("gear-104-gm2").innerHTML = Z.getUint8(18), V_()
+                }(S);
                 break;
             case 47:
-                ! function(I) {
-                    var s = I.getInt32(1);
-                    document.getElementById("respawn-button").innerHTML = s > 0 ? "Respawn<div>at level " + s + "</div>" : "Respawn"
-                }(s);
+                ! function(Z) {
+                    var S = Z.getInt32(1);
+                    document.getElementById("respawn-button").innerHTML = S > 0 ? "Respawn<div>at level " + S + "</div>" : "Respawn"
+                }(S);
                 break;
             case 48:
-                ! function(I) {
-                    var s = I.getUint8(1);
-                    bC = [];
-                    for (var x = 2, C = "", W = 0; W < s; W++) {
-                        var Z = I.getUint8(x),
-                            u = nx(I, x + 1);
-                        x += 2 + 2 * u.length, bC.push({
-                            id: Z,
-                            name: u
-                        }), C += '<div onclick="defly.voteForMap(' + W + ');">' + u + "</div>"
+                ! function(Z) {
+                    var S = Z.getUint8(1);
+                    n_ = [];
+                    for (var Y = 2, _ = "", o = 0; o < S; o++) {
+                        var J = Z.getUint8(Y),
+                            R = WY(Z, Y + 1);
+                        Y += 2 + 2 * R.length, n_.push({
+                            id: J,
+                            name: R
+                        }), _ += '<div onclick="defly.voteForMap(' + o + ');">' + R + "</div>"
                     }
-                    console.log("received map to vote for", bC), document.getElementById("map-vote-candidates").innerHTML = C, document.getElementById("map-vote").style.display = "block"
-                }(s);
+                    console.log("received map to vote for", n_), document.getElementById("map-vote-candidates").innerHTML = _, document.getElementById("map-vote").style.display = "block"
+                }(S);
                 break;
             case 55:
                 document.getElementById("spawn-lose").style.display = "block", document.getElementById("respawn-button").style.display = "none";
                 break;
             case 56:
-                ! function(I) {
-                    Gs = {
-                        x1: I.getFloat32(1),
-                        y1: I.getFloat32(5),
-                        x2: I.getFloat32(9),
-                        y2: I.getFloat32(13)
-                    }, es = !0, v["tower-kh"] = PIXI.Texture.fromImage("img/tower-kh.png")
-                }(s);
+                ! function(Z) {
+                    jS = {
+                        x1: Z.getFloat32(1),
+                        y1: Z.getFloat32(5),
+                        x2: Z.getFloat32(9),
+                        y2: Z.getFloat32(13)
+                    }, OS = !0, g["tower-kh"] = PIXI.Texture.fromImage("img/tower-kh.png")
+                }(S);
                 break;
             case 57:
-                ! function(I) {
-                    if (VW) return;
-                    for (var s = nx(I, 1).replace(/ +/g, "").split("-"), x = 0; x < s.length; x++) {
-                        var C = parseInt(s[x]);
-                        isFinite(C) && C >= 1 && C <= ns.length && (Hs[x] = ns[C - 1], Ls || (js[x] = Qs[C - 1]))
+                ! function(Z) {
+                    if (Io) return;
+                    for (var S = WY(Z, 1).replace(/ +/g, "").split("-"), Y = 0; Y < S.length; Y++) {
+                        var _ = parseInt(S[Y]);
+                        isFinite(_) && _ >= 1 && _ <= WS.length && (dS[Y] = WS[_ - 1], fS || (AS[Y] = qS[_ - 1]))
                     }
-                }(s);
+                }(S);
                 break;
             case 58:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getFloat32(5),
-                        C = I.getFloat32(9),
-                        W = I.getUint8(13) > 0,
-                        Z = I.getFloat32(14),
-                        u = I.getFloat32(18);
-                    if (console.log("INPUT", s, W, x, C, Z, u), bs[UI]) {
-                        var o = new PIXI.Sprite(v.shoot);
-                        o.anchor.set(.5), isFinite(Z) ? (o.width = o.height = .2 * cI, o.tint = 255, o.x = Z, o.y = u) : (o.width = o.height = .1 * cI, o.tint = 16711680, o.x = bs[UI].x + Math.cos(x) * C, o.y = bs[UI].y + Math.sin(x) * C), r.addChild(o), anime({
-                            targets: o,
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getFloat32(5),
+                        _ = Z.getFloat32(9),
+                        o = Z.getUint8(13) > 0,
+                        J = Z.getFloat32(14),
+                        R = Z.getFloat32(18);
+                    if (console.log("INPUT", S, o, Y, _, J, R), nS[BZ]) {
+                        var r = new PIXI.Sprite(g.shoot);
+                        r.anchor.set(.5), isFinite(J) ? (r.width = r.height = .2 * QZ, r.tint = 255, r.x = J, r.y = R) : (r.width = r.height = .1 * QZ, r.tint = 16711680, r.x = nS[BZ].x + Math.cos(Y) * _, r.y = nS[BZ].y + Math.sin(Y) * _), v.addChild(r), anime({
+                            targets: r,
                             alpha: 0,
                             easing: "linear",
                             duration: 500,
                             complete: function() {
-                                r.removeChild(o)
+                                v.removeChild(r)
                             }
                         });
-                        var N = bs[UI].filters && bs[UI].filters.length > 0 ? bs[UI].filters[0] : null;
-                        N || (N = new PIXI.filters.ColorMatrixFilter, bs[UI].filters = [N]), W ? N.brightness(2) : N.reset()
+                        var w = nS[BZ].filters && nS[BZ].filters.length > 0 ? nS[BZ].filters[0] : null;
+                        w || (w = new PIXI.filters.ColorMatrixFilter, nS[BZ].filters = [w]), o ? w.brightness(2) : w.reset()
                     }
-                }(s);
+                }(S);
                 break;
             case 59:
-                ! function(I) {
-                    if (VW) return;
-                    for (var s = nx(I, 1).split(";"), x = 0; x < s.length; x++) js[x] = s[x];
-                    Ls = !0
-                }(s);
+                ! function(Z) {
+                    if (Io) return;
+                    for (var S = WY(Z, 1).split(";"), Y = 0; Y < S.length; Y++) AS[Y] = S[Y];
+                    fS = !0
+                }(S);
                 break;
             case 60:
-                ! function(I) {
-                    var s = !1;
-                    if (!hC) {
-                        if (document.getElementById("homepage").style.display = "none", document.getElementById("homepage").style.display = "none", DC(), Zs || _C(KI || pI ? "Welcome to the 1v1 lobby. Press ENTER to chat." : "Welcome to the 1v1 lobby. Chat is disabled for anonymous players. Sign-in with an account to use the chat.", Ws ? "info-dark" : "info"), s = !0, document.getElementById("gm-1v1-button-continue").addEventListener("click", TC), document.getElementById("gm-1v1-button-back").addEventListener("click", Xx), document.getElementById("gm-1v1-button-back2").addEventListener("click", Xx), document.getElementById("back-to-1v1-lobby-button").addEventListener("click", function() {
-                                dZ(-1), DC(), "undefined" != typeof aiptag && aiptag.cmd.display.push && !pu && Date.now() - hI > 3e4 && (aiptag.cmd.display.push(function() {
+                ! function(Z) {
+                    var S = !1;
+                    if (!b_) {
+                        if (document.getElementById("homepage").style.display = "none", document.getElementById("homepage").style.display = "none", H_(), JS || e_(iZ || zZ ? "Welcome to the 1v1 lobby. Press ENTER to chat." : "Welcome to the 1v1 lobby. Chat is disabled for anonymous players. Sign-in with an account to use the chat.", oS ? "info-dark" : "info"), S = !0, document.getElementById("gm-1v1-button-continue").addEventListener("click", c_), document.getElementById("gm-1v1-button-back").addEventListener("click", MY), document.getElementById("gm-1v1-button-back2").addEventListener("click", MY), document.getElementById("back-to-1v1-lobby-button").addEventListener("click", function() {
+                                vJ(-1), H_(), "undefined" != typeof aiptag && aiptag.cmd.display.push && !eR && Date.now() - bZ > 3e4 && (aiptag.cmd.display.push(function() {
                                     aipDisplayTag.display("defly-io_300x250")
-                                }), hI = Date.now())
+                                }), bZ = Date.now())
                             }), document.getElementById("spectate-1v1-previous-button").addEventListener("click", function() {
-                                dZ(0, !0)
+                                vJ(0, !0)
                             }), document.getElementById("spectate-1v1-next-button").addEventListener("click", function() {
-                                dZ(0, !1)
+                                vJ(0, !1)
                             }), document.getElementById("gm-1v1-players-header")) {
-                            let I = document.getElementById("gm-1v1-players-header").getElementsByTagName("th");
-                            for (let s = 0; s < I.length; s++) I[s].addEventListener("click", function() {
-                                PC(s)
+                            let Z = document.getElementById("gm-1v1-players-header").getElementsByTagName("th");
+                            for (let S = 0; S < Z.length; S++) Z[S].addEventListener("click", function() {
+                                P_(S)
                             })
                         }
-                        "undefined" != typeof aiptag && aiptag.cmd.display.push && !pu && (aiptag.cmd.display.push(function() {
+                        "undefined" != typeof aiptag && aiptag.cmd.display.push && !eR && (aiptag.cmd.display.push(function() {
                             aipDisplayTag.display("defly-io_300x250")
-                        }), hI = Date.now()), hC = !0
+                        }), bZ = Date.now()), b_ = !0
                     }
-                    for (var x = I.getInt32(1), C = 5, W = 0; W < x; W++) {
-                        var Z = I.getInt32(C),
-                            u = I.getInt32(C + 4),
-                            o = I.getInt32(C + 8),
-                            N = I.getUint8(C + 12);
-                        C += 13;
-                        var i = RI[Z];
-                        s || Os[Z] || _C(i + " entered the lobby", Ws ? "info-dark" : "info"), Os[Z] = {
-                            name: i,
-                            kills: u,
-                            deaths: o,
-                            status: N
-                        }, HC == Z && (wC && 1 == N || !wC && 0 == N) && (document.getElementById("gm-1v1-confirm-duel").style.visibility = "hidden")
+                    for (var Y = Z.getInt32(1), _ = 5, o = 0; o < Y; o++) {
+                        var J = Z.getInt32(_),
+                            R = Z.getInt32(_ + 4),
+                            r = Z.getInt32(_ + 8),
+                            w = Z.getUint8(_ + 12);
+                        _ += 13;
+                        var E = VZ[J];
+                        S || FS[J] || e_(E + " entered the lobby", oS ? "info-dark" : "info"), FS[J] = {
+                            name: E,
+                            kills: R,
+                            deaths: r,
+                            status: w
+                        }, d_ == J && (l_ && 1 == w || !l_ && 0 == w) && (document.getElementById("gm-1v1-confirm-duel").style.visibility = "hidden")
                     }
-                    cC()
-                }(s);
+                    Q_()
+                }(S);
                 break;
             case 61:
-                ! function(I) {
-                    var s = I.getInt32(1);
-                    _C(Os[s].name + " left the lobby", Ws ? "info-dark" : "info"), delete Os[s], cC(), delete Cx[s], delete RI[s], HC == s && (document.getElementById("gm-1v1-confirm-duel").style.visibility = "hidden")
-                }(s);
+                ! function(Z) {
+                    var S = Z.getInt32(1);
+                    e_(FS[S].name + " left the lobby", oS ? "info-dark" : "info"), delete FS[S], Q_(), delete _Y[S], delete VZ[S], d_ == S && (document.getElementById("gm-1v1-confirm-duel").style.visibility = "hidden")
+                }(S);
                 break;
             case 62:
-                ! function(I) {
-                    var s = I.getInt32(1);
-                    s && _C(Os[s].name + " is challenging you!", "bold");
-                    for (var x = I.getInt32(5), C = "", W = 0; W < x; W++) {
-                        var Z = I.getInt32(9 + 4 * W);
-                        C += '<div><div class="duel-text">' + Os[Z].name + ' is challenging you, accept?</div> <div onclick="defly.answerChallenge(' + Z + ', true);" class="button orange">YES</div> <div onclick="defly.answerChallenge(' + Z + ', false);" class="button">NO</div></div>'
+                ! function(Z) {
+                    var S = Z.getInt32(1);
+                    S && e_(FS[S].name + " is challenging you!", "bold");
+                    for (var Y = Z.getInt32(5), _ = "", o = 0; o < Y; o++) {
+                        var J = Z.getInt32(9 + 4 * o);
+                        _ += '<div><div class="duel-text">' + FS[J].name + ' is challenging you, accept?</div> <div onclick="defly.answerChallenge(' + J + ', true);" class="button orange">YES</div> <div onclick="defly.answerChallenge(' + J + ', false);" class="button">NO</div></div>'
                     }
-                    document.getElementById("gm-1v1-duel-list").innerHTML = C
-                }(s);
+                    document.getElementById("gm-1v1-duel-list").innerHTML = _
+                }(S);
                 break;
             case 63:
-                ! function(I) {
-                    var s = I.getInt32(1),
-                        x = I.getUint8(5);
-                    x < 2 && (_C(Os[s].name + (x ? " accepted" : " rejected") + " your challenge", "bold"), Os[s].challenged = !1, cC());
-                    if (1 == x || 2 == x)
-                        for (var s in ds = s, Os) Os[s].challenged = !1
-                }(s);
+                ! function(Z) {
+                    var S = Z.getInt32(1),
+                        Y = Z.getUint8(5);
+                    Y < 2 && (e_(FS[S].name + (Y ? " accepted" : " rejected") + " your challenge", "bold"), FS[S].challenged = !1, Q_());
+                    if (1 == Y || 2 == Y)
+                        for (var S in TS = S, FS) FS[S].challenged = !1
+                }(S);
                 break;
             case 64:
-                ! function(I) {
-                    var s = nx(I, 1).replace(/[ ,-]+/g, " ").split(" ");
-                    PI = [];
-                    for (var x = 0; x < s.length; x++) {
-                        var C = parseInt(s[x]);
-                        jx[C] ? PI.push(C) : console.error("Skin id does not exists", C)
+                ! function(Z) {
+                    var S = WY(Z, 1).replace(/[ ,-]+/g, " ").split(" ");
+                    PZ = [];
+                    for (var Y = 0; Y < S.length; Y++) {
+                        var _ = parseInt(S[Y]);
+                        AY[_] ? PZ.push(_) : console.error("Skin id does not exists", _)
                     }
-                }(s);
+                }(S);
                 break;
             case 98:
-                _I = !0, console.log("Received: kicked for inactivity");
+                eZ = !0, console.log("Received: kicked for inactivity");
                 try {
-                    i.close()
-                } catch (I) {}(R || LC) && document.location.reload();
+                    E.close()
+                } catch (Z) {}(V || f_) && document.location.reload();
                 break;
             case 99:
-                var u = (new Date).getTime() - Z;
-                Mx(u), console.log("ping is", u), 0;
+                var R = (new Date).getTime() - J;
+                GY(R), console.log("ping is", R), 0;
                 break;
             default:
-                console.log("unhandled message code", x)
+                console.log("unhandled message code", Y)
         }
     }
 
-    function Mx(I) {
+    function GY(Z) {
         (new Date).getTime();
-        u ? (u = .9 * u + .1 * I, I > o && (o = I), I < N && (N = I)) : (o = u = I, N = u)
+        R ? (R = .9 * R + .1 * Z, Z > r && (r = Z), Z < w && (w = Z)) : (r = R = Z, w = R)
     }
 
-    function nx(I, s) {
-        for (var x = I.getUint8(s++), C = "", W = 0; W < x; W++) {
-            var Z = I.getUint8(s + 2 * W + 1) | I.getUint8(s + 2 * W + 0) << 8;
-            C += String.fromCharCode(Z)
+    function WY(Z, S) {
+        for (var Y = Z.getUint8(S++), _ = "", o = 0; o < Y; o++) {
+            var J = Z.getUint8(S + 2 * o + 1) | Z.getUint8(S + 2 * o + 0) << 8;
+            _ += String.fromCharCode(J)
         }
-        return C
+        return _
     }
 
-    function Hx(I, s, x) {
-        I.setUint8(s, x.length);
-        for (var C = 0; C < x.length; C++) {
-            var W = x.charCodeAt(C);
-            I.setUint8(s + 1 + 2 * C + 1, 255 & W), I.setUint8(s + 1 + 2 * C + 0, W >>> 8)
+    function dY(Z, S, Y) {
+        Z.setUint8(S, Y.length);
+        for (var _ = 0; _ < Y.length; _++) {
+            var o = Y.charCodeAt(_);
+            Z.setUint8(S + 1 + 2 * _ + 1, 255 & o), Z.setUint8(S + 1 + 2 * _ + 0, o >>> 8)
         }
     }
 
-    function wx(I, s) {
-        var x = new PIXI.Sprite(v["wall-line"]);
-        return x.dot1 = I, x.dot2 = s, x.rotation = Math.atan2(s.y - I.y, s.x - I.x), x.x = (I.x + s.x) / 2, x.y = (I.y + s.y) / 2, x.anchor.set(.5), x.height = ys, x.width = Math.sqrt(Math.pow(s.x - I.x, 2) + Math.pow(s.y - I.y, 2)) - .9 * (I.size + s.size), I.lines.push(x), s.lines.push(x), x
+    function lY(Z, S) {
+        var Y = new PIXI.Sprite(g["wall-line"]);
+        return Y.dot1 = Z, Y.dot2 = S, Y.rotation = Math.atan2(S.y - Z.y, S.x - Z.x), Y.x = (Z.x + S.x) / 2, Y.y = (Z.y + S.y) / 2, Y.anchor.set(.5), Y.height = tS, Y.width = Math.sqrt(Math.pow(S.x - Z.x, 2) + Math.pow(S.y - Z.y, 2)) - .9 * (Z.size + S.size), Z.lines.push(Y), S.lines.push(Y), Y
     }
-    var Qx, jx = {
+    var qY, AY = {
         1: {
             base: "player1",
             notint: "player1-notint",
@@ -21464,407 +21468,407 @@ var defly = function() {
         }
     };
 
-    function Lx(I, s) {
-        return Qx && Qx.width == I && Qx.height == s || ((Qx = document.createElement("canvas")).width = I, Qx.height = s), Qx
+    function fY(Z, S) {
+        return qY && qY.width == Z && qY.height == S || ((qY = document.createElement("canvas")).width = Z, qY.height = S), qY
     }
-    var lx = {};
+    var hY = {};
 
-    function IC(I, s) {
-        if (lx[I.textureCacheIds[0] + "-" + s]) var x = lx[I.textureCacheIds[0] + "-" + s];
+    function Z_(Z, S) {
+        if (hY[Z.textureCacheIds[0] + "-" + S]) var Y = hY[Z.textureCacheIds[0] + "-" + S];
         else {
-            var C = s,
-                W = s;
-            I.width > I.height && (W = s / I.width * I.height), I.width < I.height && (C = s / I.height * I.width);
-            var Z = Lx(C, W),
-                u = Z.getContext("2d");
-            u.clearRect(0, 0, C, W), u.drawImage(I.baseTexture.source, I.orig.x, I.orig.y, I.orig.width, I.orig.height, 0, 0, C, W);
-            x = Z.toDataURL("image/png");
-            lx[I.textureCacheIds[0] + "-" + s] = x
+            var _ = S,
+                o = S;
+            Z.width > Z.height && (o = S / Z.width * Z.height), Z.width < Z.height && (_ = S / Z.height * Z.width);
+            var J = fY(_, o),
+                R = J.getContext("2d");
+            R.clearRect(0, 0, _, o), R.drawImage(Z.baseTexture.source, Z.orig.x, Z.orig.y, Z.orig.width, Z.orig.height, 0, 0, _, o);
+            Y = J.toDataURL("image/png");
+            hY[Z.textureCacheIds[0] + "-" + S] = Y
         }
-        return x
+        return Y
     }
 
-    function sC(I, s) {
-        for (var x = I.getImageData(0, 0, I.canvas.width, I.canvas.height), C = (16711680 & s) >> 16, W = (65280 & s) >> 8, Z = 255 & s, u = 0; u < x.data.length; u += 4) {
-            var o = x.data[u + 0],
-                N = x.data[u + 1],
-                i = x.data[u + 2];
-            x.data[u + 0] = o * C / 255, x.data[u + 1] = N * W / 255, x.data[u + 2] = i * Z / 255
+    function S_(Z, S) {
+        for (var Y = Z.getImageData(0, 0, Z.canvas.width, Z.canvas.height), _ = (16711680 & S) >> 16, o = (65280 & S) >> 8, J = 255 & S, R = 0; R < Y.data.length; R += 4) {
+            var r = Y.data[R + 0],
+                w = Y.data[R + 1],
+                E = Y.data[R + 2];
+            Y.data[R + 0] = r * _ / 255, Y.data[R + 1] = w * o / 255, Y.data[R + 2] = E * J / 255
         }
-        I.putImageData(x, 0, 0)
+        Z.putImageData(Y, 0, 0)
     }
 
-    function xC(I, s) {
-        var x = Lx(256, 256),
-            C = x.getContext("2d"),
-            W = jx[mI[I] ? mI[I] : 1],
-            Z = document.createElement("div");
-        if (Z.skinId = mI[I] ? mI[I] : 1, Z.style.position = "relative", Z.style.display = "inline-block", Z.style.width = s + "px", Z.style.height = s + "px", Z.style.backgroundColor = "#F2F7FF", !W) return Z.className = "loading", Z;
-        C.clearRect(0, 0, 256, 256), C.globalCompositeOperation = "source-over";
-        var u = document.createElement("img");
-        u.style.position = "absolute", u.style.top = s * (1 - .9) / 2 + "px", u.style.left = s * (1 - .9) / 2 + "px", u.style.width = .9 * s + "px", u.style.height = .9 * s + "px", v[W.base] && (C.drawImage(v[W.base].baseTexture.source, v[W.base].orig.x, v[W.base].orig.y, v[W.base].orig.width, v[W.base].orig.height, 0, 0, 256, 256), sC(C, Wx(I))), v[W.notint] && C.drawImage(v[W.notint].baseTexture.source, v[W.notint].orig.x, v[W.notint].orig.y, v[W.notint].orig.width, v[W.notint].orig.height, 0, 0, 256, 256);
-        var o = x.toDataURL("image/png");
-        u.src = o, Z.appendChild(u);
-        var N = -1 != [81, 82, 83, 84, 85, 86, 87, 88, 90, 95, 57, 62, 63, 70].indexOf(mI[I]) ? 1 : 2;
-        Z.rotors = [];
-        for (var i = 0; i < W.rotors.length; i++) {
-            var t = W.rotors[i];
-            if (v[t.img] && t.visibility != N) {
-                var a = document.createElement("img");
-                if (a.style.position = "absolute", a.style.left = s * (1 - .9) / 2 - .9 * -t.x * s / 2 - .9 * s * Math.abs(t.size) / 2 + .9 * s / 2 + "px", a.style.top = s * (1 - .9) / 2 - .9 * -t.y * s / 2 - .9 * s * Math.abs(t.size) / v[t.img].orig.width * v[t.img].orig.height / 2 + .9 * s / 2 + "px", a.style.width = .9 * s * Math.abs(t.size) + "px", a.style.height = .9 * s * Math.abs(t.size) / v[t.img].orig.width * v[t.img].orig.height + "px", t.tinted) {
-                    C.clearRect(0, 0, 256, 256), C.save(), t.size < 0 && (C.translate(256, 0), C.scale(-1, 1)), C.drawImage(v[t.img].baseTexture.source, v[t.img].orig.x, v[t.img].orig.y, v[t.img].orig.width, v[t.img].orig.height, 0, 0, 256, 256), C.restore(), sC(C, Wx(I));
-                    o = x.toDataURL("image/png")
-                } else o = IC(v[t.img], 256);
-                a.src = o, t.speed > 0 ? a.style.animation = "spinInverse " + 2 * Math.PI / t.speed + "s linear infinite" : t.speed < 0 && (a.style.animation = "spin " + 2 * Math.PI / -t.speed + "s linear infinite"), void 0 !== t.layer ? Z.insertBefore(a, Z.childNodes[t.layer]) : Z.appendChild(a)
+    function Y_(Z, S) {
+        var Y = fY(256, 256),
+            _ = Y.getContext("2d"),
+            o = AY[pZ[Z] ? pZ[Z] : 1],
+            J = document.createElement("div");
+        if (J.skinId = pZ[Z] ? pZ[Z] : 1, J.style.position = "relative", J.style.display = "inline-block", J.style.width = S + "px", J.style.height = S + "px", J.style.backgroundColor = "#F2F7FF", !o) return J.className = "loading", J;
+        _.clearRect(0, 0, 256, 256), _.globalCompositeOperation = "source-over";
+        var R = document.createElement("img");
+        R.style.position = "absolute", R.style.top = S * (1 - .9) / 2 + "px", R.style.left = S * (1 - .9) / 2 + "px", R.style.width = .9 * S + "px", R.style.height = .9 * S + "px", g[o.base] && (_.drawImage(g[o.base].baseTexture.source, g[o.base].orig.x, g[o.base].orig.y, g[o.base].orig.width, g[o.base].orig.height, 0, 0, 256, 256), S_(_, oY(Z))), g[o.notint] && _.drawImage(g[o.notint].baseTexture.source, g[o.notint].orig.x, g[o.notint].orig.y, g[o.notint].orig.width, g[o.notint].orig.height, 0, 0, 256, 256);
+        var r = Y.toDataURL("image/png");
+        R.src = r, J.appendChild(R);
+        var w = -1 != [81, 82, 83, 84, 85, 86, 87, 88, 90, 95, 57, 62, 63, 70].indexOf(pZ[Z]) ? 1 : 2;
+        J.rotors = [];
+        for (var E = 0; E < o.rotors.length; E++) {
+            var m = o.rotors[E];
+            if (g[m.img] && m.visibility != w) {
+                var K = document.createElement("img");
+                if (K.style.position = "absolute", K.style.left = S * (1 - .9) / 2 - .9 * -m.x * S / 2 - .9 * S * Math.abs(m.size) / 2 + .9 * S / 2 + "px", K.style.top = S * (1 - .9) / 2 - .9 * -m.y * S / 2 - .9 * S * Math.abs(m.size) / g[m.img].orig.width * g[m.img].orig.height / 2 + .9 * S / 2 + "px", K.style.width = .9 * S * Math.abs(m.size) + "px", K.style.height = .9 * S * Math.abs(m.size) / g[m.img].orig.width * g[m.img].orig.height + "px", m.tinted) {
+                    _.clearRect(0, 0, 256, 256), _.save(), m.size < 0 && (_.translate(256, 0), _.scale(-1, 1)), _.drawImage(g[m.img].baseTexture.source, g[m.img].orig.x, g[m.img].orig.y, g[m.img].orig.width, g[m.img].orig.height, 0, 0, 256, 256), _.restore(), S_(_, oY(Z));
+                    r = Y.toDataURL("image/png")
+                } else r = Z_(g[m.img], 256);
+                K.src = r, m.speed > 0 ? K.style.animation = "spinInverse " + 2 * Math.PI / m.speed + "s linear infinite" : m.speed < 0 && (K.style.animation = "spin " + 2 * Math.PI / -m.speed + "s linear infinite"), void 0 !== m.layer ? J.insertBefore(K, J.childNodes[m.layer]) : J.appendChild(K)
             }
         }
-        return Z
+        return J
     }
 
-    function CC(I) {
-        2 != aI && (_s && (mI[I] = Math.floor(7 * Math.random()) + 72), PI && PI.length > 0 && (mI[I] = PI[Math.floor(Math.random() * PI.length)]), ts && (mI[I] = Math.floor(7 * Math.random()) + 114, Math.random() <= .01 && (mI[I] = 121)), as && (mI[I] = Math.floor(6 * Math.random()) + 130));
-        var s = jx[mI[I] ? mI[I] : 1];
-        s || (s = jx[1]);
-        var x = new PIXI.Container,
-            C = new PIXI.Sprite(v[s.base]);
-        C.width = 2 * cI * s.size, C.height = 2 * cI * s.size, C.anchor.set(.5), C.tint = Wx(I), x.addChild(C);
-        var W = new PIXI.Sprite(v[s.notint]);
-        W.width = 2 * cI * s.size, W.height = 2 * cI * s.size, W.anchor.set(.5), x.addChild(W), x.rotors = [];
-        for (var Z = 0; Z < s.rotors.length; Z++) {
-            var u = s.rotors[Z],
-                o = new PIXI.Sprite(v[u.img]);
-            o.width = 2 * cI * s.size * u.size, o.height = o.width / o.texture.width * o.texture.height, o.anchor.set(.5), o.baseRotation = 0, o.x = u.x * cI * s.size, o.y = u.y * cI * s.size, void 0 !== u.layer && u.layer <= x.children.length ? x.addChildAt(o, u.layer) : x.addChild(o), void 0 !== u.tinted && u.tinted && (o.tint = Wx(I)), x.rotors.push({
-                sprite: o,
-                speed: u.speed,
-                visibility: void 0 !== u.visibility ? u.visibility : 0,
-                fixedRotation: void 0 !== u.fixedRotation && u.fixedRotation,
-                noRotation: void 0 !== u.noRotation && u.noRotation
+    function __(Z) {
+        2 != KZ && (eS && (pZ[Z] = Math.floor(7 * Math.random()) + 72), PZ && PZ.length > 0 && (pZ[Z] = PZ[Math.floor(Math.random() * PZ.length)]), mS && (pZ[Z] = Math.floor(7 * Math.random()) + 114, Math.random() <= .01 && (pZ[Z] = 121)), KS && (pZ[Z] = Math.floor(6 * Math.random()) + 130));
+        var S = AY[pZ[Z] ? pZ[Z] : 1];
+        S || (S = AY[1]);
+        var Y = new PIXI.Container,
+            _ = new PIXI.Sprite(g[S.base]);
+        _.width = 2 * QZ * S.size, _.height = 2 * QZ * S.size, _.anchor.set(.5), _.tint = oY(Z), Y.addChild(_);
+        var o = new PIXI.Sprite(g[S.notint]);
+        o.width = 2 * QZ * S.size, o.height = 2 * QZ * S.size, o.anchor.set(.5), Y.addChild(o), Y.rotors = [];
+        for (var J = 0; J < S.rotors.length; J++) {
+            var R = S.rotors[J],
+                r = new PIXI.Sprite(g[R.img]);
+            r.width = 2 * QZ * S.size * R.size, r.height = r.width / r.texture.width * r.texture.height, r.anchor.set(.5), r.baseRotation = 0, r.x = R.x * QZ * S.size, r.y = R.y * QZ * S.size, void 0 !== R.layer && R.layer <= Y.children.length ? Y.addChildAt(r, R.layer) : Y.addChild(r), void 0 !== R.tinted && R.tinted && (r.tint = oY(Z)), Y.rotors.push({
+                sprite: r,
+                speed: R.speed,
+                visibility: void 0 !== R.visibility ? R.visibility : 0,
+                fixedRotation: void 0 !== R.fixedRotation && R.fixedRotation,
+                noRotation: void 0 !== R.noRotation && R.noRotation
             })
         }
-        var N = new PIXI.Sprite(v.shield);
-        N.width = 2 * cI, N.height = 2 * cI, N.anchor.set(.5), N.tint = Wx(I), N.visible = !1;
-        var i = new PIXI.Text(RI[I] ? RI[I] : "", {
+        var w = new PIXI.Sprite(g.shield);
+        w.width = 2 * QZ, w.height = 2 * QZ, w.anchor.set(.5), w.tint = oY(Z), w.visible = !1;
+        var E = new PIXI.Text(VZ[Z] ? VZ[Z] : "", {
             fontFamily: "Arial",
             fontSize: Math.round(window.innerHeight / 60),
-            fill: Ws ? 16777215 : 0,
+            fill: oS ? 16777215 : 0,
             align: "center"
         });
-        if (i.anchor.set(.5), i.scale.set(1 / e.scale.x), x.sx = 0, x.sy = 0, x.name = name, x.playerId = I, bs[I] = x, r.addChild(x), x.shield = N, r.addChild(N), x.usernameText = i, E.addChild(i), R && I == Ts && (x.visible = !1, i.visible = !1), fI[I])
-            if (v["badge-" + fI[I]]) {
-                var t = new PIXI.Sprite(v["badge-" + fI[I]]);
-                t.height = .6 * cI, t.width = t.height / t.texture.height * t.texture.width, E.addChild(t), t.anchor.set(.5), x.badge = t
+        if (E.anchor.set(.5), E.scale.set(1 / O.scale.x), Y.sx = 0, Y.sy = 0, Y.name = name, Y.playerId = Z, nS[Z] = Y, v.addChild(Y), Y.shield = w, v.addChild(w), Y.usernameText = E, C.addChild(E), V && Z == cS && (Y.visible = !1, E.visible = !1), UZ[Z])
+            if (g["badge-" + UZ[Z]]) {
+                var m = new PIXI.Sprite(g["badge-" + UZ[Z]]);
+                m.height = .6 * QZ, m.width = m.height / m.texture.height * m.texture.width, C.addChild(m), m.anchor.set(.5), Y.badge = m
             } else {
-                var a = new PIXI.loaders.Loader;
-                a.add("badge-" + fI[I], "img/badges/" + fI[I] + ".png"), a.load(function(s, C) {
-                    if (v["badge-" + fI[I]] = C["badge-" + fI[I]].texture, x.parent) {
-                        var W = new PIXI.Sprite(v["badge-" + fI[I]]);
-                        W.height = .6 * cI, W.width = W.height / W.texture.height * W.texture.width, E.addChild(W), W.anchor.set(.5), x.badge = W
+                var K = new PIXI.loaders.Loader;
+                K.add("badge-" + UZ[Z], "img/badges/" + UZ[Z] + ".png"), K.load(function(S, _) {
+                    if (g["badge-" + UZ[Z]] = _["badge-" + UZ[Z]].texture, Y.parent) {
+                        var o = new PIXI.Sprite(g["badge-" + UZ[Z]]);
+                        o.height = .6 * QZ, o.width = o.height / o.texture.height * o.texture.width, C.addChild(o), o.anchor.set(.5), Y.badge = o
                     }
                 })
-            } return x
+            } return Y
     }
-    var WC, ZC, uC, oC, NC = 0;
+    var o_, J_, R_, r_, w_ = 0;
 
-    function iC() {
-        NC = 1 == Xs ? 3 * Math.sqrt(3) / 2 * Math.pow(HI / 2, 2) : 2 == Xs ? Math.PI * HI / 2 * wI / 2 : HI * wI, ZC = [0 - 3 * (WC = [wI / HI * 2, wI / -HI * 2, wI / -HI * 2, wI / HI * 2])[0] / 4 * HI, wI - 3 * WC[1] / 4 * HI, 0 - 1 * WC[2] / 4 * HI, wI - 1 * WC[3] / 4 * HI]
+    function E_() {
+        w_ = 1 == MS ? 3 * Math.sqrt(3) / 2 * Math.pow(dZ / 2, 2) : 2 == MS ? Math.PI * dZ / 2 * lZ / 2 : dZ * lZ, J_ = [0 - 3 * (o_ = [lZ / dZ * 2, lZ / -dZ * 2, lZ / -dZ * 2, lZ / dZ * 2])[0] / 4 * dZ, lZ - 3 * o_[1] / 4 * dZ, 0 - 1 * o_[2] / 4 * dZ, lZ - 1 * o_[3] / 4 * dZ]
     }
 
-    function tC(I) {
-        if (0 == Xs) I.x < 0 && (I.x = 0), I.x > HI && (I.x = HI), I.y < 0 && (I.y = 0), I.y > wI && (I.y = wI);
-        else if (1 == Xs) {
-            if (I.x < 0 && (I.x = 0), I.x > HI && (I.x = HI), I.y < 0 && (I.y = 0), I.y > wI && (I.y = wI), I.x > 3 * HI / 4) {
-                var s = WC[I.y < wI / 2 ? 0 : 1],
-                    x = ZC[I.y < wI / 2 ? 0 : 1],
-                    C = (I.y - x) / s;
-                I.x > C && (I.x = C)
-            } else if (I.x < 1 * HI / 4) {
-                s = WC[I.y < wI / 2 ? 2 : 3], x = ZC[I.y < wI / 2 ? 2 : 3];
-                var W = (I.y - x) / s;
-                I.x < W && (I.x = W)
+    function m_(Z) {
+        if (0 == MS) Z.x < 0 && (Z.x = 0), Z.x > dZ && (Z.x = dZ), Z.y < 0 && (Z.y = 0), Z.y > lZ && (Z.y = lZ);
+        else if (1 == MS) {
+            if (Z.x < 0 && (Z.x = 0), Z.x > dZ && (Z.x = dZ), Z.y < 0 && (Z.y = 0), Z.y > lZ && (Z.y = lZ), Z.x > 3 * dZ / 4) {
+                var S = o_[Z.y < lZ / 2 ? 0 : 1],
+                    Y = J_[Z.y < lZ / 2 ? 0 : 1],
+                    _ = (Z.y - Y) / S;
+                Z.x > _ && (Z.x = _)
+            } else if (Z.x < 1 * dZ / 4) {
+                S = o_[Z.y < lZ / 2 ? 2 : 3], Y = J_[Z.y < lZ / 2 ? 2 : 3];
+                var o = (Z.y - Y) / S;
+                Z.x < o && (Z.x = o)
             }
-        } else if (2 == Xs) {
-            if (I.dst2XY(HI / 2, HI / 2) > Math.pow(HI / 2, 2)) {
-                var Z = Math.atan2(I.y - wI / 2, I.x - HI / 2);
-                I.x = HI / 2 + Math.cos(Z) * HI / 2, I.y = wI / 2 + Math.sin(Z) * wI / 2
+        } else if (2 == MS) {
+            if (Z.dst2XY(dZ / 2, dZ / 2) > Math.pow(dZ / 2, 2)) {
+                var J = Math.atan2(Z.y - lZ / 2, Z.x - dZ / 2);
+                Z.x = dZ / 2 + Math.cos(J) * dZ / 2, Z.y = lZ / 2 + Math.sin(J) * lZ / 2
             }
         }
     }
 
-    function aC(I) {
-        if (I) {
-            var s = JI.slice();
-            JI = [];
-            for (var x = 0; x < s.length; x++) sZ(s[x], !0)
-        } else if (JI = [], SI > 0)
-            for (x = 0; x < AI.length; x++) document.getElementById("skill-plus-" + x).style.display = AI[x] >= BI[x] ? "none" : "block", document.getElementById("skill-bar-" + x).innerHTML = hW('<span class="full"></span>', AI[x]) + hW("<span></span>", BI[x] - AI[x]);
+    function K_(Z) {
+        if (Z) {
+            var S = aZ.slice();
+            aZ = [];
+            for (var Y = 0; Y < S.length; Y++) YJ(S[Y], !0)
+        } else if (aZ = [], XZ > 0)
+            for (Y = 0; Y < sZ.length; Y++) document.getElementById("skill-plus-" + Y).style.display = sZ[Y] >= yZ[Y] ? "none" : "block", document.getElementById("skill-bar-" + Y).innerHTML = bo('<span class="full"></span>', sZ[Y]) + bo("<span></span>", yZ[Y] - sZ[Y]);
         document.getElementById("upgrade-block").classList.remove("ask-redo")
     }
 
-    function eC() {
-        document.getElementById("respawn").style.color = Ws ? "white" : "", document.getElementById("respawn").style.backgroundColor = Ws ? "rgba(255, 255, 255, 0.2)" : "", document.getElementById("respawn-gm2").style.color = Ws ? "white" : "", document.getElementById("respawn-gm2").style.backgroundColor = Ws ? "rgba(255, 255, 255, 0.2)" : "", document.getElementById("chat-input").style.color = Ws ? "white" : "", document.getElementById("chat-history").style.color = Ws ? "white" : "", document.getElementById("chat-history-full").style.color = Ws ? "white" : "", document.getElementById("fps").style.color = Ws ? "white" : "", document.getElementById("choose-superpower").style.color = Ws ? "white" : "", document.getElementById("upgrade-block").style.color = Ws ? "white" : "", document.getElementById("countdown").style.color = Ws ? "white" : "";
-        for (var I = document.getElementsByClassName("bars-bg"), s = 0; s < I.length; s++) I[s].style.backgroundColor = Ws ? "rgba(84, 84, 84, 0.7)" : "";
-        for (I = document.getElementsByClassName("score-bar"), s = 0; s < I.length; s++) I[s].style.backgroundColor = Ws ? "rgba(255, 255, 255, 0.5)" : "";
-        for (I = document.getElementsByClassName("xp-bar"), s = 0; s < I.length; s++) I[s].style.backgroundColor = Ws ? "rgba(255, 255, 255, 0.5)" : "";
-        Ws ? document.body.classList.add("dark-theme") : document.body.classList.remove("dark-theme")
+    function O_() {
+        document.getElementById("respawn").style.color = oS ? "white" : "", document.getElementById("respawn").style.backgroundColor = oS ? "rgba(255, 255, 255, 0.2)" : "", document.getElementById("respawn-gm2").style.color = oS ? "white" : "", document.getElementById("respawn-gm2").style.backgroundColor = oS ? "rgba(255, 255, 255, 0.2)" : "", document.getElementById("chat-input").style.color = oS ? "white" : "", document.getElementById("chat-history").style.color = oS ? "white" : "", document.getElementById("chat-history-full").style.color = oS ? "white" : "", document.getElementById("fps").style.color = oS ? "white" : "", document.getElementById("choose-superpower").style.color = oS ? "white" : "", document.getElementById("upgrade-block").style.color = oS ? "white" : "", document.getElementById("countdown").style.color = oS ? "white" : "";
+        for (var Z = document.getElementsByClassName("bars-bg"), S = 0; S < Z.length; S++) Z[S].style.backgroundColor = oS ? "rgba(84, 84, 84, 0.7)" : "";
+        for (Z = document.getElementsByClassName("score-bar"), S = 0; S < Z.length; S++) Z[S].style.backgroundColor = oS ? "rgba(255, 255, 255, 0.5)" : "";
+        for (Z = document.getElementsByClassName("xp-bar"), S = 0; S < Z.length; S++) Z[S].style.backgroundColor = oS ? "rgba(255, 255, 255, 0.5)" : "";
+        oS ? document.body.classList.add("dark-theme") : document.body.classList.remove("dark-theme")
     }
 
-    function GC(I, s, x) {
-        var C = Math.pow(x.x - I, 2) + Math.pow(x.y - s, 2);
-        if (C < .01 || C > 1) x.x = I, x.y = s;
+    function j_(Z, S, Y) {
+        var _ = Math.pow(Y.x - Z, 2) + Math.pow(Y.y - S, 2);
+        if (_ < .01 || _ > 1) Y.x = Z, Y.y = S;
         else {
-            var W = .01 / C;
-            x.x = W * x.x + (1 - W) * I, x.y = W * x.y + (1 - W) * s
+            var o = .01 / _;
+            Y.x = o * Y.x + (1 - o) * Z, Y.y = o * Y.y + (1 - o) * S
         }
     }
 
-    function SC(I) {
-        var s = 5,
-            x = I.getInt16(s);
-        s += 2;
-        for (var C = {}, W = 0; W < x; W++) {
-            var Z = I.getInt32(s),
-                u = I.getFloat32(s + 4),
-                o = I.getFloat32(s + 8),
-                N = I.getFloat32(s + 12),
-                i = I.getFloat32(s + 16),
-                t = I.getFloat32(s + 20),
-                a = I.getUint8(s + 24);
-            s += 25, bs[Z] || CC(Z), C[Z] = !0, Z != Ts ? (bs[Z].x = u, bs[Z].y = o, bs[Z].sx = N, bs[Z].sy = i, bs[Z].rotation = t, bs[Z].superpower = 255 == a ? -1 : a, bs[Z].shield.visible = 3 == a, bs[Z].shield.visible && bs[Z].shield.position.set(u, o)) : (bs[Z].sx = N, bs[Z].sy = i, bs[Z].shield.visible = 3 == a), GC(u, o, bs[Z])
+    function X_(Z) {
+        var S = 5,
+            Y = Z.getInt16(S);
+        S += 2;
+        for (var _ = {}, o = 0; o < Y; o++) {
+            var J = Z.getInt32(S),
+                R = Z.getFloat32(S + 4),
+                r = Z.getFloat32(S + 8),
+                w = Z.getFloat32(S + 12),
+                E = Z.getFloat32(S + 16),
+                m = Z.getFloat32(S + 20),
+                K = Z.getUint8(S + 24);
+            S += 25, nS[J] || __(J), _[J] = !0, J != cS ? (nS[J].x = R, nS[J].y = r, nS[J].sx = w, nS[J].sy = E, nS[J].rotation = m, nS[J].superpower = 255 == K ? -1 : K, nS[J].shield.visible = 3 == K, nS[J].shield.visible && nS[J].shield.position.set(R, r)) : (nS[J].sx = w, nS[J].sy = E, nS[J].shield.visible = 3 == K), j_(R, r, nS[J])
         }
-        for (var Z in bs)
-            if ("ghost" != Z && !C[Z]) {
-                var e = bs[Z];
-                delete bs[Z], r.removeChild(e), E.removeChild(e.usernameText), e.shield && r.removeChild(e.shield), e.badge && E.removeChild(e.badge)
-            } if (bs[Ts])(G = document.getElementById("minimap-position")).style.left = bs[Ts].x / HI * 100 + "%", G.style.top = bs[Ts].y / wI * 100 + "%";
-        else if (bs[UI]) {
-            var G;
-            (G = document.getElementById("minimap-position")).style.left = bs[UI].x / HI * 100 + "%", G.style.top = bs[UI].y / wI * 100 + "%"
+        for (var J in nS)
+            if ("ghost" != J && !_[J]) {
+                var O = nS[J];
+                delete nS[J], v.removeChild(O), C.removeChild(O.usernameText), O.shield && v.removeChild(O.shield), O.badge && C.removeChild(O.badge)
+            } if (nS[cS])(j = document.getElementById("minimap-position")).style.left = nS[cS].x / dZ * 100 + "%", j.style.top = nS[cS].y / lZ * 100 + "%";
+        else if (nS[BZ]) {
+            var j;
+            (j = document.getElementById("minimap-position")).style.left = nS[BZ].x / dZ * 100 + "%", j.style.top = nS[BZ].y / lZ * 100 + "%"
         }
-        if (!Es && (1 == aI || 2 == aI || 3 == aI)) {
-            var S = "";
-            for (var Z in bs) {
-                if (Z != Ts && hs[Z] == Bs && !WZ) S += '<div class="minimap-position" style="left: ' + bs[Z].x / HI * 100 + "%; top: " + bs[Z].y / wI * 100 + '%;"></div>'
+        if (!CS && (1 == KZ || 2 == KZ || 3 == KZ)) {
+            var X = "";
+            for (var J in nS) {
+                if (J != cS && bS[J] == yS && !JJ) X += '<div class="minimap-position" style="left: ' + nS[J].x / dZ * 100 + "%; top: " + nS[J].y / lZ * 100 + '%;"></div>'
             }
-            document.getElementById("minimap-team-positions").innerHTML = S
+            document.getElementById("minimap-team-positions").innerHTML = X
         }
     }
-    var JC = 0;
-    var AC, FC, gC, EC, dC = ["Can't cross enemy lines", "Can't build: too close from existing dot", "Can't build line so long", "Can't build line on existing dot", "Can't build dot on existing line"],
-        rC = 0;
+    var a_ = 0;
+    var s_, k_, N_, C_, T_ = ["Can't cross enemy lines", "Can't build: too close from existing dot", "Can't build line so long", "Can't build line on existing dot", "Can't build dot on existing line"],
+        v_ = 0;
 
-    function vC(I, s, x) {
-        var C = document.getElementById("user-info");
-        C && x && (window.document.body.removeChild(C), C = null), C || ((C = document.createElement("div")).setAttribute("class", "user-info"), C.setAttribute("id", "user-info"), window.document.body.appendChild(C)), C.innerHTML = I, Ws && (C.style.color = "white"), C.style.opacity = 1, clearTimeout(gC), clearInterval(EC), gC = setTimeout(function() {
-            var I = (new Date).getTime();
-            EC = setInterval(function() {
-                var s = (new Date).getTime() - I;
-                s > 500 ? (clearInterval(EC), window.document.body.removeChild(C)) : C.style.opacity = 1 - s / 500
+    function g_(Z, S, Y) {
+        var _ = document.getElementById("user-info");
+        _ && Y && (window.document.body.removeChild(_), _ = null), _ || ((_ = document.createElement("div")).setAttribute("class", "user-info"), _.setAttribute("id", "user-info"), window.document.body.appendChild(_)), _.innerHTML = Z, oS && (_.style.color = "white"), _.style.opacity = 1, clearTimeout(N_), clearInterval(C_), N_ = setTimeout(function() {
+            var Z = (new Date).getTime();
+            C_ = setInterval(function() {
+                var S = (new Date).getTime() - Z;
+                S > 500 ? (clearInterval(C_), window.document.body.removeChild(_)) : _.style.opacity = 1 - S / 500
             }, 20)
-        }, s)
+        }, S)
     }
 
-    function UC(I) {
-        var s = document.getElementById("fade-screen");
-        s || ((s = document.createElement("div")).setAttribute("id", "fade-screen"), window.document.body.appendChild(s)), anime({
-            targets: s,
+    function B_(Z) {
+        var S = document.getElementById("fade-screen");
+        S || ((S = document.createElement("div")).setAttribute("id", "fade-screen"), window.document.body.appendChild(S)), anime({
+            targets: S,
             opacity: [0, 1],
             easing: "linear",
             duration: 500,
-            complete: I
+            complete: Z
         })
     }
 
-    function RC(I) {
-        var s = document.getElementById("fade-screen");
-        s && anime({
-            targets: s,
+    function V_(Z) {
+        var S = document.getElementById("fade-screen");
+        S && anime({
+            targets: S,
             opacity: [1, 0],
             easing: "linear",
             duration: 500,
             complete: function() {
-                window.document.body.removeChild(s), "function" == typeof I && I()
+                window.document.body.removeChild(S), "function" == typeof Z && Z()
             }
         })
     }
-    var fC = [];
+    var U_ = [];
 
-    function mC() {
-        for (var I = document.getElementById("toasts"), s = "", x = (new Date).getTime(), C = fC.length - 1; C >= 0; C--) {
-            if (x - fC[C].t >= 9900) fC.splice(C, 1);
-            else s = "<div" + (fC[C].c ? " class=" + fC[C].c : "") + ">" + fC[C].s + "</div>" + s
+    function p_() {
+        for (var Z = document.getElementById("toasts"), S = "", Y = (new Date).getTime(), _ = U_.length - 1; _ >= 0; _--) {
+            if (Y - U_[_].t >= 9900) U_.splice(_, 1);
+            else S = "<div" + (U_[_].c ? " class=" + U_[_].c : "") + ">" + U_[_].s + "</div>" + S
         }
-        I.innerHTML = s
+        Z.innerHTML = S
     }
 
-    function kC(I, s) {
-        fC.push({
+    function $_(Z, S) {
+        U_.push({
             t: (new Date).getTime(),
-            s: I,
-            c: s
-        }), mC(), setTimeout(mC, 1e4)
+            s: Z,
+            c: S
+        }), p_(), setTimeout(p_, 1e4)
     }
-    var yC = [],
-        VC = [];
+    var t_ = [],
+        I_ = [];
 
-    function KC() {
-        for (var I = document.getElementById("chat-history"), s = "", x = (new Date).getTime(), C = yC.length - 1; C >= 0; C--) {
-            if (x - yC[C].t >= 2e4) yC.splice(C, 1);
-            else s = "<div" + (yC[C].c ? " class=" + yC[C].c : "") + ">" + yC[C].s + "</div>" + s
+    function i_() {
+        for (var Z = document.getElementById("chat-history"), S = "", Y = (new Date).getTime(), _ = t_.length - 1; _ >= 0; _--) {
+            if (Y - t_[_].t >= 2e4) t_.splice(_, 1);
+            else S = "<div" + (t_[_].c ? " class=" + t_[_].c : "") + ">" + t_[_].s + "</div>" + S
         }
-        I.innerHTML = s
+        Z.innerHTML = S
     }
 
-    function pC(I) {
-        for (var s = document.getElementById("chat-history-full").scrollHeight - document.getElementById("chat-history-full").scrollTop - document.getElementById("chat-history-full").offsetHeight <= 1, x = document.getElementById("chat-history-full"), C = "", W = 0; W < VC.length; W++) {
-            C += "<div" + (VC[W].c ? " class=" + VC[W].c : "") + ">" + VC[W].s + "</div>"
+    function z_(Z) {
+        for (var S = document.getElementById("chat-history-full").scrollHeight - document.getElementById("chat-history-full").scrollTop - document.getElementById("chat-history-full").offsetHeight <= 1, Y = document.getElementById("chat-history-full"), _ = "", o = 0; o < I_.length; o++) {
+            _ += "<div" + (I_[o].c ? " class=" + I_[o].c : "") + ">" + I_[o].s + "</div>"
         }
-        x.innerHTML = C, I && s && (document.getElementById("chat-history-full").scrollTop = document.getElementById("chat-history-full").scrollHeight)
+        Y.innerHTML = _, Z && S && (document.getElementById("chat-history-full").scrollTop = document.getElementById("chat-history-full").scrollHeight)
     }
 
-    function _C(I, s) {
-        for (yC.push({
+    function e_(Z, S) {
+        for (t_.push({
                 t: (new Date).getTime(),
-                s: I,
-                c: s
-            }); yC.length > 10;) yC.splice(0, 1);
-        for (KC(), setTimeout(KC, 2e4), VC.push({
-                s: I,
-                c: s
-            }); VC.length > 100;) VC.splice(0, 1);
-        document.getElementById("chat-block").classList.contains("typing") && pC(!0)
+                s: Z,
+                c: S
+            }); t_.length > 10;) t_.splice(0, 1);
+        for (i_(), setTimeout(i_, 2e4), I_.push({
+                s: Z,
+                c: S
+            }); I_.length > 100;) I_.splice(0, 1);
+        document.getElementById("chat-block").classList.contains("typing") && z_(!0)
     }
 
-    function zC(I) {
-        I = I.substring(0, 255);
-        var s = new DataView(new ArrayBuffer(2 + 2 * I.length));
-        s.setUint8(0, 10), s.setUint8(1, I.length);
-        for (var x = 0; x < I.length; x++) {
-            var C = I.charCodeAt(x);
-            s.setUint8(2 + 2 * x + 1, 255 & C), s.setUint8(2 + 2 * x + 0, C >>> 8)
+    function x_(Z) {
+        Z = Z.substring(0, 255);
+        var S = new DataView(new ArrayBuffer(2 + 2 * Z.length));
+        S.setUint8(0, 10), S.setUint8(1, Z.length);
+        for (var Y = 0; Y < Z.length; Y++) {
+            var _ = Z.charCodeAt(Y);
+            S.setUint8(2 + 2 * Y + 1, 255 & _), S.setUint8(2 + 2 * Y + 0, _ >>> 8)
         }
-        i.send(s.buffer)
+        E.send(S.buffer)
     }
-    var qC = [];
-    var YC = ["You win! You protected your bomb spots until the end", "You win! All enemies have been killed!", "You win! The bomb exploded", "You win! You defused the bomb", "You lose! You failed to plant the bomb before the countdown", "You lose! All your teammates have been killed", "You lose! You failed to defuse the bomb", "You lose! The enemy defused the bomb"];
-    var bC = [];
+    var u_ = [];
+    var L_ = ["You win! You protected your bomb spots until the end", "You win! All enemies have been killed!", "You win! The bomb exploded", "You win! You defused the bomb", "You lose! You failed to plant the bomb before the countdown", "You lose! All your teammates have been killed", "You lose! You failed to defuse the bomb", "You lose! The enemy defused the bomb"];
+    var n_ = [];
 
-    function TC() {
-        document.getElementById("gm-1v1-continue-spinner").style.display = "inline-block", document.getElementById("gm-1v1-button-continue").style.display = "none", Yx = BC, !Js && Date.now() - OI > 12e4 && Ox() ? "undefined" != typeof gtag && gtag("event", "Respawn", {
+    function c_() {
+        document.getElementById("gm-1v1-continue-spinner").style.display = "inline-block", document.getElementById("gm-1v1-button-continue").style.display = "none", LY = y_, !aS && Date.now() - FZ > 12e4 && FY() ? "undefined" != typeof gtag && gtag("event", "Respawn", {
             event_category: "Click",
             event_label: "VideoAd"
-        }) : (BC(), "undefined" != typeof gtag && gtag("event", "Respawn", {
+        }) : (y_(), "undefined" != typeof gtag && gtag("event", "Respawn", {
             event_category: "Click",
             event_label: "NoVideoAd"
         }))
     }
 
-    function DC() {
-        document.getElementById("gm-1v1-lobby").style.display = "block", document.getElementById("chat-block").classList.add("typing"), document.getElementById("chat-block").classList.add("gm-1v1-lobby"), document.getElementById("spectate-1v1-ui").style.display = "none", KI || pI || (document.getElementById("chat-input").style.display = "none")
+    function H_() {
+        document.getElementById("gm-1v1-lobby").style.display = "block", document.getElementById("chat-block").classList.add("typing"), document.getElementById("chat-block").classList.add("gm-1v1-lobby"), document.getElementById("spectate-1v1-ui").style.display = "none", iZ || zZ || (document.getElementById("chat-input").style.display = "none")
     }
 
-    function BC() {
-        var I = document.getElementById("gm-1v1-main"),
-            s = {
+    function y_() {
+        var Z = document.getElementById("gm-1v1-main"),
+            S = {
                 v: 1
             };
         anime({
-            targets: s,
+            targets: S,
             v: 0,
             easing: "easeOutQuad",
             duration: 500,
             update: function() {
-                I.style.gridTemplateRows = 50 + 50 * s.v + "% 50%"
+                Z.style.gridTemplateRows = 50 + 50 * S.v + "% 50%"
             },
             complete: function() {
-                I.style.gridTemplateRows = "50% 50%", document.getElementById("gm-1v1-continue-spinner").style.display = "none", document.getElementById("gm-1v1-button-continue").style.display = "none", document.getElementById("gm-1v1-button-back").style.display = "inline-block"
+                Z.style.gridTemplateRows = "50% 50%", document.getElementById("gm-1v1-continue-spinner").style.display = "none", document.getElementById("gm-1v1-button-continue").style.display = "none", document.getElementById("gm-1v1-button-back").style.display = "inline-block"
             }
         })
     }
-    var hC = !1;
-    let OC = 0,
-        $C = 0,
-        XC = ["name", "kills", "deaths", "statusText"];
+    var b_ = !1;
+    let F_ = 0,
+        D_ = 0,
+        M_ = ["name", "kills", "deaths", "statusText"];
 
-    function PC(I) {
-        OC == I ? $C = ($C + 1) % 3 : (OC = I, $C = 1), cC()
+    function P_(Z) {
+        F_ == Z ? D_ = (D_ + 1) % 3 : (F_ = Z, D_ = 1), Q_()
     }
 
-    function cC() {
-        let I = [];
-        for (var s in Os) {
-            I.push(s);
-            var x = Os[s];
-            Os[s].statusText = x.challenged ? "Asked" : 0 == x.status ? "Lobby" : "Arena"
+    function Q_() {
+        let Z = [];
+        for (var S in FS) {
+            Z.push(S);
+            var Y = FS[S];
+            FS[S].statusText = Y.challenged ? "Asked" : 0 == Y.status ? "Lobby" : "Arena"
         }
-        0 != $C && function(I, s, x) {
-            I.sort(function(I, C) {
-                return "string" == typeof Os[I][s] ? Os[I][s].localeCompare(Os[C][s]) * (x ? 1 : -1) : (Os[I][s] - Os[C][s]) * (x ? 1 : -1)
+        0 != D_ && function(Z, S, Y) {
+            Z.sort(function(Z, _) {
+                return "string" == typeof FS[Z][S] ? FS[Z][S].localeCompare(FS[_][S]) * (Y ? 1 : -1) : (FS[Z][S] - FS[_][S]) * (Y ? 1 : -1)
             })
-        }(I, XC[OC], 1 == $C);
-        let C = document.getElementById("gm-1v1-players-header").getElementsByTagName("th");
-        for (let I = 0; I < C.length; I++) C[I].classList = OC == I && 0 != $C ? 1 == $C ? "sortA" : "sortD" : "";
-        for (var W = "", Z = 0; Z < I.length; Z++) {
-            let s = I[Z];
-            x = Os[s];
-            W += '<tr id="gm1-player-"+id ' + (s == Ts ? 'class="is-local-player" ' : "") + 'onclick="defly.select1v1Player(' + s + ');"><td>' + x.name + "</td><td>" + x.kills + "</td><td>" + x.deaths + "</td><td>" + x.statusText + "</td></tr>"
+        }(Z, M_[F_], 1 == D_);
+        let _ = document.getElementById("gm-1v1-players-header").getElementsByTagName("th");
+        for (let Z = 0; Z < _.length; Z++) _[Z].classList = F_ == Z && 0 != D_ ? 1 == D_ ? "sortA" : "sortD" : "";
+        for (var o = "", J = 0; J < Z.length; J++) {
+            let S = Z[J];
+            Y = FS[S];
+            o += '<tr id="gm1-player-"+id ' + (S == cS ? 'class="is-local-player" ' : "") + 'onclick="defly.select1v1Player(' + S + ');"><td>' + Y.name + "</td><td>" + Y.kills + "</td><td>" + Y.deaths + "</td><td>" + Y.statusText + "</td></tr>"
         }
-        document.getElementById("gm-1v1-players").innerHTML = W
+        document.getElementById("gm-1v1-players").innerHTML = o
     }
-    var MC, nC, HC = 0,
-        wC = !1;
+    var G_, W_, d_ = 0,
+        l_ = !1;
 
-    function QC() {
-        var I = Math.floor(ps / 60),
-            s = Math.ceil(ps % 60);
-        60 == s && (s = 0, I++), document.getElementById("countdown-value").innerHTML = (I > 0 ? "0" + I + ":" : "00:") + (s > 9 ? s : "0" + s)
+    function q_() {
+        var Z = Math.floor(zS / 60),
+            S = Math.ceil(zS % 60);
+        60 == S && (S = 0, Z++), document.getElementById("countdown-value").innerHTML = (Z > 0 ? "0" + Z + ":" : "00:") + (S > 9 ? S : "0" + S)
     }
 
-    function jC(I, s) {
-        return I + Math.floor(Math.random() * (s - I))
+    function A_(Z, S) {
+        return Z + Math.floor(Math.random() * (S - Z))
     }
-    var LC = !1;
-    var lC = 0;
+    var f_ = !1;
+    var h_ = 0;
 
-    function IW(I) {
-        var s = I.getInt32(1),
-            x = I.getInt32(5),
-            C = I.getFloat32(9),
-            W = I.getFloat32(13),
-            Z = I.getUint8(17),
-            u = I.getUint8(18),
-            o = I.getFloat32(19),
-            N = I.getInt32(23),
-            i = MI;
-        if (zs[s]) 0;
+    function Zo(Z) {
+        var S = Z.getInt32(1),
+            Y = Z.getInt32(5),
+            _ = Z.getFloat32(9),
+            o = Z.getFloat32(13),
+            J = Z.getUint8(17),
+            R = Z.getUint8(18),
+            r = Z.getFloat32(19),
+            w = Z.getInt32(23),
+            E = GZ;
+        if (xS[S]) 0;
         else {
-            var t = new PIXI.Sprite(v.dot1);
-            t.x = C, t.y = W, t.width = 2 * i, t.height = 2 * i, t.size = i, t.anchor.set(.5), t.owner = x, t.hp = Z, t.maxHP = u, t.creationTurn = N, t.alpha = 1, t.tint = 1 == aI || 2 == aI ? Zx(x) : Wx(x), es && 1 == x && C >= Gs.x1 && C <= Gs.x2 && W >= Gs.y1 && W <= Gs.y2 && v["tower-kh"] && (t.texture = v["tower-kh"], t.tint = 15642415), t.lines = [], t.dotId = s, J.addChild(t), zs[s] = t, t.hp != t.maxHP && (t.healthBar = AW(t), g.addChild(t.healthBar), t.healthBar.outer.width = t.healthBar.width * t.hp / t.maxHP), o > 0 && sW(t, o), 0 != aI && 3 != aI || x != Ts || (Wu = !0)
+            var m = new PIXI.Sprite(g.dot1);
+            m.x = _, m.y = o, m.width = 2 * E, m.height = 2 * E, m.size = E, m.anchor.set(.5), m.owner = Y, m.hp = J, m.maxHP = R, m.creationTurn = w, m.alpha = 1, m.tint = 1 == KZ || 2 == KZ ? JY(Y) : oY(Y), OS && 1 == Y && _ >= jS.x1 && _ <= jS.x2 && o >= jS.y1 && o <= jS.y2 && g["tower-kh"] && (m.texture = g["tower-kh"], m.tint = 15642415), m.lines = [], m.dotId = S, a.addChild(m), xS[S] = m, m.hp != m.maxHP && (m.healthBar = so(m), N.addChild(m.healthBar), m.healthBar.outer.width = m.healthBar.width * m.hp / m.maxHP), r > 0 && So(m, r), 0 != KZ && 3 != KZ || Y != cS || (JR = !0)
         }
     }
 
-    function sW(I, s) {
-        var x = new PIXI.Sprite(v.shield);
-        x.x = I.x, x.y = I.y, x.width = 1.709089011247097 * I.width, x.height = 1.709089011247097 * I.height, x.anchor.set(.5), x.tint = 1 == aI || 2 == aI ? Zx(I.owner) : Wx(I.owner), x.lastAppearTurn = -1e3, x.appearPercent = s, x.state = 0, x.alpha = 0, J.addChild(x), I.shield = x
+    function So(Z, S) {
+        var Y = new PIXI.Sprite(g.shield);
+        Y.x = Z.x, Y.y = Z.y, Y.width = 1.709089011247097 * Z.width, Y.height = 1.709089011247097 * Z.height, Y.anchor.set(.5), Y.tint = 1 == KZ || 2 == KZ ? JY(Z.owner) : oY(Z.owner), Y.lastAppearTurn = -1e3, Y.appearPercent = S, Y.state = 0, Y.alpha = 0, a.addChild(Y), Z.shield = Y
     }
 
-    function xW(I, s, x) {
-        return 3 == aI ? "dot" + s + "-" + x : _s || !Ss || 1 != aI && 2 != aI || I == Bs ? !_s && Ss && 0 == aI && I != Ts ? "dot1-enemy" : "dot1" : "dot1-enemy"
+    function Yo(Z, S, Y) {
+        return 3 == KZ ? "dot" + S + "-" + Y : eS || !XS || 1 != KZ && 2 != KZ || Z == yS ? !eS && XS && 0 == KZ && Z != cS ? "dot1-enemy" : "dot1" : "dot1-enemy"
     }
 
-    function CW(I) {
-        var s = I.getInt32(1),
-            x = I.getInt32(5),
-            C = I.getInt32(9),
-            W = I.getInt32(13),
-            Z = I.getInt32(17),
-            u = I.getInt32(21),
-            o = zs[C],
-            N = zs[W];
-        if (o || console.error("could not find dot", C), N || console.error("could not find dot", W), qs[s]) 0;
+    function _o(Z) {
+        var S = Z.getInt32(1),
+            Y = Z.getInt32(5),
+            _ = Z.getInt32(9),
+            o = Z.getInt32(13),
+            J = Z.getInt32(17),
+            R = Z.getInt32(21),
+            r = xS[_],
+            w = xS[o];
+        if (r || console.error("could not find dot", _), w || console.error("could not find dot", o), uS[S]) 0;
         else {
-            var i = wx(o, N);
-            i.lineId = s, i.owner = x, i.tint = 1 == aI || 2 == aI ? Zx(x) : Wx(x), es && 15642415 == o.tint && (i.tint = 15642415), i.dot1 = o, i.dot2 = N, i.leftZoneId = Z, i.rightZoneId = u, A.addChild(i), qs[s] = i, X && X.addLine(i, o.position, N.position), i.alpha = 0, anime({
-                targets: i,
+            var E = lY(r, w);
+            E.lineId = S, E.owner = Y, E.tint = 1 == KZ || 2 == KZ ? JY(Y) : oY(Y), OS && 15642415 == r.tint && (E.tint = 15642415), E.dot1 = r, E.dot2 = w, E.leftZoneId = J, E.rightZoneId = R, s.addChild(E), uS[S] = E, M && M.addLine(E, r.position, w.position), E.alpha = 0, anime({
+                targets: E,
                 alpha: 1,
                 duration: 250,
                 easing: "linear"
@@ -21872,431 +21876,431 @@ var defly = function() {
         }
     }
 
-    function WW(I, s, x, C, W, Z) {
-        return I >= x && I <= C && s >= W && s <= Z
+    function oo(Z, S, Y, _, o, J) {
+        return Z >= Y && Z <= _ && S >= o && S <= J
     }
 
-    function ZW(I, s, x, C, W, Z, u, o) {
-        if (I > Z) {
-            var N = (Z - x) / (I - x);
-            I = Z, s = (s - C) * N + C
-        } else if (I < W) {
-            N = (W - x) / (I - x);
-            I = W, s = (s - C) * N + C
+    function Jo(Z, S, Y, _, o, J, R, r) {
+        if (Z > J) {
+            var w = (J - Y) / (Z - Y);
+            Z = J, S = (S - _) * w + _
+        } else if (Z < o) {
+            w = (o - Y) / (Z - Y);
+            Z = o, S = (S - _) * w + _
         }
-        if (s > o) {
-            N = (o - C) / (s - C);
-            s = o, I = (I - x) * N + x
-        } else if (s < u) {
-            N = (u - C) / (s - C);
-            s = u, I = (I - x) * N + x
+        if (S > r) {
+            w = (r - _) / (S - _);
+            S = r, Z = (Z - Y) * w + Y
+        } else if (S < R) {
+            w = (R - _) / (S - _);
+            S = R, Z = (Z - Y) * w + Y
         }
         return {
-            x: I,
-            y: s
+            x: Z,
+            y: S
         }
     }
 
-    function uW(I, s) {
-        var x = I.getInt32(1),
-            C = I.getInt32(5),
-            W = I.getFloat32(9),
-            Z = I.getInt16(13),
-            u = I.byteLength > 15 + 5 * Z;
-        if (u && Ys[x]) {
-            for (var o = Ys[x], N = 0; N < o.linePath.length; N++) o.linePath[N].leftZoneId == x && (o.linePath[N].leftZoneId = 0), o.linePath[N].rightZoneId == x && (o.linePath[N].rightZoneId = 0);
-            F.removeChild(o), delete Ys[x], P && P.removeZone(o, o.zoneBounds.minX, o.zoneBounds.maxX, o.zoneBounds.minY, o.zoneBounds.maxY)
+    function Ro(Z, S) {
+        var Y = Z.getInt32(1),
+            _ = Z.getInt32(5),
+            o = Z.getFloat32(9),
+            J = Z.getInt16(13),
+            R = Z.byteLength > 15 + 5 * J;
+        if (R && LS[Y]) {
+            for (var r = LS[Y], w = 0; w < r.linePath.length; w++) r.linePath[w].leftZoneId == Y && (r.linePath[w].leftZoneId = 0), r.linePath[w].rightZoneId == Y && (r.linePath[w].rightZoneId = 0);
+            k.removeChild(r), delete LS[Y], P && P.removeZone(r, r.zoneBounds.minX, r.zoneBounds.maxX, r.zoneBounds.minY, r.zoneBounds.maxY)
         }
-        if (Ys[x]) 0;
+        if (LS[Y]) 0;
         else {
-            var i, t, a = [],
-                e = [];
-            for (N = 0; N < Z; N++) {
-                var G = I.getInt32(15 + 5 * N),
-                    S = 0 == I.getUint8(15 + 5 * N + 4);
-                qs[G] || console.error("new zone: line not found: " + G);
-                var J = qs[G];
-                if (a.push(J), S ? J.leftZoneId = x : J.rightZoneId = x, 1 == N) {
-                    var A;
-                    J.dot1 == i.dot1 || J.dot1 == i.dot2 ? A = J.dot1 : J.dot2 != i.dot1 && J.dot2 != i.dot2 || (A = J.dot2);
-                    var g = i.dot1 == A ? i.dot2 : i.dot1;
-                    u || (e.push(g.x, g.y), e.push(A.x, A.y)), t = J.dot1 == A ? J.dot2 : J.dot1
-                } else N > 1 && (u || e.push(t.x, t.y), t = J.dot1 != t ? J.dot1 : J.dot2);
-                i = J
+            var E, m, K = [],
+                O = [];
+            for (w = 0; w < J; w++) {
+                var j = Z.getInt32(15 + 5 * w),
+                    X = 0 == Z.getUint8(15 + 5 * w + 4);
+                uS[j] || console.error("new zone: line not found: " + j);
+                var a = uS[j];
+                if (K.push(a), X ? a.leftZoneId = Y : a.rightZoneId = Y, 1 == w) {
+                    var s;
+                    a.dot1 == E.dot1 || a.dot1 == E.dot2 ? s = a.dot1 : a.dot2 != E.dot1 && a.dot2 != E.dot2 || (s = a.dot2);
+                    var N = E.dot1 == s ? E.dot2 : E.dot1;
+                    R || (O.push(N.x, N.y), O.push(s.x, s.y)), m = a.dot1 == s ? a.dot2 : a.dot1
+                } else w > 1 && (R || O.push(m.x, m.y), m = a.dot1 != m ? a.dot1 : a.dot2);
+                E = a
             }
-            if (u) {
-                var E = 15 + 5 * Z,
-                    d = I.getInt16(E),
-                    r = [];
-                for (N = 0; N < d; N++) {
-                    var v = I.getInt32(E + 2 + 4 * N);
-                    zs[v] || console.error("new simplified zone: dot not found: " + v);
-                    var U = zs[v].x,
-                        R = zs[v].y;
-                    e.push(U, R), r.push(zs[v])
+            if (R) {
+                var C = 15 + 5 * J,
+                    T = Z.getInt16(C),
+                    v = [];
+                for (w = 0; w < T; w++) {
+                    var g = Z.getInt32(C + 2 + 4 * w);
+                    xS[g] || console.error("new simplified zone: dot not found: " + g);
+                    var B = xS[g].x,
+                        V = xS[g].y;
+                    O.push(B, V), v.push(xS[g])
                 }
-                var f = 0,
-                    m = 0,
-                    k = HI,
-                    y = wI;
-                if (I.byteLength >= E + 2 + 4 * d + 16) {
-                    f = I.getFloat32(E + 2 + 4 * d), k = I.getFloat32(E + 2 + 4 * d + 4), m = I.getFloat32(E + 2 + 4 * d + 8), y = I.getFloat32(E + 2 + 4 * d + 12);
-                    var V = [],
-                        K = e[e.length - 2],
-                        p = e[e.length - 1],
-                        _ = e[0],
-                        z = e[1];
-                    for (N = 0; N < e.length / 2; N++) {
-                        if (U = _, R = z, N < e.length / 2 - 1) _ = e[2 * (N + 1) + 0], z = e[2 * (N + 1) + 1];
-                        else _ = e[0], z = e[1];
-                        var q = WW(K, p, f, k, m, y),
-                            Y = WW(U, R, f, k, m, y),
-                            b = WW(_, z, f, k, m, y);
-                        if (Y) V.push(U, R);
-                        else if (q || Y || b) {
-                            if (q) {
-                                var T = ZW(U, R, K, p, f, k, m, y);
-                                V.push(T.x, T.y)
+                var U = 0,
+                    p = 0,
+                    $ = dZ,
+                    t = lZ;
+                if (Z.byteLength >= C + 2 + 4 * T + 16) {
+                    U = Z.getFloat32(C + 2 + 4 * T), $ = Z.getFloat32(C + 2 + 4 * T + 4), p = Z.getFloat32(C + 2 + 4 * T + 8), t = Z.getFloat32(C + 2 + 4 * T + 12);
+                    var I = [],
+                        i = O[O.length - 2],
+                        z = O[O.length - 1],
+                        e = O[0],
+                        x = O[1];
+                    for (w = 0; w < O.length / 2; w++) {
+                        if (B = e, V = x, w < O.length / 2 - 1) e = O[2 * (w + 1) + 0], x = O[2 * (w + 1) + 1];
+                        else e = O[0], x = O[1];
+                        var u = oo(i, z, U, $, p, t),
+                            L = oo(B, V, U, $, p, t),
+                            n = oo(e, x, U, $, p, t);
+                        if (L) I.push(B, V);
+                        else if (u || L || n) {
+                            if (u) {
+                                var c = Jo(B, V, i, z, U, $, p, t);
+                                I.push(c.x, c.y)
                             }
-                            if (b) {
-                                T = ZW(U, R, _, z, f, k, m, y);
-                                V.push(T.x, T.y)
+                            if (n) {
+                                c = Jo(B, V, e, x, U, $, p, t);
+                                I.push(c.x, c.y)
                             }
-                        } else V.push(Math.max(f, Math.min(k, U)), Math.max(m, Math.min(y, R)));
-                        K = U, p = R
+                        } else I.push(Math.max(U, Math.min($, B)), Math.max(p, Math.min(t, V)));
+                        i = B, z = V
                     }
-                    e = V
+                    O = I
                 }
             }
-            if ((o = new PIXI.Graphics).simplified = u, u && (o.simplifiedDotPath = r), o.zoneId = x, o.owner = C, o.linePath = a, o.areaScore = W, o.beginFill(1 == aI || 2 == aI ? Zx(C) : Wx(C), .5), es && a.length > 0 && 15642415 == a[0].tint && o.beginFill(15642415, .5), o.drawPolygon(e), o.endFill(), o.polygon = e, F.addChild(o), Ys[x] = o, s && C == Ts) {
-                gI++, hZ(o.areaScore / 4);
-                var D = Math.ceil(o.areaScore / 4);
-                if (gI <= 5 || D >= 50) {
-                    var B = {
-                        x: (o.linePath[0].dot1.x + o.linePath[0].dot2.x) / 2,
-                        y: (o.linePath[0].dot1.y + o.linePath[0].dot2.y) / 2
+            if ((r = new PIXI.Graphics).simplified = R, R && (r.simplifiedDotPath = v), r.zoneId = Y, r.owner = _, r.linePath = K, r.areaScore = o, r.beginFill(1 == KZ || 2 == KZ ? JY(_) : oY(_), .5), OS && K.length > 0 && 15642415 == K[0].tint && r.beginFill(15642415, .5), r.drawPolygon(O), r.endFill(), r.polygon = O, k.addChild(r), LS[Y] = r, S && _ == cS) {
+                NZ++, FJ(r.areaScore / 4);
+                var H = Math.ceil(r.areaScore / 4);
+                if (NZ <= 5 || H >= 50) {
+                    var y = {
+                        x: (r.linePath[0].dot1.x + r.linePath[0].dot2.x) / 2,
+                        y: (r.linePath[0].dot1.y + r.linePath[0].dot2.y) / 2
                     };
-                    DZ(B.x, B.y, "+" + D)
+                    yJ(y.x, y.y, "+" + H)
                 }
             }
-            s && (o.alpha = 0, anime({
-                targets: o,
+            S && (r.alpha = 0, anime({
+                targets: r,
                 alpha: 1,
                 duration: 250,
                 easing: "linear"
-            })), 0 != aI && 3 != aI || C != Ts || (Zu = !0)
+            })), 0 != KZ && 3 != KZ || _ != cS || (RR = !0)
         }
     }
 
-    function oW(I, s, x, C) {
-        var W = I.getInt32(s),
-            Z = I.getInt32(s + 4),
-            u = I.getFloat32(s + 8),
-            o = I.getInt16(s + 12);
-        if (s += 14, x && Ys[W]) {
-            for (var N = Ys[W], i = 0; i < N.linePath.length; i++) N.linePath[i].leftZoneId == W && (N.linePath[i].leftZoneId = 0), N.linePath[i].rightZoneId == W && (N.linePath[i].rightZoneId = 0);
-            F.removeChild(N), delete Ys[W], P && P.removeZone(N, N.zoneBounds.minX, N.zoneBounds.maxX, N.zoneBounds.minY, N.zoneBounds.maxY)
+    function ro(Z, S, Y, _) {
+        var o = Z.getInt32(S),
+            J = Z.getInt32(S + 4),
+            R = Z.getFloat32(S + 8),
+            r = Z.getInt16(S + 12);
+        if (S += 14, Y && LS[o]) {
+            for (var w = LS[o], E = 0; E < w.linePath.length; E++) w.linePath[E].leftZoneId == o && (w.linePath[E].leftZoneId = 0), w.linePath[E].rightZoneId == o && (w.linePath[E].rightZoneId = 0);
+            k.removeChild(w), delete LS[o], P && P.removeZone(w, w.zoneBounds.minX, w.zoneBounds.maxX, w.zoneBounds.minY, w.zoneBounds.maxY)
         }
-        if (Ys[W]) s += 5 * o;
+        if (LS[o]) S += 5 * r;
         else {
-            var t, a, e = [],
-                G = [];
-            for (i = 0; i < o; i++) {
-                var S = I.getInt32(s),
-                    J = 0 == I.getUint8(s + 4);
-                s += 5, qs[S] || console.error("new zone: line not found: " + S);
-                var A = qs[S];
-                if (e.push(A), J ? A.leftZoneId = W : A.rightZoneId = W, 1 == i) {
-                    var g;
-                    A.dot1 == t.dot1 || A.dot1 == t.dot2 ? g = A.dot1 : A.dot2 != t.dot1 && A.dot2 != t.dot2 || (g = A.dot2);
-                    var E = t.dot1 == g ? t.dot2 : t.dot1;
-                    x || (G.push(E.x, E.y), G.push(g.x, g.y)), a = A.dot1 == g ? A.dot2 : A.dot1
-                } else i > 1 && (x || G.push(a.x, a.y), a = A.dot1 != a ? A.dot1 : A.dot2);
-                t = A
+            var m, K, O = [],
+                j = [];
+            for (E = 0; E < r; E++) {
+                var X = Z.getInt32(S),
+                    a = 0 == Z.getUint8(S + 4);
+                S += 5, uS[X] || console.error("new zone: line not found: " + X);
+                var s = uS[X];
+                if (O.push(s), a ? s.leftZoneId = o : s.rightZoneId = o, 1 == E) {
+                    var N;
+                    s.dot1 == m.dot1 || s.dot1 == m.dot2 ? N = s.dot1 : s.dot2 != m.dot1 && s.dot2 != m.dot2 || (N = s.dot2);
+                    var C = m.dot1 == N ? m.dot2 : m.dot1;
+                    Y || (j.push(C.x, C.y), j.push(N.x, N.y)), K = s.dot1 == N ? s.dot2 : s.dot1
+                } else E > 1 && (Y || j.push(K.x, K.y), K = s.dot1 != K ? s.dot1 : s.dot2);
+                m = s
             }
-            if (x) {
-                var d = I.getInt16(s);
-                s += 2;
-                var r = [];
-                for (i = 0; i < d; i++) {
-                    var v = I.getInt32(s);
-                    s += 4, zs[v] || console.error("new simplified zone: dot not found: " + v);
-                    var U = zs[v].x,
-                        R = zs[v].y;
-                    G.push(U, R), r.push(zs[v])
+            if (Y) {
+                var T = Z.getInt16(S);
+                S += 2;
+                var v = [];
+                for (E = 0; E < T; E++) {
+                    var g = Z.getInt32(S);
+                    S += 4, xS[g] || console.error("new simplified zone: dot not found: " + g);
+                    var B = xS[g].x,
+                        V = xS[g].y;
+                    j.push(B, V), v.push(xS[g])
                 }
-                var f = I.getFloat32(s),
-                    m = I.getFloat32(s + 4),
-                    k = I.getFloat32(s + 8),
-                    y = I.getFloat32(s + 12);
-                s += 16;
-                var V = [],
-                    K = G[G.length - 2],
-                    p = G[G.length - 1],
-                    _ = G[0],
-                    z = G[1];
-                for (i = 0; i < G.length / 2; i++) {
-                    if (U = _, R = z, i < G.length / 2 - 1) _ = G[2 * (i + 1) + 0], z = G[2 * (i + 1) + 1];
-                    else _ = G[0], z = G[1];
-                    var q = WW(K, p, f, m, k, y),
-                        Y = WW(U, R, f, m, k, y),
-                        b = WW(_, z, f, m, k, y);
-                    if (Y) V.push(U, R);
-                    else if (q || Y || b) {
-                        if (q) {
-                            var T = ZW(U, R, K, p, f, m, k, y);
-                            V.push(T.x, T.y)
+                var U = Z.getFloat32(S),
+                    p = Z.getFloat32(S + 4),
+                    $ = Z.getFloat32(S + 8),
+                    t = Z.getFloat32(S + 12);
+                S += 16;
+                var I = [],
+                    i = j[j.length - 2],
+                    z = j[j.length - 1],
+                    e = j[0],
+                    x = j[1];
+                for (E = 0; E < j.length / 2; E++) {
+                    if (B = e, V = x, E < j.length / 2 - 1) e = j[2 * (E + 1) + 0], x = j[2 * (E + 1) + 1];
+                    else e = j[0], x = j[1];
+                    var u = oo(i, z, U, p, $, t),
+                        L = oo(B, V, U, p, $, t),
+                        n = oo(e, x, U, p, $, t);
+                    if (L) I.push(B, V);
+                    else if (u || L || n) {
+                        if (u) {
+                            var c = Jo(B, V, i, z, U, p, $, t);
+                            I.push(c.x, c.y)
                         }
-                        if (b) {
-                            T = ZW(U, R, _, z, f, m, k, y);
-                            V.push(T.x, T.y)
+                        if (n) {
+                            c = Jo(B, V, e, x, U, p, $, t);
+                            I.push(c.x, c.y)
                         }
-                    } else V.push(Math.max(f, Math.min(m, U)), Math.max(k, Math.min(y, R)));
-                    K = U, p = R
+                    } else I.push(Math.max(U, Math.min(p, B)), Math.max($, Math.min(t, V)));
+                    i = B, z = V
                 }
-                G = V
+                j = I
             }
-            if ((N = new PIXI.Graphics).simplified = x, x && (N.simplifiedDotPath = r), N.zoneId = W, N.owner = Z, N.linePath = e, N.areaScore = u, N.beginFill(1 == aI || 2 == aI ? Zx(Z) : Wx(Z), .5), es && e.length > 0 && 15642415 == e[0].tint && N.beginFill(15642415, .5), N.drawPolygon(G), N.endFill(), N.polygon = G, F.addChild(N), Ys[W] = N, C && Z == Ts) {
-                gI++, hZ(N.areaScore / 4);
-                var D = Math.floor(N.areaScore / 4);
-                if (gI <= 10 || D >= 200) {
-                    var B = {
-                        x: (N.linePath[0].dot1.x + N.linePath[0].dot2.x) / 2,
-                        y: (N.linePath[0].dot1.y + N.linePath[0].dot2.y) / 2
+            if ((w = new PIXI.Graphics).simplified = Y, Y && (w.simplifiedDotPath = v), w.zoneId = o, w.owner = J, w.linePath = O, w.areaScore = R, w.beginFill(1 == KZ || 2 == KZ ? JY(J) : oY(J), .5), OS && O.length > 0 && 15642415 == O[0].tint && w.beginFill(15642415, .5), w.drawPolygon(j), w.endFill(), w.polygon = j, k.addChild(w), LS[o] = w, _ && J == cS) {
+                NZ++, FJ(w.areaScore / 4);
+                var H = Math.floor(w.areaScore / 4);
+                if (NZ <= 10 || H >= 200) {
+                    var y = {
+                        x: (w.linePath[0].dot1.x + w.linePath[0].dot2.x) / 2,
+                        y: (w.linePath[0].dot1.y + w.linePath[0].dot2.y) / 2
                     };
-                    DZ(B.x, B.y, "+" + D)
+                    yJ(y.x, y.y, "+" + H)
                 }
             }
-            if (C && (N.alpha = 0, anime({
-                    targets: N,
+            if (_ && (w.alpha = 0, anime({
+                    targets: w,
                     alpha: 1,
                     duration: 250,
                     easing: "linear"
-                })), 0 != aI && 3 != aI || Z != Ts || (Zu = !0), P) {
-                for (f = G[0], m = G[0], k = G[1], y = G[1], i = 0; i < G.length / 2; i++) {
-                    var h;
-                    (h = G[2 * i]) < f ? f = h : h > m && (m = h), (h = G[2 * i + 1]) < k ? k = h : h > y && (y = h)
+                })), 0 != KZ && 3 != KZ || J != cS || (RR = !0), P) {
+                for (U = j[0], p = j[0], $ = j[1], t = j[1], E = 0; E < j.length / 2; E++) {
+                    var b;
+                    (b = j[2 * E]) < U ? U = b : b > p && (p = b), (b = j[2 * E + 1]) < $ ? $ = b : b > t && (t = b)
                 }
-                N.zoneBounds = {
-                    minX: f,
-                    maxX: m,
-                    minY: k,
-                    maxY: y
-                }, P.addZone(N, f, m, k, y), 3 == aI && function(I) {
-                    for (var s = O.getAllInRect(I.zoneBounds.minX, I.zoneBounds.maxX, I.zoneBounds.minY, I.zoneBounds.maxY), x = 0; x < s.length; x++) {
-                        var C = s[x];
-                        C.owner != I.owner && eW(I.polygon, C.position) && NW(C)
+                w.zoneBounds = {
+                    minX: U,
+                    maxX: p,
+                    minY: $,
+                    maxY: t
+                }, P.addZone(w, U, p, $, t), 3 == KZ && function(Z) {
+                    for (var S = D.getAllInRect(Z.zoneBounds.minX, Z.zoneBounds.maxX, Z.zoneBounds.minY, Z.zoneBounds.maxY), Y = 0; Y < S.length; Y++) {
+                        var _ = S[Y];
+                        _.owner != Z.owner && Oo(Z.polygon, _.position) && wo(_)
                     }
-                }(N)
+                }(w)
             }
         }
-        return s
+        return S
     }
 
-    function NW(I) {
-        I.alpha = .6, I.isCaptured = !0;
-        for (var s = 0; s < I.lines.length; s++) I.lines[s].alpha = .6
+    function wo(Z) {
+        Z.alpha = .6, Z.isCaptured = !0;
+        for (var S = 0; S < Z.lines.length; S++) Z.lines[S].alpha = .6
     }
 
-    function iW(I) {
-        I.alpha = 1, I.isCaptured = !1;
-        for (var s = 0; s < I.lines.length; s++) I.lines[s].alpha = 1
+    function Eo(Z) {
+        Z.alpha = 1, Z.isCaptured = !1;
+        for (var S = 0; S < Z.lines.length; S++) Z.lines[S].alpha = 1
     }
 
-    function tW(I) {
-        for (var s = P.getAllInRange(I.position, 0, 0), x = 0; x < s.length; x++) {
-            var C = s[x];
-            I.owner != C.owner && eW(C.polygon, I.position) && NW(I)
+    function mo(Z) {
+        for (var S = P.getAllInRange(Z.position, 0, 0), Y = 0; Y < S.length; Y++) {
+            var _ = S[Y];
+            Z.owner != _.owner && Oo(_.polygon, Z.position) && wo(Z)
         }
     }
 
-    function aW(I) {
-        for (var s = O.getAllInRect(I.zoneBounds.minX, I.zoneBounds.maxX, I.zoneBounds.minY, I.zoneBounds.maxY), x = 0; x < s.length; x++) {
-            var C = s[x];
-            C.owner != I.owner && eW(I.polygon, C.position) && iW(C)
+    function Ko(Z) {
+        for (var S = D.getAllInRect(Z.zoneBounds.minX, Z.zoneBounds.maxX, Z.zoneBounds.minY, Z.zoneBounds.maxY), Y = 0; Y < S.length; Y++) {
+            var _ = S[Y];
+            _.owner != Z.owner && Oo(Z.polygon, _.position) && Eo(_)
         }
     }
 
-    function eW(I, s) {
-        for (var x = I[I.length - 2], C = I[I.length - 1], W = !1, Z = 0; Z < I.length; Z += 2) {
-            var u = I[Z],
-                o = I[Z + 1];
-            (o < s.y && C >= s.y || C < s.y && o >= s.y) && u + (s.y - o) / (C - o) * (x - u) < s.x && (W = !W), x = u, C = o
+    function Oo(Z, S) {
+        for (var Y = Z[Z.length - 2], _ = Z[Z.length - 1], o = !1, J = 0; J < Z.length; J += 2) {
+            var R = Z[J],
+                r = Z[J + 1];
+            (r < S.y && _ >= S.y || _ < S.y && r >= S.y) && R + (S.y - r) / (_ - r) * (Y - R) < S.x && (o = !o), Y = R, _ = r
         }
-        return W
+        return o
     }
 
-    function GW(I) {
-        var s = bs[Ts] || bs[UI] || R;
-        if (!s) return console.log("Unkown current position in isDotOutOfView", Ts, UI), !0;
-        var x = Math.floor(s.x / Ps),
-            C = Math.floor(s.y / Ps),
-            W = Math.floor(I.x / Ps),
-            Z = Math.floor(I.y / Ps),
-            u = Math.ceil(QI / 2 / Ps),
-            o = Math.ceil(jI / 2 / Ps);
-        return W < x - u || (W > x + u || (Z < C - o || Z > C + o))
+    function jo(Z) {
+        var S = nS[cS] || nS[BZ] || V;
+        if (!S) return console.log("Unkown current position in isDotOutOfView", cS, BZ), !0;
+        var Y = Math.floor(S.x / PS),
+            _ = Math.floor(S.y / PS),
+            o = Math.floor(Z.x / PS),
+            J = Math.floor(Z.y / PS),
+            R = Math.ceil(qZ / 2 / PS),
+            r = Math.ceil(AZ / 2 / PS);
+        return o < Y - R || (o > Y + R || (J < _ - r || J > _ + r))
     }
 
-    function SW(I) {
-        if (I.shieldAppearAnim) {
+    function Xo(Z) {
+        if (Z.shieldAppearAnim) {
             try {
-                I.shieldAppearAnim.pause()
-            } catch (I) {}
-            I.shieldAppearAnim = null
+                Z.shieldAppearAnim.pause()
+            } catch (Z) {}
+            Z.shieldAppearAnim = null
         }
-        I.shield.alpha = 1;
-        var s = I.shield.width;
-        I.dotBlastAnim = anime({
-            targets: I.shield,
-            width: [s, 1.5 * s],
-            height: [s, 1.5 * s],
+        Z.shield.alpha = 1;
+        var S = Z.shield.width;
+        Z.dotBlastAnim = anime({
+            targets: Z.shield,
+            width: [S, 1.5 * S],
+            height: [S, 1.5 * S],
             alpha: 0,
             duration: 300,
             easing: "linear",
             complete: function() {
-                I.shield.width = s, I.shield.height = s, I.dotBlastAnim = null
+                Z.shield.width = S, Z.shield.height = S, Z.dotBlastAnim = null
             }
         })
     }
 
-    function JW(I, s, x) {
-        delete Ys[I.zoneId], P && (P.removeZone(I, I.zoneBounds.minX, I.zoneBounds.maxX, I.zoneBounds.minY, I.zoneBounds.maxY), 3 == aI && s && aW(I)), s ? anime({
-            targets: I,
+    function ao(Z, S, Y) {
+        delete LS[Z.zoneId], P && (P.removeZone(Z, Z.zoneBounds.minX, Z.zoneBounds.maxX, Z.zoneBounds.minY, Z.zoneBounds.maxY), 3 == KZ && S && Ko(Z)), S ? anime({
+            targets: Z,
             alpha: 0,
             duration: 250,
             easing: "linear",
-            complete: function(I) {
+            complete: function(Z) {
                 return function() {
-                    F.removeChild(I)
+                    k.removeChild(Z)
                 }
-            }(I)
-        }) : F.removeChild(I), I.owner == Ts && s && !x && hZ(-I.areaScore / 4);
-        for (var C = {}, W = 0; W < I.linePath.length; W++) {
-            var Z = I.linePath[W];
-            Z.leftZoneId == I.zoneId && (Z.leftZoneId = 0), Z.rightZoneId == I.zoneId && (Z.rightZoneId = 0), s && !x && (Z.leftZoneId || Z.rightZoneId || (Z.dot1.shield && !LZ(Z.dot1) && (C[Z.dot1.dotId] = !0, Z.dot1.shield.state = 0, Z.dot1.shield.alpha = 0), Z.dot2.shield && !LZ(Z.dot2) && (C[Z.dot2.dotId] = !0, Z.dot2.shield.state = 0, Z.dot2.shield.alpha = 0))), Ys[Z.leftZoneId] || Ys[Z.rightZoneId] || oo || GW(Z.dot1) && GW(Z.dot2) && (A.removeChild(Z), delete qs[Z.lineId], X && X.removeLine(Z, Z.dot1.position, Z.dot2.position), Z.dot1.lines.splice(Z.dot1.lines.indexOf(Z), 1), Z.dot2.lines.splice(Z.dot2.lines.indexOf(Z), 1), FW(Z.dot1), FW(Z.dot2))
+            }(Z)
+        }) : k.removeChild(Z), Z.owner == cS && S && !Y && FJ(-Z.areaScore / 4);
+        for (var _ = {}, o = 0; o < Z.linePath.length; o++) {
+            var J = Z.linePath[o];
+            J.leftZoneId == Z.zoneId && (J.leftZoneId = 0), J.rightZoneId == Z.zoneId && (J.rightZoneId = 0), S && !Y && (J.leftZoneId || J.rightZoneId || (J.dot1.shield && !hJ(J.dot1) && (_[J.dot1.dotId] = !0, J.dot1.shield.state = 0, J.dot1.shield.alpha = 0), J.dot2.shield && !hJ(J.dot2) && (_[J.dot2.dotId] = !0, J.dot2.shield.state = 0, J.dot2.shield.alpha = 0))), LS[J.leftZoneId] || LS[J.rightZoneId] || wr || jo(J.dot1) && jo(J.dot2) && (s.removeChild(J), delete uS[J.lineId], M && M.removeLine(J, J.dot1.position, J.dot2.position), J.dot1.lines.splice(J.dot1.lines.indexOf(J), 1), J.dot2.lines.splice(J.dot2.lines.indexOf(J), 1), ko(J.dot1), ko(J.dot2))
         }
-        for (var u in C) {
-            var o = zs[u];
-            o && SW(o)
+        for (var R in _) {
+            var r = xS[R];
+            r && Xo(r)
         }
     }
 
-    function AW(I) {
-        var s = new PIXI.Container,
-            x = new PIXI.Graphics;
-        x.beginFill(32768), x.drawRoundedRect(0, 0, 4 * MI, MI, MI / 4), x.endFill(), s.addChild(x);
-        var C = new PIXI.Graphics;
-        return C.beginFill(65280), C.drawRoundedRect(0, 0, 4 * MI, MI, MI / 4), C.endFill(), s.addChild(C), s.outer = C, s.position.set(I.position.x - s.width / 2, I.position.y + 1.5 * MI), s
+    function so(Z) {
+        var S = new PIXI.Container,
+            Y = new PIXI.Graphics;
+        Y.beginFill(32768), Y.drawRoundedRect(0, 0, 4 * GZ, GZ, GZ / 4), Y.endFill(), S.addChild(Y);
+        var _ = new PIXI.Graphics;
+        return _.beginFill(65280), _.drawRoundedRect(0, 0, 4 * GZ, GZ, GZ / 4), _.endFill(), S.addChild(_), S.outer = _, S.position.set(Z.position.x - S.width / 2, Z.position.y + 1.5 * GZ), S
     }
 
-    function FW(I) {
-        0 == I.lines.length && GW(I) && (J.removeChild(I), delete zs[I.dotId], O && O.remove(I, I.position), I.healthBar && g.removeChild(I.healthBar), I.shield && J.removeChild(I.shield), I.text && J.removeChild(I.text))
+    function ko(Z) {
+        0 == Z.lines.length && jo(Z) && (a.removeChild(Z), delete xS[Z.dotId], D && D.remove(Z, Z.position), Z.healthBar && N.removeChild(Z.healthBar), Z.shield && a.removeChild(Z.shield), Z.text && a.removeChild(Z.text))
     }
 
-    function gW(I, s, x, C, W, Z, u) {
-        I < 0 && (I = 0), s >= p.width && (s = p.width - 1);
-        for (var o = 4 * (x * p.width + I), N = 4 * (x * p.width + s), i = o; i <= N; i += 4) p.data[i + 0] = C, p.data[i + 1] = W, p.data[i + 2] = Z, p.data[i + 3] = u
+    function No(Z, S, Y, _, o, J, R) {
+        Z < 0 && (Z = 0), S >= z.width && (S = z.width - 1);
+        for (var r = 4 * (Y * z.width + Z), w = 4 * (Y * z.width + S), E = r; E <= w; E += 4) z.data[E + 0] = _, z.data[E + 1] = o, z.data[E + 2] = J, z.data[E + 3] = R
     }
 
-    function EW() {
-        p = K.createImageData(V.width, V.height), _ = K.createImageData(V.width, V.height), K.putImageData(p, 0, 0)
+    function Co() {
+        z = i.createImageData(I.width, I.height), e = i.createImageData(I.width, I.height), i.putImageData(z, 0, 0)
     }
 
-    function dW(I, s) {
-        if (WZ && s && Js) {
-            if (HI > wI) {
-                var x = Math.ceil(256 / HI * wI);
-                V.width = 256, V.height = x
-            } else if (wI > HI) {
-                var C = Math.ceil(256 / wI * HI);
-                document.getElementById("minimap").style.width = C + "px", V.width = C, V.height = 256
-            } else V.width = 256, V.height = 256;
-            V.style.transformOrigin = "top left", "256px" != document.getElementById("minimap").style.width && (V.style.transform = "scale(0.375)")
+    function To(Z, S) {
+        if (JJ && S && aS) {
+            if (dZ > lZ) {
+                var Y = Math.ceil(256 / dZ * lZ);
+                I.width = 256, I.height = Y
+            } else if (lZ > dZ) {
+                var _ = Math.ceil(256 / lZ * dZ);
+                document.getElementById("minimap").style.width = _ + "px", I.width = _, I.height = 256
+            } else I.width = 256, I.height = 256;
+            I.style.transformOrigin = "top left", "256px" != document.getElementById("minimap").style.width && (I.style.transform = "scale(0.375)")
         }
-        EW();
-        for (var W = Wx(Ts), Z = (16711680 & W) >> 16, u = (65280 & W) >> 8, o = 255 & W, N = 1, i = s ? 7 : 3; N + i <= I.byteLength;) {
-            if (s) {
-                var t = I.getInt32(N);
-                Z = (16711680 & (W = (ZI >= 1 || 2 == aI) && 1 == t ? 0 : 1 == aI || 2 == aI ? Zx(t) : Wx(t))) >> 16, u = (65280 & W) >> 8, o = 255 & W, N += 4
+        Co();
+        for (var o = oY(cS), J = (16711680 & o) >> 16, R = (65280 & o) >> 8, r = 255 & o, w = 1, E = S ? 7 : 3; w + E <= Z.byteLength;) {
+            if (S) {
+                var m = Z.getInt32(w);
+                J = (16711680 & (o = (JZ >= 1 || 2 == KZ) && 1 == m ? 0 : 1 == KZ || 2 == KZ ? JY(m) : oY(m))) >> 16, R = (65280 & o) >> 8, r = 255 & o, w += 4
             }
-            var a = I.getUint8(N),
-                e = I.getUint8(N + 1),
-                G = I.getUint8(N + 2);
-            N += 3, gW(e, G, a, Z, u, o, 255)
+            var K = Z.getUint8(w),
+                O = Z.getUint8(w + 1),
+                j = Z.getUint8(w + 2);
+            w += 3, No(O, j, K, J, R, r, 255)
         }
-        $W && clearTimeout($W), $W = setTimeout(function() {
-            K.putImageData(p, 0, 0)
+        Do && clearTimeout(Do), Do = setTimeout(function() {
+            i.putImageData(z, 0, 0)
         }, 100)
     }
 
-    function rW(I) {
-        var s = I.getInt32(1),
-            x = I.getInt32(5),
-            C = eI[x];
-        if (zs[s]) {
-            var W = zs[s];
-            delete zs[s], O && O.remove(W, W.position), J.removeChild(W), zW(1 == aI || 2 == aI ? Zx(W.owner) : Wx(W.owner), W.x, W.y, 6, MI, 2, C ? {
-                x: .25 * C.sx,
-                y: .25 * C.sy
-            } : void 0, 3 == aI && W.isCaptured ? .6 : 1), W.healthBar && g.removeChild(W.healthBar), W.shield && J.removeChild(W.shield), W.text && J.removeChild(W.text);
-            for (var Z = 0; Z < W.lines.length; Z++) {
-                var u = W.lines[Z];
-                delete qs[u.lineId], X && X.removeLine(u, u.dot1.position, u.dot2.position), anime({
-                    targets: u,
+    function vo(Z) {
+        var S = Z.getInt32(1),
+            Y = Z.getInt32(5),
+            _ = OZ[Y];
+        if (xS[S]) {
+            var o = xS[S];
+            delete xS[S], D && D.remove(o, o.position), a.removeChild(o), xo(1 == KZ || 2 == KZ ? JY(o.owner) : oY(o.owner), o.x, o.y, 6, GZ, 2, _ ? {
+                x: .25 * _.sx,
+                y: .25 * _.sy
+            } : void 0, 3 == KZ && o.isCaptured ? .6 : 1), o.healthBar && N.removeChild(o.healthBar), o.shield && a.removeChild(o.shield), o.text && a.removeChild(o.text);
+            for (var J = 0; J < o.lines.length; J++) {
+                var R = o.lines[J];
+                delete uS[R.lineId], M && M.removeLine(R, R.dot1.position, R.dot2.position), anime({
+                    targets: R,
                     alpha: 0,
                     duration: 250,
                     easing: "linear",
-                    complete: function(I) {
+                    complete: function(Z) {
                         return function() {
-                            A.removeChild(I)
+                            s.removeChild(Z)
                         }
-                    }(u)
-                }), u.leftZoneId && Ys[u.leftZoneId] && JW(Ys[u.leftZoneId], !0), u.rightZoneId && Ys[u.rightZoneId] && JW(Ys[u.rightZoneId], !0);
-                var o = u.dot1 == W ? u.dot2 : u.dot1;
-                o.lines.splice(o.lines.indexOf(u), 1), FW(o)
+                    }(R)
+                }), R.leftZoneId && LS[R.leftZoneId] && ao(LS[R.leftZoneId], !0), R.rightZoneId && LS[R.rightZoneId] && ao(LS[R.rightZoneId], !0);
+                var r = R.dot1 == o ? R.dot2 : R.dot1;
+                r.lines.splice(r.lines.indexOf(R), 1), ko(r)
             }
         }
-        C && (delete eI[x], d.removeChild(C), C.creator == Ts && iI < 3 && W && ++EI <= 10 && DZ(W.x, W.y, "+10"))
+        _ && (delete OZ[Y], T.removeChild(_), _.creator == cS && EZ < 3 && o && ++CZ <= 10 && yJ(o.x, o.y, "+10"))
     }
 
-    function vW(I, s, x) {
-        var C = new PIXI.Sprite(v["death-blast"] ? v["death-blast"] : v.shoot);
-        C.x = I, C.y = s, C.anchor.set(.5), is || (C.tint = 16739353), g.addChild(C), anime({
-            targets: C,
+    function go(Z, S, Y) {
+        var _ = new PIXI.Sprite(g["death-blast"] ? g["death-blast"] : g.shoot);
+        _.x = Z, _.y = S, _.anchor.set(.5), ES || (_.tint = 16739353), N.addChild(_), anime({
+            targets: _,
             alpha: [1, 0],
-            width: [0, 2 * x * 1.2],
-            height: [0, 2 * x * 1.2],
+            width: [0, 2 * Y * 1.2],
+            height: [0, 2 * Y * 1.2],
             duration: 500,
             easing: "linear",
-            complete: function(I) {
+            complete: function(Z) {
                 return function() {
-                    g.removeChild(I)
+                    N.removeChild(Z)
                 }
-            }(C)
+            }(_)
         })
     }
-    var UW = !1;
+    var Bo = !1;
 
-    function RW(I, s, x) {
-        var C = new PIXI.Text(I, {
+    function Vo(Z, S, Y) {
+        var _ = new PIXI.Text(Z, {
             fontFamily: "Arial",
             fontWeight: "bold",
             fontSize: Math.round(Math.min(window.innerHeight, window.innerWidth) / 30),
-            fill: s || 56576,
+            fill: S || 56576,
             align: "center"
         });
-        C.anchor.set(.5), C.position.set(window.innerWidth / 2, .1 * window.innerHeight), z.addChild(C), anime({
-            targets: C,
+        _.anchor.set(.5), _.position.set(window.innerWidth / 2, .1 * window.innerHeight), x.addChild(_), anime({
+            targets: _,
             easing: "linear",
             alpha: [1, 0],
             y: .02 * window.innerHeight,
             duration: 2e3,
             complete: function() {
-                z.removeChild(C)
+                x.removeChild(_)
             }
-        }), x && anime({
-            targets: C.scale,
+        }), Y && anime({
+            targets: _.scale,
             x: [.5, 1],
             y: [.5, 1],
             easing: "easeOutBack",
@@ -22304,644 +22308,644 @@ var defly = function() {
         })
     }
 
-    function fW(I) {
-        var s = {},
-            x = {},
-            C = {};
-        for (var W in Ys) Ys[W].owner == I && (s[W] = !0);
-        for (var W in qs) qs[W].owner == I && (x[W] = !0);
-        for (var W in zs) zs[W].owner == I && (C[W] = !0);
-        for (var W in s) {
+    function Uo(Z) {
+        var S = {},
+            Y = {},
+            _ = {};
+        for (var o in LS) LS[o].owner == Z && (S[o] = !0);
+        for (var o in uS) uS[o].owner == Z && (Y[o] = !0);
+        for (var o in xS) xS[o].owner == Z && (_[o] = !0);
+        for (var o in S) {
             anime({
-                targets: Ys[W],
+                targets: LS[o],
                 alpha: 0,
                 duration: 250,
                 easing: "linear",
-                complete: function(I) {
+                complete: function(Z) {
                     return function() {
-                        F.removeChild(I)
+                        k.removeChild(Z)
                     }
-                }(Ys[W])
+                }(LS[o])
             });
-            var Z = Ys[W];
-            delete Ys[W], P && (P.removeZone(Z, Z.zoneBounds.minX, Z.zoneBounds.maxX, Z.zoneBounds.minY, Z.zoneBounds.maxY), 3 == aI && aW(Z))
+            var J = LS[o];
+            delete LS[o], P && (P.removeZone(J, J.zoneBounds.minX, J.zoneBounds.maxX, J.zoneBounds.minY, J.zoneBounds.maxY), 3 == KZ && Ko(J))
         }
-        for (var W in x) {
-            var u = qs[W];
+        for (var o in Y) {
+            var R = uS[o];
             anime({
-                targets: u,
+                targets: R,
                 alpha: 0,
                 duration: 250,
                 easing: "linear",
-                complete: function(I) {
+                complete: function(Z) {
                     return function() {
-                        A.removeChild(I)
+                        s.removeChild(Z)
                     }
-                }(u)
-            }), delete qs[W], X && X.removeLine(u, u.dot1.position, u.dot2.position)
+                }(R)
+            }), delete uS[o], M && M.removeLine(R, R.dot1.position, R.dot2.position)
         }
-        for (var W in C) {
-            zs[W].healthBar && g.removeChild(zs[W].healthBar), zs[W].shield && J.removeChild(zs[W].shield), zs[W].text && J.removeChild(zs[W].text), anime({
-                targets: zs[W],
+        for (var o in _) {
+            xS[o].healthBar && N.removeChild(xS[o].healthBar), xS[o].shield && a.removeChild(xS[o].shield), xS[o].text && a.removeChild(xS[o].text), anime({
+                targets: xS[o],
                 alpha: 0,
                 duration: 250,
                 easing: "linear",
-                complete: function(I) {
+                complete: function(Z) {
                     return function() {
-                        J.removeChild(I)
+                        a.removeChild(Z)
                     }
-                }(zs[W])
+                }(xS[o])
             });
-            var o = zs[W];
-            delete zs[W], O && O.remove(o, o.position)
+            var r = xS[o];
+            delete xS[o], D && D.remove(r, r.position)
         }
     }
 
-    function mW(I) {
-        return '<span style="font-weight:700;color:' + mu(Wx(I)) + '">' + RI[I] + (Ss ? " (" + js[hs[I] - 1] + ")" : "") + "</span>"
+    function po(Z) {
+        return '<span style="font-weight:700;color:' + $R(oY(Z)) + '">' + VZ[Z] + (XS ? " (" + AS[bS[Z] - 1] + ")" : "") + "</span>"
     }
 
-    function kW(I) {
-        var s = I.getInt32(1),
-            x = I.getUint8(5),
-            C = I.getInt32(6),
-            W = 50;
-        I.byteLength >= 14 && (W = I.getFloat32(10));
-        var Z = 0;
-        if (I.byteLength >= 18 && (Z = I.getInt32(14)), s == Ts && qI++, (1 == x && C == Ts || 2 == x && Z == Ts || 5 == x && C == Ts || C == Ds) && zI++, 1 != aI && 2 != aI) 3 == aI && 0 != x || fW(s), s != Ts && bs[s] && (1 == x ? C == Ts ? (_C("<span>You killed </span><span>" + RI[s] + "</span><span> (kills: " + zI + ")</span>", Ws ? "info-dark" : "info"), RW("You killed " + RI[s] + "!", Ws ? 16777215 : Gx(Wx(Ts), -.7), !0)) : us || _C("<span>" + RI[s] + "</span><span> has been killed</span>", Ws ? "info-dark" : "info") : 2 == x ? (us || _C("<span>" + RI[s] + "</span><span> crashed into a wall</span>" + (Z == Ts ? "<span> (you get the kill)</span>" : ""), Ws ? "info-dark" : "info"), Z == Ts && RW("You killed " + RI[s] + "!", Ws ? 16777215 : Gx(Wx(Ts), -.7), !0)) : 3 == x ? us || _C("<span>" + RI[s] + "</span><span> died in a collision</span>", Ws ? "info-dark" : "info") : 5 == x && (C == Ts ? (_C("<span>You exploded </span><span>" + RI[s] + "</span><span> (kills: " + zI + ")</span>", Ws ? "info-dark" : "info"), RW("You exploded " + RI[s] + "!", Ws ? 16777215 : Gx(Wx(Ts), -.7), !0)) : us || _C("<span>" + RI[s] + "</span><span> has been exploded</span>", Ws ? "info-dark" : "info")));
+    function $o(Z) {
+        var S = Z.getInt32(1),
+            Y = Z.getUint8(5),
+            _ = Z.getInt32(6),
+            o = 50;
+        Z.byteLength >= 14 && (o = Z.getFloat32(10));
+        var J = 0;
+        if (Z.byteLength >= 18 && (J = Z.getInt32(14)), S == cS && uZ++, (1 == Y && _ == cS || 2 == Y && J == cS || 5 == Y && _ == cS || _ == HS) && xZ++, 1 != KZ && 2 != KZ) 3 == KZ && 0 != Y || Uo(S), S != cS && nS[S] && (1 == Y ? _ == cS ? (e_("<span>You killed </span><span>" + VZ[S] + "</span><span> (kills: " + xZ + ")</span>", oS ? "info-dark" : "info"), Vo("You killed " + VZ[S] + "!", oS ? 16777215 : jY(oY(cS), -.7), !0)) : RS || e_("<span>" + VZ[S] + "</span><span> has been killed</span>", oS ? "info-dark" : "info") : 2 == Y ? (RS || e_("<span>" + VZ[S] + "</span><span> crashed into a wall</span>" + (J == cS ? "<span> (you get the kill)</span>" : ""), oS ? "info-dark" : "info"), J == cS && Vo("You killed " + VZ[S] + "!", oS ? 16777215 : jY(oY(cS), -.7), !0)) : 3 == Y ? RS || e_("<span>" + VZ[S] + "</span><span> died in a collision</span>", oS ? "info-dark" : "info") : 5 == Y && (_ == cS ? (e_("<span>You exploded </span><span>" + VZ[S] + "</span><span> (kills: " + xZ + ")</span>", oS ? "info-dark" : "info"), Vo("You exploded " + VZ[S] + "!", oS ? 16777215 : jY(oY(cS), -.7), !0)) : RS || e_("<span>" + VZ[S] + "</span><span> has been exploded</span>", oS ? "info-dark" : "info")));
         else try {
-            1 == x && (hs[s] == Bs || hs[C] == Bs || Js && WZ) ? C == Ts ? (RW("You killed " + RI[s] + "!", Ws ? 16777215 : Gx(Wx(Ts), -.7), !0), _C("<span>You killed </span>" + mW(s) + "<span> (kills: " + zI + ")</span>", Ws ? "info-dark" : "info")) : us || _C(mW(s) + "<span> has been killed by </span>" + mW(C), Ws ? "info-dark" : "info") : 2 == x && (hs[s] == Bs || Z == Ts || Js && WZ) ? (us || _C(mW(s) + "<span> crashed into a wall</span>" + (Z == Ts ? "<span> (you get the kill)</span>" : ""), Ws ? "info-dark" : "info"), Z == Ts && RW("You killed " + RI[s] + "!", Ws ? 16777215 : Gx(Wx(Ts), -.7), !0)) : 3 == x && (hs[s] == Bs || Js && WZ) && (us || _C(mW(s) + "<span> died colliding with </span>" + mW(C), Ws ? "info-dark" : "info"))
-        } catch (I) {}
-        if (!bs[s] || 0 == x || 1 != aI && 2 != aI && 3 != aI || vW(bs[s].x, bs[s].y, W), s == Ts) {
-            if (iI++, "undefined" != typeof Storage) try {
-                localStorage.setItem("gamesPlayed", iI)
-            } catch (I) {
-                console.log(I)
+            1 == Y && (bS[S] == yS || bS[_] == yS || aS && JJ) ? _ == cS ? (Vo("You killed " + VZ[S] + "!", oS ? 16777215 : jY(oY(cS), -.7), !0), e_("<span>You killed </span>" + po(S) + "<span> (kills: " + xZ + ")</span>", oS ? "info-dark" : "info")) : RS || e_(po(S) + "<span> has been killed by </span>" + po(_), oS ? "info-dark" : "info") : 2 == Y && (bS[S] == yS || J == cS || aS && JJ) ? (RS || e_(po(S) + "<span> crashed into a wall</span>" + (J == cS ? "<span> (you get the kill)</span>" : ""), oS ? "info-dark" : "info"), J == cS && Vo("You killed " + VZ[S] + "!", oS ? 16777215 : jY(oY(cS), -.7), !0)) : 3 == Y && (bS[S] == yS || aS && JJ) && (RS || e_(po(S) + "<span> died colliding with </span>" + po(_), oS ? "info-dark" : "info"))
+        } catch (Z) {}
+        if (!nS[S] || 0 == Y || 1 != KZ && 2 != KZ && 3 != KZ || go(nS[S].x, nS[S].y, o), S == cS) {
+            if (EZ++, "undefined" != typeof Storage) try {
+                localStorage.setItem("gamesPlayed", EZ)
+            } catch (Z) {
+                console.log(Z)
             }
-            switch ($I.visible = !1, XI.visible = !1, R = bs[Ts] ? bs[Ts].position : {
-                    x: HI / 2,
-                    y: wI / 2
-                }, f = sI, !bs[Ts] || 4 == aI && 4 == x || (bs[Ts].visible = !1), x) {
+            switch (DZ.visible = !1, MZ.visible = !1, V = nS[cS] ? nS[cS].position : {
+                    x: dZ / 2,
+                    y: lZ / 2
+                }, U = SZ, !nS[cS] || 4 == KZ && 4 == Y || (nS[cS].visible = !1), Y) {
                 case 0:
-                    var u = "The connection with the server has been lost";
+                    var R = "The connection with the server has been lost";
                     break;
                 case 1:
-                    u = "You were killed by " + (RI[C] ? RI[C] : " an unknown player");
+                    R = "You were killed by " + (VZ[_] ? VZ[_] : " an unknown player");
                     break;
                 case 2:
-                    var o = RI[C] ? RI[C] : "somebody";
-                    1 != aI && 2 != aI || (o = "Team " + js[C - 1]);
-                    u = "You crashed into " + o + "'s wall";
+                    var r = VZ[_] ? VZ[_] : "somebody";
+                    1 != KZ && 2 != KZ || (r = "Team " + AS[_ - 1]);
+                    R = "You crashed into " + r + "'s wall";
                     break;
                 case 3:
-                    u = "You collided with " + (RI[C] ? RI[C] : " an unknown player");
+                    R = "You collided with " + (VZ[_] ? VZ[_] : " an unknown player");
                     break;
                 case 5:
-                    u = "You were exploded by " + (RI[C] ? RI[C] : " an unknown player")
+                    R = "You were exploded by " + (VZ[_] ? VZ[_] : " an unknown player")
             }
-            if (4 == aI) {
-                oI = [], U.moving = !1, bs[Ts].moving = !1, fZ[0] = !1, fZ[1] = !1, fZ[2] = !1, fZ[3] = !1, tI = t = sI / 60;
-                var N = Math.floor(t / 60),
-                    i = Math.floor(t % 60);
-                document.getElementById("gm-1v1-fight-duration").innerHTML = (N > 0 ? N + " min. " : "") + i + " s", ds = 0
-            } else if (2 == aI) document.getElementById("respawn-kill-reason-gm2").innerHTML = u, document.getElementById("respawn-score-gm2").innerHTML = document.getElementById("lb-player-points").innerHTML, document.getElementById("respawn-kills-gm2").innerHTML = zI, zI = 0, document.getElementById("respawn-deaths-gm2").innerHTML = qI, document.getElementById("respawn-rounds-won-gm2").innerHTML = YI + "/" + bI;
+            if (4 == KZ) {
+                rZ = [], B.moving = !1, nS[cS].moving = !1, pJ[0] = !1, pJ[1] = !1, pJ[2] = !1, pJ[3] = !1, mZ = m = SZ / 60;
+                var w = Math.floor(m / 60),
+                    E = Math.floor(m % 60);
+                document.getElementById("gm-1v1-fight-duration").innerHTML = (w > 0 ? w + " min. " : "") + E + " s", TS = 0
+            } else if (2 == KZ) document.getElementById("respawn-kill-reason-gm2").innerHTML = R, document.getElementById("respawn-score-gm2").innerHTML = document.getElementById("lb-player-points").innerHTML, document.getElementById("respawn-kills-gm2").innerHTML = xZ, xZ = 0, document.getElementById("respawn-deaths-gm2").innerHTML = uZ, document.getElementById("respawn-rounds-won-gm2").innerHTML = LZ + "/" + nZ;
             else {
-                var t;
-                document.getElementById("respawn-kill-reason").innerHTML = u, document.getElementById("respawn-score").innerHTML = document.getElementById("lb-player-points").innerHTML, document.getElementById("respawn-map").innerHTML = document.getElementById("map-control-value").innerHTML + "%", tI = t = sI / 60;
-                N = Math.floor(t / 60), i = Math.floor(t % 60);
-                document.getElementById("respawn-alive").innerHTML = (N > 0 ? N + " min. " : "") + i + " s", document.getElementById("respawn-level").innerHTML = document.getElementById("level-value").innerHTML
+                var m;
+                document.getElementById("respawn-kill-reason").innerHTML = R, document.getElementById("respawn-score").innerHTML = document.getElementById("lb-player-points").innerHTML, document.getElementById("respawn-map").innerHTML = document.getElementById("map-control-value").innerHTML + "%", mZ = m = SZ / 60;
+                w = Math.floor(m / 60), E = Math.floor(m % 60);
+                document.getElementById("respawn-alive").innerHTML = (w > 0 ? w + " min. " : "") + E + " s", document.getElementById("respawn-level").innerHTML = document.getElementById("level-value").innerHTML
             }
-            document.getElementById("choose-superpower").style.display = "none", document.getElementById("xp-block").style.display = "none", document.getElementById("upgrade-block").style.display = "none", UW = !0, setTimeout(function() {
-                WZ || 4 != aI ? WZ || 2 == aI && 3 == Ks || (document.getElementById("respawn" + (2 == aI ? "-gm2" : "")).style.display = "block") : (UC(function() {
-                    document.getElementById("gm-1v1-button-back").style.display = "none", document.getElementById("gm-1v1-button-continue").style.display = "inline-block", document.getElementById("gm-1v1-main").style.gridTemplateRows = "100% 50%", DC(), document.getElementById("gm-1v1-result").style.display = "block", document.getElementById("gm-1v1-noresult").style.display = "none", pC(), document.getElementById("chat-history-full").scrollTop = document.getElementById("chat-history-full").scrollHeight, RC()
-                }), "undefined" != typeof aiptag && aiptag.cmd.display.push && !pu && Date.now() - hI > 3e4 && (aiptag.cmd.display.push(function() {
+            document.getElementById("choose-superpower").style.display = "none", document.getElementById("xp-block").style.display = "none", document.getElementById("upgrade-block").style.display = "none", Bo = !0, setTimeout(function() {
+                JJ || 4 != KZ ? JJ || 2 == KZ && 3 == iS || (document.getElementById("respawn" + (2 == KZ ? "-gm2" : "")).style.display = "block") : (B_(function() {
+                    document.getElementById("gm-1v1-button-back").style.display = "none", document.getElementById("gm-1v1-button-continue").style.display = "inline-block", document.getElementById("gm-1v1-main").style.gridTemplateRows = "100% 50%", H_(), document.getElementById("gm-1v1-result").style.display = "block", document.getElementById("gm-1v1-noresult").style.display = "none", z_(), document.getElementById("chat-history-full").scrollTop = document.getElementById("chat-history-full").scrollHeight, V_()
+                }), "undefined" != typeof aiptag && aiptag.cmd.display.push && !eR && Date.now() - bZ > 3e4 && (aiptag.cmd.display.push(function() {
                     aipDisplayTag.display("defly-io_300x250")
-                }), hI = Date.now())), UW = !1
-            }, 1500), $I.visible = !1, XI.visible = !1, $Z = null, "undefined" != typeof aiptag && aiptag.cmd.display.push && !pu && (aiptag.cmd.display.push(function() {
+                }), bZ = Date.now())), Bo = !1
+            }, 1500), DZ.visible = !1, MZ.visible = !1, MJ = null, "undefined" != typeof aiptag && aiptag.cmd.display.push && !eR && (aiptag.cmd.display.push(function() {
                 aipDisplayTag.display("defly-io_300x250")
             }), aiptag.cmd.display.push(function() {
                 aipDisplayTag.display("defly-io_728x90")
-            })), parseInt(document.getElementById("lb-player-points").innerHTML), parseInt(Math.floor(100 * document.getElementById("map-control-value").innerHTML)), Math.floor(t), document.getElementById("level-value").innerHTML, "undefined" != typeof gtag && (gtag("event", "PlayerKilled", {
+            })), parseInt(document.getElementById("lb-player-points").innerHTML), parseInt(Math.floor(100 * document.getElementById("map-control-value").innerHTML)), Math.floor(m), document.getElementById("level-value").innerHTML, "undefined" != typeof gtag && (gtag("event", "PlayerKilled", {
                 event_category: "Game",
                 score: parseInt(document.getElementById("lb-player-points").innerHTML),
                 mapPercent: parseInt(Math.floor(100 * document.getElementById("map-control-value").innerHTML)),
-                gameDuration: Math.floor(t)
+                gameDuration: Math.floor(m)
             }), gtag("set", {
-                page_title: "respawn" + (2 == aI ? "-gm2" : ""),
-                page_path: "/respawn" + (2 == aI ? "-gm2" : "")
+                page_title: "respawn" + (2 == KZ ? "-gm2" : ""),
+                page_path: "/respawn" + (2 == KZ ? "-gm2" : "")
             }), gtag("event", "page_view")), document.getElementById("respawn-panel-earnings").style.display = "none", document.getElementById("respawn-panel-earnings-gm2").style.display = "none", document.getElementById("buy-screen").style.display = "none", document.getElementById("game-won") && document.body.removeChild(document.getElementById("game-won"))
-        } else s == UI && bs[s] && (R = bs[s].position);
-        4 == aI && bs[s] && (4 != x && (bs[s].visible = !1, bs[s].usernameText.visible = !1, bs[s].badge && (bs[s].badge.visible = !1)), bs[s].moving = !1, bs[s].sx = 0, bs[s].sy = 0), !bs[s] || 4 == aI && 4 == x || zW(Wx(s), bs[s].x, bs[s].y, 10, .5 * cI, 6), 3 != aI && 4 != aI && delete Cx[s], 4 == aI || 1 != x && 5 != x || C != Ts || !bs[s] || (DZ(bs[s].x, bs[s].y, 2 == aI ? "+1000" : "+500"), hZ(500))
+        } else S == BZ && nS[S] && (V = nS[S].position);
+        4 == KZ && nS[S] && (4 != Y && (nS[S].visible = !1, nS[S].usernameText.visible = !1, nS[S].badge && (nS[S].badge.visible = !1)), nS[S].moving = !1, nS[S].sx = 0, nS[S].sy = 0), !nS[S] || 4 == KZ && 4 == Y || xo(oY(S), nS[S].x, nS[S].y, 10, .5 * QZ, 6), 3 != KZ && 4 != KZ && delete _Y[S], 4 == KZ || 1 != Y && 5 != Y || _ != cS || !nS[S] || (yJ(nS[S].x, nS[S].y, 2 == KZ ? "+1000" : "+500"), FJ(500))
     }
-    var yW, VW = !1;
-    var KW = -1;
+    var to, Io = !1;
+    var io = -1;
 
-    function pW(I) {
-        clearTimeout(yW), KW = I;
-        var s = new DataView(new ArrayBuffer(5));
-        s.setUint8(0, 8), s.setInt32(1, I), i.send(s.buffer), document.getElementById("team-choice-buttons") && (document.getElementById("team-choice-buttons").style.display = "none"), document.getElementById("team-choice-loading").style.display = "block"
-    }
-
-    function _W() {
-        var I = new DataView(new ArrayBuffer(1));
-        I.setUint8(0, 9), i.send(I.buffer)
+    function zo(Z) {
+        clearTimeout(to), io = Z;
+        var S = new DataView(new ArrayBuffer(5));
+        S.setUint8(0, 8), S.setInt32(1, Z), E.send(S.buffer), document.getElementById("team-choice-buttons") && (document.getElementById("team-choice-buttons").style.display = "none"), document.getElementById("team-choice-loading").style.display = "block"
     }
 
-    function zW(I, s, x, C, W, Z, u, o) {
-        void 0 === o && (o = 1);
-        for (var N = u ? Math.atan2(u.y, u.x) : null, i = 0; i < C; i++) {
-            var t = new PIXI.Sprite(v.debris);
-            t.tint = I, t.alpha = o, t.width = W, t.height = W / t.texture.width * t.texture.height;
-            var a = N ? N + Math.random() * Math.PI - Math.PI / 2 : Math.random() * Math.PI * 2,
-                e = Math.random() * cI * Z,
-                G = Math.random() * Math.PI / 4;
-            t.x = s + Math.cos(a) * cI * .25, t.y = x + Math.sin(a) * cI * .25, t.rotation = Math.random() * Math.PI * 2, r.addChild(t), anime({
-                targets: t,
-                x: s + Math.cos(a) * e + (u ? u.x : 0),
-                y: x + Math.sin(a) * e + (u ? u.y : 0),
-                rotation: t.rotation + G,
+    function eo() {
+        var Z = new DataView(new ArrayBuffer(1));
+        Z.setUint8(0, 9), E.send(Z.buffer)
+    }
+
+    function xo(Z, S, Y, _, o, J, R, r) {
+        void 0 === r && (r = 1);
+        for (var w = R ? Math.atan2(R.y, R.x) : null, E = 0; E < _; E++) {
+            var m = new PIXI.Sprite(g.debris);
+            m.tint = Z, m.alpha = r, m.width = o, m.height = o / m.texture.width * m.texture.height;
+            var K = w ? w + Math.random() * Math.PI - Math.PI / 2 : Math.random() * Math.PI * 2,
+                O = Math.random() * QZ * J,
+                j = Math.random() * Math.PI / 4;
+            m.x = S + Math.cos(K) * QZ * .25, m.y = Y + Math.sin(K) * QZ * .25, m.rotation = Math.random() * Math.PI * 2, v.addChild(m), anime({
+                targets: m,
+                x: S + Math.cos(K) * O + (R ? R.x : 0),
+                y: Y + Math.sin(K) * O + (R ? R.y : 0),
+                rotation: m.rotation + j,
                 alpha: 0,
                 duration: 2e3,
                 easing: "easeOutQuart",
-                complete: function(I) {
+                complete: function(Z) {
                     return function() {
-                        r.removeChild(I)
+                        v.removeChild(Z)
                     }
-                }(t)
+                }(m)
             })
         }
     }
 
-    function qW(I) {
-        return (I = Math.round(100 * I) / 100).toString().match(/^-?\d+(?:\.\d{2})?/)[0]
+    function uo(Z) {
+        return (Z = Math.round(100 * Z) / 100).toString().match(/^-?\d+(?:\.\d{2})?/)[0]
     }
-    var YW = 0;
+    var Lo = 0;
 
-    function bW(I) {
-        for (var s in eI) TW(eI[s], I)
-    }
-
-    function TW(I, s) {
-        if (sI + s <= I.initialTurn) return I.x = I.initialX, void(I.y = I.initialY);
-        I.lifetime -= s, I.x += 1 * I.sx / 60 * s, I.y += 1 * I.sy / 60 * s
+    function no(Z) {
+        for (var S in OZ) co(OZ[S], Z)
     }
 
-    function DW(I, s) {
-        var x = I.getInt32(1);
-        Ys[x] && JW(Ys[x], !0, s)
+    function co(Z, S) {
+        if (SZ + S <= Z.initialTurn) return Z.x = Z.initialX, void(Z.y = Z.initialY);
+        Z.lifetime -= S, Z.x += 1 * Z.sx / 60 * S, Z.y += 1 * Z.sy / 60 * S
     }
 
-    function BW(I, s, x) {
-        var C = I.getFloat32(1);
-        var W = function(I) {
-                return s ? x ? I.x >= C : I.x < C : x ? I.y >= C : I.y < C
+    function Ho(Z, S) {
+        var Y = Z.getInt32(1);
+        LS[Y] && ao(LS[Y], !0, S)
+    }
+
+    function yo(Z, S, Y) {
+        var _ = Z.getFloat32(1);
+        var o = function(Z) {
+                return S ? Y ? Z.x >= _ : Z.x < _ : Y ? Z.y >= _ : Z.y < _
             },
-            Z = {},
-            u = {},
-            o = {};
-        for (var N in Ys) {
-            var i = !0;
-            if ((a = Ys[N]).simplified)
-                for (var t = 0; t < a.simplifiedDotPath.length; t++) {
-                    if (!W(S = a.simplifiedDotPath[t])) {
-                        i = !1;
+            J = {},
+            R = {},
+            r = {};
+        for (var w in LS) {
+            var E = !0;
+            if ((K = LS[w]).simplified)
+                for (var m = 0; m < K.simplifiedDotPath.length; m++) {
+                    if (!o(X = K.simplifiedDotPath[m])) {
+                        E = !1;
                         break
                     }
                 } else
-                    for (t = 0; t < a.linePath.length; t++) {
-                        if (!W((e = a.linePath[t]).dot1) || !W(e.dot2)) {
-                            i = !1;
+                    for (m = 0; m < K.linePath.length; m++) {
+                        if (!o((O = K.linePath[m]).dot1) || !o(O.dot2)) {
+                            E = !1;
                             break
                         }
                     }
-            i && (Z[N] = !0)
+            E && (J[w] = !0)
         }
-        for (var N in Z) {
-            var a = Ys[N];
-            0, delete Ys[N], P && P.removeZone(a, a.zoneBounds.minX, a.zoneBounds.maxX, a.zoneBounds.minY, a.zoneBounds.maxY), F.removeChild(a);
-            for (t = 0; t < a.linePath.length; t++) {
-                (e = a.linePath[t]).leftZoneId == a.zoneId && (e.leftZoneId = 0), e.rightZoneId == a.zoneId && (e.rightZoneId = 0), e.leftZoneId || e.rightZoneId || (e.dot1.shield && !LZ(e.dot1) && (e.dot1.shield.state = 0, e.dot1.shield.alpha = 0), e.dot2.shield && !LZ(e.dot2) && (e.dot2.shield.state = 0, e.dot2.shield.alpha = 0))
+        for (var w in J) {
+            var K = LS[w];
+            0, delete LS[w], P && P.removeZone(K, K.zoneBounds.minX, K.zoneBounds.maxX, K.zoneBounds.minY, K.zoneBounds.maxY), k.removeChild(K);
+            for (m = 0; m < K.linePath.length; m++) {
+                (O = K.linePath[m]).leftZoneId == K.zoneId && (O.leftZoneId = 0), O.rightZoneId == K.zoneId && (O.rightZoneId = 0), O.leftZoneId || O.rightZoneId || (O.dot1.shield && !hJ(O.dot1) && (O.dot1.shield.state = 0, O.dot1.shield.alpha = 0), O.dot2.shield && !hJ(O.dot2) && (O.dot2.shield.state = 0, O.dot2.shield.alpha = 0))
             }
         }
-        for (var N in qs) {
-            var e = qs[N];
-            Ys[e.leftZoneId] || Ys[e.rightZoneId] || W(e.dot1) && W(e.dot2) && (u[e.lineId] = !0)
+        for (var w in uS) {
+            var O = uS[w];
+            LS[O.leftZoneId] || LS[O.rightZoneId] || o(O.dot1) && o(O.dot2) && (R[O.lineId] = !0)
         }
-        for (var N in u) {
-            qs[N] || console.error("could not find line ", N);
-            e = qs[N];
-            delete qs[N], X && X.removeLine(e, e.dot1.position, e.dot2.position), A.removeChild(e), e.dot1.lines.splice(e.dot1.lines.indexOf(e), 1), e.dot2.lines.splice(e.dot2.lines.indexOf(e), 1)
+        for (var w in R) {
+            uS[w] || console.error("could not find line ", w);
+            O = uS[w];
+            delete uS[w], M && M.removeLine(O, O.dot1.position, O.dot2.position), s.removeChild(O), O.dot1.lines.splice(O.dot1.lines.indexOf(O), 1), O.dot2.lines.splice(O.dot2.lines.indexOf(O), 1)
         }
-        for (var N in zs) {
-            if (0 == (S = zs[N]).lines.length) W(S) && (o[N] = !0);
+        for (var w in xS) {
+            if (0 == (X = xS[w]).lines.length) o(X) && (r[w] = !0);
             else
-                for (var G = 0; G < S.lines.length; G++) qs[S.lines[G].lineId] || console.error("dot has removed line", N, S, S.lines[G].lineId)
+                for (var j = 0; j < X.lines.length; j++) uS[X.lines[j].lineId] || console.error("dot has removed line", w, X, X.lines[j].lineId)
         }
-        for (var N in o) {
-            var S = zs[N];
-            delete zs[N], O && O.remove(S, S.position), J.removeChild(S), S.healthBar && g.removeChild(S.healthBar), S.shield && J.removeChild(S.shield), S.text && J.removeChild(S.text)
+        for (var w in r) {
+            var X = xS[w];
+            delete xS[w], D && D.remove(X, X.position), a.removeChild(X), X.healthBar && N.removeChild(X.healthBar), X.shield && a.removeChild(X.shield), X.text && a.removeChild(X.text)
         }
     }
 
-    function hW(I, s) {
-        for (var x = "", C = 0; C < s; C++) x += I;
-        return x
+    function bo(Z, S) {
+        for (var Y = "", _ = 0; _ < S; _++) Y += Z;
+        return Y
     }
-    var OW, $W, XW, PW = 0;
+    var Fo, Do, Mo, Po = 0;
 
-    function cW() {
-        document.getElementById("superpower-label").innerHTML = vI ? "Superpower active" : rI >= 100 ? "Superpower ready, " + (Ex ? "double-tap" : "press E or SHIFT") : "Recharging Superpower...", document.getElementById("superpower-fuel-value").style.width = Math.min(100, rI) + "%"
-    }
-
-    function MW() {
-        var I = new DataView(new ArrayBuffer(9));
-        I.setUint8(0, 7), I.setFloat32(1, U.aimDirection), I.setFloat32(5, U.aimDistance), i.send(I.buffer)
+    function Qo() {
+        document.getElementById("superpower-label").innerHTML = gZ ? "Superpower active" : vZ >= 100 ? "Superpower ready, " + (CY ? "double-tap" : "press E or SHIFT") : "Recharging Superpower...", document.getElementById("superpower-fuel-value").style.width = Math.min(100, vZ) + "%"
     }
 
-    function nW(I) {
-        return GI ? Math.round(I / Us) * Us + Us / 2 * 0 : I
+    function Go() {
+        var Z = new DataView(new ArrayBuffer(9));
+        Z.setUint8(0, 7), Z.setFloat32(1, B.aimDirection), Z.setFloat32(5, B.aimDistance), E.send(Z.buffer)
     }
 
-    function HW(I) {
-        bs[I].parent.removeChild(bs[I]), bs[I].usernameText.parent.removeChild(bs[I].usernameText), bs[I].shield && bs[I].shield.parent.removeChild(bs[I].shield), bs[I].badge && bs[I].badge.parent.removeChild(bs[I].badge);
-        var s = bs[I];
-        delete bs[I], CC(I), bs[I].position.set(s.x, s.y), bs[I].rotation = s.rotation
+    function Wo(Z) {
+        return jZ ? Math.round(Z / BS) * BS + BS / 2 * 0 : Z
     }
-    anime.easings.flashbangCurve = function(I) {
-        return I < .5 ? anime.easings.easeInQuad(2 * I) / 2 : anime.easings.easeInQuad(2 * (.5 - (I - .5))) + .5
+
+    function lo(Z) {
+        nS[Z].parent.removeChild(nS[Z]), nS[Z].usernameText.parent.removeChild(nS[Z].usernameText), nS[Z].shield && nS[Z].shield.parent.removeChild(nS[Z].shield), nS[Z].badge && nS[Z].badge.parent.removeChild(nS[Z].badge);
+        var S = nS[Z];
+        delete nS[Z], __(Z), nS[Z].position.set(S.x, S.y), nS[Z].rotation = S.rotation
+    }
+    anime.easings.flashbangCurve = function(Z) {
+        return Z < .5 ? anime.easings.easeInQuad(2 * Z) / 2 : anime.easings.easeInQuad(2 * (.5 - (Z - .5))) + .5
     };
-    var wW = [],
-        QW = !1;
+    var qo = [],
+        Ao = !1;
 
-    function jW() {
-        for (var I = 0; I < wW.length; I++) g.removeChild(wW[I].playerText), g.removeChild(wW[I]);
-        wW = [], QW = !1
+    function fo() {
+        for (var Z = 0; Z < qo.length; Z++) N.removeChild(qo[Z].playerText), N.removeChild(qo[Z]);
+        qo = [], Ao = !1
     }
 
-    function LW(I) {
-        var s = window.innerWidth / 2,
-            x = window.innerHeight / 2,
-            C = (I.y - x) / (I.x - s),
-            W = C * s,
-            Z = x / C;
-        return -x <= W && W <= x ? I.x > s ? {
+    function ho(Z) {
+        var S = window.innerWidth / 2,
+            Y = window.innerHeight / 2,
+            _ = (Z.y - Y) / (Z.x - S),
+            o = _ * S,
+            J = Y / _;
+        return -Y <= o && o <= Y ? Z.x > S ? {
             x: window.innerWidth,
-            y: x + C * s,
+            y: Y + _ * S,
             s: 0
         } : {
             x: 0,
-            y: x - C * s,
+            y: Y - _ * S,
             s: 2
-        } : -s <= Z && Z <= s ? I.y > x ? {
-            x: s + x / C,
+        } : -S <= J && J <= S ? Z.y > Y ? {
+            x: S + Y / _,
             y: window.innerHeight,
             s: 3
         } : {
-            x: s - x / C,
+            x: S - Y / _,
             y: 0,
             s: 1
         } : null
     }
 
-    function lW(I) {
-        if (R) return R;
-        var s = AI[4] / 2;
-        !Ex && U.aimDistance > 0 && (s = Math.min(U.aimDistance, s));
-        var x = new PIXI.Point((I ? I.x : bs[Ts].x) + s * Math.cos(U.aimDirection), (I ? I.y : bs[Ts].y) + s * Math.sin(U.aimDirection));
-        return tC(x), x
+    function ZJ(Z) {
+        if (V) return V;
+        var S = sZ[4] / 2;
+        !CY && B.aimDistance > 0 && (S = Math.min(B.aimDistance, S));
+        var Y = new PIXI.Point((Z ? Z.x : nS[cS].x) + S * Math.cos(B.aimDirection), (Z ? Z.y : nS[cS].y) + S * Math.sin(B.aimDirection));
+        return m_(Y), Y
     }
 
-    function IZ() {
-        if (!R) {
-            var I = lW();
-            if (oo) {
-                for (var s in zs) {
-                    var x = zs[s];
-                    if (x.owner == Bs)
-                        if ((I = lW()).x = nW(I.x), I.y = nW(I.y), x.position.dst(I) < MI) {
-                            if ($Z && $Z != x)
-                                if (!Ao(x, $Z))(C = new DataView(new ArrayBuffer(25))).setInt32(1, No++), C.setInt32(5, x.owner), C.setInt32(9, $Z.dotId), C.setInt32(13, x.dotId), C.setInt32(17, 0), C.setInt32(21, 0), CW(C);
-                            return $Z = x, void($I.visible = !0)
+    function SJ() {
+        if (!V) {
+            var Z = ZJ();
+            if (wr) {
+                for (var S in xS) {
+                    var Y = xS[S];
+                    if (Y.owner == yS)
+                        if ((Z = ZJ()).x = Wo(Z.x), Z.y = Wo(Z.y), Y.position.dst(Z) < GZ) {
+                            if (MJ && MJ != Y)
+                                if (!kr(Y, MJ))(_ = new DataView(new ArrayBuffer(25))).setInt32(1, Er++), _.setInt32(5, Y.owner), _.setInt32(9, MJ.dotId), _.setInt32(13, Y.dotId), _.setInt32(17, 0), _.setInt32(21, 0), _o(_);
+                            return MJ = Y, void(DZ.visible = !0)
                         }
                 }
-                var C = new DataView(new ArrayBuffer(27)),
-                    W = No++;
-                if (C.setInt32(1, W), C.setInt32(5, Bs), C.setFloat32(9, nW(I.x)), C.setFloat32(13, nW(I.y)), C.setUint8(17, 1), C.setUint8(18, 1), C.setFloat32(19, 0), C.setInt32(23, 0), IW(C), null != $Z)(C = new DataView(new ArrayBuffer(25))).setInt32(1, No++), C.setInt32(5, Bs), C.setInt32(9, $Z.dotId), C.setInt32(13, W), C.setInt32(17, 0), C.setInt32(21, 0), CW(C);
-                $Z = zs[W], $I.visible = !0, vZ = !1
+                var _ = new DataView(new ArrayBuffer(27)),
+                    o = Er++;
+                if (_.setInt32(1, o), _.setInt32(5, yS), _.setFloat32(9, Wo(Z.x)), _.setFloat32(13, Wo(Z.y)), _.setUint8(17, 1), _.setUint8(18, 1), _.setFloat32(19, 0), _.setInt32(23, 0), Zo(_), null != MJ)(_ = new DataView(new ArrayBuffer(25))).setInt32(1, Er++), _.setInt32(5, yS), _.setInt32(9, MJ.dotId), _.setInt32(13, o), _.setInt32(17, 0), _.setInt32(21, 0), _o(_);
+                MJ = xS[o], DZ.visible = !0, BJ = !1
             } else {
-                (C = new DataView(new ArrayBuffer(9))).setUint8(0, 3), C.setFloat32(1, I.x), C.setFloat32(5, I.y), i.send(C.buffer), vZ = !1
+                (_ = new DataView(new ArrayBuffer(9))).setUint8(0, 3), _.setFloat32(1, Z.x), _.setFloat32(5, Z.y), E.send(_.buffer), BJ = !1
             }
         }
     }
 
-    function sZ(I, s) {
-        if (document.getElementById("upgrade-block").classList.contains("ask-redo") && !s && aC(!1), SI <= 0) setTimeout(function() {
+    function YJ(Z, S) {
+        if (document.getElementById("upgrade-block").classList.contains("ask-redo") && !S && K_(!1), XZ <= 0) setTimeout(function() {
             document.getElementById("upgrade-block").style.left = "-264px", document.getElementById("upgrade-block").style.display = "none"
         }, 300);
         else {
-            var x = new DataView(new ArrayBuffer(2));
-            x.setUint8(0, 5), x.setUint8(1, I), i.send(x.buffer), AI[I] < BI[I] && --SI <= 0 && anime({
+            var Y = new DataView(new ArrayBuffer(2));
+            Y.setUint8(0, 5), Y.setUint8(1, Z), E.send(Y.buffer), sZ[Z] < yZ[Z] && --XZ <= 0 && anime({
                 targets: "#upgrade-block",
                 easing: "easeInQuad",
                 left: "-264px",
                 duration: 250,
                 complete: function() {
-                    SI <= 0 && (document.getElementById("upgrade-block").style.left = "-264px", document.getElementById("upgrade-block").style.display = "none")
+                    XZ <= 0 && (document.getElementById("upgrade-block").style.left = "-264px", document.getElementById("upgrade-block").style.display = "none")
                 }
             }), window.event && window.event.preventDefault()
         }
     }
 
-    function xZ() {
-        var I = new DataView(new ArrayBuffer(5));
-        I.setUint8(0, 4), I.setInt32(1, kI), i.send(I.buffer)
+    function _J() {
+        var Z = new DataView(new ArrayBuffer(5));
+        Z.setUint8(0, 4), Z.setInt32(1, $Z), E.send(Z.buffer)
     }
 
-    function CZ() {
-        document.getElementById("respawn-gm2").style.display = "none", vC((Ex ? "Tap" : "Click") + " anywhere to spectate next player", 1e4)
+    function oJ() {
+        document.getElementById("respawn-gm2").style.display = "none", g_((CY ? "Tap" : "Click") + " anywhere to spectate next player", 1e4)
     }
-    var WZ = !1;
+    var JJ = !1;
 
-    function ZZ(I, s) {
-        if (i && 1 == i.readyState) {
-            s || (s = "");
-            var x = new DataView(new ArrayBuffer(3 + 2 * s.length));
-            x.setUint8(0, 128), x.setUint8(1, I), Hx(x, 2, s), i.send(x.buffer), WZ = !0
+    function RJ(Z, S) {
+        if (E && 1 == E.readyState) {
+            S || (S = "");
+            var Y = new DataView(new ArrayBuffer(3 + 2 * S.length));
+            Y.setUint8(0, 128), Y.setUint8(1, Z), dY(Y, 2, S), E.send(Y.buffer), JJ = !0
         }
     }
-    var uZ = 0;
+    var rJ = 0;
 
-    function oZ() {
-        if (i && 1 == i.readyState && (bs[Ts] && !R || WZ)) {
-            var I = new DataView(new ArrayBuffer(20));
-            I.setUint8(0, 2);
-            var s = (U.shooting ? 1 : 0) + (U.moving ? 2 : 0) + (1 == Vs ? 4 : 0);
-            I.setUint8(1, s), I.setFloat32(2, U.moveDirection), I.setFloat32(6, U.aimDirection), I.setInt16(10, u || 0), I.setFloat32(12, U.aimDistance), i.send(I.buffer), uZ = (new Date).getTime(), uI.push(uZ), oI.push({
-                turn: sI + 60 * (u || 0) / 1e3,
+    function wJ() {
+        if (E && 1 == E.readyState && (nS[cS] && !V || JJ)) {
+            var Z = new DataView(new ArrayBuffer(20));
+            Z.setUint8(0, 2);
+            var S = (B.shooting ? 1 : 0) + (B.moving ? 2 : 0) + (1 == IS ? 4 : 0);
+            Z.setUint8(1, S), Z.setFloat32(2, B.moveDirection), Z.setFloat32(6, B.aimDirection), Z.setInt16(10, R || 0), Z.setFloat32(12, B.aimDistance), E.send(Z.buffer), rJ = (new Date).getTime(), RZ.push(rJ), rZ.push({
+                turn: SZ + 60 * (R || 0) / 1e3,
                 input: {
-                    shooting: U.shooting,
-                    moving: U.moving,
-                    aimDirection: U.aimDirection,
-                    moveDirection: U.moveDirection
+                    shooting: B.shooting,
+                    moving: B.moving,
+                    aimDirection: B.aimDirection,
+                    moveDirection: B.moveDirection
                 }
-            }), AZ = !1
+            }), kJ = !1
         }
-        oo && oI.push({
-            turn: sI,
+        wr && rZ.push({
+            turn: SZ,
             input: {
-                shooting: U.shooting,
-                moving: U.moving,
-                aimDirection: U.aimDirection,
-                moveDirection: U.moveDirection
+                shooting: B.shooting,
+                moving: B.moving,
+                aimDirection: B.aimDirection,
+                moveDirection: B.moveDirection
             }
         })
     }
-    var NZ, iZ, tZ, aZ, eZ, GZ, SZ, JZ = 0,
-        AZ = !1;
+    var EJ, mJ, KJ, OJ, jJ, XJ, aJ, sJ = 0,
+        kJ = !1;
 
-    function FZ(I) {
-        if ((0 != j || oo) && (4 != aI || !R)) {
-            if (CI = I.clientX, WI = I.clientY, bs[Ts]) {
-                var s = Math.atan2(WI - window.innerHeight / 2, CI - window.innerWidth / 2);
-                bs[Ts].rotation = s, U.aimDirection = s, U.aimDistance = Math.sqrt(Math.pow(WI - window.innerHeight / 2, 2) + Math.pow(CI - window.innerWidth / 2, 2)) / e.scale.x, 1 == NI && (U.moveDirection = s + (mZ ? Math.PI : 0), U.moving = !0), Cs && (U.moveDirection = U.aimDirection, U.moving = U.aimDistance > 4 * cI);
-                var x = (new Date).getTime();
-                x - JZ > 20 ? (oZ(), JZ = x) : AZ = !0
+    function NJ(Z) {
+        if ((0 != A || wr) && (4 != KZ || !V)) {
+            if (_Z = Z.clientX, oZ = Z.clientY, nS[cS]) {
+                var S = Math.atan2(oZ - window.innerHeight / 2, _Z - window.innerWidth / 2);
+                nS[cS].rotation = S, B.aimDirection = S, B.aimDistance = Math.sqrt(Math.pow(oZ - window.innerHeight / 2, 2) + Math.pow(_Z - window.innerWidth / 2, 2)) / O.scale.x, 1 == wZ && (B.moveDirection = S + ($J ? Math.PI : 0), B.moving = !0), _S && (B.moveDirection = B.aimDirection, B.moving = B.aimDistance > 4 * QZ);
+                var Y = (new Date).getTime();
+                Y - sJ > 20 ? (wJ(), sJ = Y) : kJ = !0
             }
-            if (oo) {
-                var C = lW();
-                document.getElementById("defuse-editor-position").innerHTML = nW(C.x).toFixed(2) + " " + nW(C.y).toFixed(2)
+            if (wr) {
+                var _ = ZJ();
+                document.getElementById("defuse-editor-position").innerHTML = Wo(_.x).toFixed(2) + " " + Wo(_.y).toFixed(2)
             }
         }
     }
 
-    function gZ(I) {
-        return Math.pow(I.clientX - B.x, 2) + Math.pow(I.clientY - B.y, 2) <= Math.pow(B.width, 2)
+    function CJ(Z) {
+        return Math.pow(Z.clientX - b.x, 2) + Math.pow(Z.clientY - b.y, 2) <= Math.pow(b.width, 2)
     }
 
-    function EZ(I) {
-        if (0 != j)
-            if (UI && 2 != aI && 4 != aI) document.getElementById("respawn" + (2 == aI ? "-gm2" : "")).style.display = "block";
-            else if (4 != aI || !R)
-            if (2 == aI && R) dZ();
+    function TJ(Z) {
+        if (0 != A)
+            if (BZ && 2 != KZ && 4 != KZ) document.getElementById("respawn" + (2 == KZ ? "-gm2" : "")).style.display = "block";
+            else if (4 != KZ || !V)
+            if (2 == KZ && V) vJ();
             else {
-                var s = (new Date).getTime(),
-                    x = 1 * ax;
-                if ("touchend" === I.type || "touchcancel" === I.type)
-                    for (var C = 0; C < I.changedTouches.length; C++) {
-                        var W = I.changedTouches[C];
-                        if (NZ && NZ.identifier == W.identifier ? (U.moving = !1, oZ(), Y.visible = !1, b.visible = !1, NZ = null) : aZ && aZ.identifier == W.identifier ? (U.shooting = !1, oZ(), T.visible = !1, D.visible = !1, aZ = null) : tZ && tZ.identifier == W.identifier && (vZ = !1, tZ = null), GZ && W.identifier == GZ.identifier && s - GZ.time < 250)
-                            if ((N = Math.sqrt(Math.pow(GZ.clientX - W.clientX, 2) + Math.pow(GZ.clientY - W.clientY, 2))) < .2 * ax) {
-                                if (SZ && s - SZ.time < 250)
-                                    if ((N = Math.sqrt(Math.pow(SZ.clientX - W.clientX, 2) + Math.pow(SZ.clientY - W.clientY, 2))) < .2 * ax) {
-                                        var Z = U.aimDirection,
-                                            u = U.aimDistance;
-                                        U.aimDirection = Math.atan2(W.clientY - window.innerHeight / 2, W.clientX - window.innerWidth / 2), U.aimDistance = Math.sqrt(Math.pow(window.innerWidth / 2 - W.clientX, 2) + Math.pow(window.innerHeight / 2 - W.clientY, 2)) / e.scale.x, MW(), Z = U.aimDirection = Z, u = U.aimDistance = u
-                                    }(SZ = {
-                                        clientX: W.clientX,
-                                        clientY: W.clientY,
-                                        identifier: W.identifier
-                                    }). time = s
+                var S = (new Date).getTime(),
+                    Y = 1 * KY;
+                if ("touchend" === Z.type || "touchcancel" === Z.type)
+                    for (var _ = 0; _ < Z.changedTouches.length; _++) {
+                        var o = Z.changedTouches[_];
+                        if (EJ && EJ.identifier == o.identifier ? (B.moving = !1, wJ(), L.visible = !1, n.visible = !1, EJ = null) : OJ && OJ.identifier == o.identifier ? (B.shooting = !1, wJ(), c.visible = !1, H.visible = !1, OJ = null) : KJ && KJ.identifier == o.identifier && (BJ = !1, KJ = null), XJ && o.identifier == XJ.identifier && S - XJ.time < 250)
+                            if ((w = Math.sqrt(Math.pow(XJ.clientX - o.clientX, 2) + Math.pow(XJ.clientY - o.clientY, 2))) < .2 * KY) {
+                                if (aJ && S - aJ.time < 250)
+                                    if ((w = Math.sqrt(Math.pow(aJ.clientX - o.clientX, 2) + Math.pow(aJ.clientY - o.clientY, 2))) < .2 * KY) {
+                                        var J = B.aimDirection,
+                                            R = B.aimDistance;
+                                        B.aimDirection = Math.atan2(o.clientY - window.innerHeight / 2, o.clientX - window.innerWidth / 2), B.aimDistance = Math.sqrt(Math.pow(window.innerWidth / 2 - o.clientX, 2) + Math.pow(window.innerHeight / 2 - o.clientY, 2)) / O.scale.x, Go(), J = B.aimDirection = J, R = B.aimDistance = R
+                                    }(aJ = {
+                                        clientX: o.clientX,
+                                        clientY: o.clientY,
+                                        identifier: o.identifier
+                                    }). time = S
                             }
-                    } else if ("touchstart" === I.type)
-                        for (C = 0; C < I.changedTouches.length; C++) {
-                            W = I.changedTouches[C];
-                            if ((GZ = {
-                                    clientX: W.clientX,
-                                    clientY: W.clientY,
-                                    identifier: W.identifier
-                                }).time = s, gZ(W) && !U.shooting)(s = (new Date).getTime()) - rZ > 200 ? (IZ(), rZ = s) : vZ = !0, 3 == aI && (vZ = !0, tZ = {
-                                clientX: W.clientX,
-                                clientY: W.clientY,
-                                identifier: W.identifier
-                            }), GZ = null;
-                            else W.clientX <= window.innerWidth / 2 ? (NZ = {
-                                clientX: W.clientX,
-                                clientY: W.clientY,
-                                identifier: W.identifier
-                            }, Y.width = x, Y.height = x, Y.x = NZ.clientX, Y.y = NZ.clientY, b.width = x / 2, b.height = x / 2, b.x = NZ.clientX, b.y = NZ.clientY, Y.visible = !0, b.visible = !0) : (aZ = {
-                                clientX: W.clientX,
-                                clientY: W.clientY,
-                                identifier: W.identifier
-                            }, T.width = x, T.height = x, T.x = aZ.clientX, T.y = aZ.clientY, D.width = x / 2, D.height = x / 2, D.x = aZ.clientX, D.y = aZ.clientY, T.visible = !0, D.visible = !0)
-                        } else if ("touchmove" === I.type)
-                            for (C = 0; C < I.changedTouches.length; C++) {
-                                W = I.changedTouches[C];
-                                if (NZ && W.identifier == NZ.identifier && bs[Ts]) {
-                                    if (iZ = {
-                                            clientX: W.clientX,
-                                            clientY: W.clientY,
-                                            identifier: W.identifier
-                                        }, b.x = iZ.clientX, b.y = iZ.clientY, (N = Math.sqrt(Math.pow(iZ.clientX - NZ.clientX, 2) + Math.pow(iZ.clientY - NZ.clientY, 2))) >= .2 * x) {
-                                        var o = Math.atan2(iZ.clientY - NZ.clientY, iZ.clientX - NZ.clientX);
-                                        U.moveDirection = o, U.moving = !0, (s = (new Date).getTime()) - JZ > 20 ? (oZ(), JZ = s) : AZ = !0, N >= .4 * x && (b.x = Y.x + Math.cos(o) * x * .4, b.y = Y.y + Math.sin(o) * x * .4, NZ.clientX = W.clientX + Math.cos(o + Math.PI) * Math.min(N, x), NZ.clientY = W.clientY + Math.sin(o + Math.PI) * Math.min(N, x), Y.x = NZ.clientX, Y.y = NZ.clientY)
+                    } else if ("touchstart" === Z.type)
+                        for (_ = 0; _ < Z.changedTouches.length; _++) {
+                            o = Z.changedTouches[_];
+                            if ((XJ = {
+                                    clientX: o.clientX,
+                                    clientY: o.clientY,
+                                    identifier: o.identifier
+                                }).time = S, CJ(o) && !B.shooting)(S = (new Date).getTime()) - gJ > 200 ? (SJ(), gJ = S) : BJ = !0, 3 == KZ && (BJ = !0, KJ = {
+                                clientX: o.clientX,
+                                clientY: o.clientY,
+                                identifier: o.identifier
+                            }), XJ = null;
+                            else o.clientX <= window.innerWidth / 2 ? (EJ = {
+                                clientX: o.clientX,
+                                clientY: o.clientY,
+                                identifier: o.identifier
+                            }, L.width = Y, L.height = Y, L.x = EJ.clientX, L.y = EJ.clientY, n.width = Y / 2, n.height = Y / 2, n.x = EJ.clientX, n.y = EJ.clientY, L.visible = !0, n.visible = !0) : (OJ = {
+                                clientX: o.clientX,
+                                clientY: o.clientY,
+                                identifier: o.identifier
+                            }, c.width = Y, c.height = Y, c.x = OJ.clientX, c.y = OJ.clientY, H.width = Y / 2, H.height = Y / 2, H.x = OJ.clientX, H.y = OJ.clientY, c.visible = !0, H.visible = !0)
+                        } else if ("touchmove" === Z.type)
+                            for (_ = 0; _ < Z.changedTouches.length; _++) {
+                                o = Z.changedTouches[_];
+                                if (EJ && o.identifier == EJ.identifier && nS[cS]) {
+                                    if (mJ = {
+                                            clientX: o.clientX,
+                                            clientY: o.clientY,
+                                            identifier: o.identifier
+                                        }, n.x = mJ.clientX, n.y = mJ.clientY, (w = Math.sqrt(Math.pow(mJ.clientX - EJ.clientX, 2) + Math.pow(mJ.clientY - EJ.clientY, 2))) >= .2 * Y) {
+                                        var r = Math.atan2(mJ.clientY - EJ.clientY, mJ.clientX - EJ.clientX);
+                                        B.moveDirection = r, B.moving = !0, (S = (new Date).getTime()) - sJ > 20 ? (wJ(), sJ = S) : kJ = !0, w >= .4 * Y && (n.x = L.x + Math.cos(r) * Y * .4, n.y = L.y + Math.sin(r) * Y * .4, EJ.clientX = o.clientX + Math.cos(r + Math.PI) * Math.min(w, Y), EJ.clientY = o.clientY + Math.sin(r + Math.PI) * Math.min(w, Y), L.x = EJ.clientX, L.y = EJ.clientY)
                                     }
-                                } else if (aZ && W.identifier == aZ.identifier && bs[Ts]) {
-                                    eZ = {
-                                        clientX: W.clientX,
-                                        clientY: W.clientY,
-                                        identifier: W.identifier
-                                    }, D.x = eZ.clientX, D.y = eZ.clientY;
-                                    var N = Math.sqrt(Math.pow(eZ.clientX - aZ.clientX, 2) + Math.pow(eZ.clientY - aZ.clientY, 2));
-                                    o = Math.atan2(eZ.clientY - aZ.clientY, eZ.clientX - aZ.clientX);
-                                    U.aimDirection = o, bs[Ts].rotation = o, U.shooting = !0, (s = (new Date).getTime()) - JZ > 20 ? (oZ(), JZ = s) : AZ = !0, N >= .4 * x && (D.x = T.x + Math.cos(o) * x * .4, D.y = T.y + Math.sin(o) * x * .4)
+                                } else if (OJ && o.identifier == OJ.identifier && nS[cS]) {
+                                    jJ = {
+                                        clientX: o.clientX,
+                                        clientY: o.clientY,
+                                        identifier: o.identifier
+                                    }, H.x = jJ.clientX, H.y = jJ.clientY;
+                                    var w = Math.sqrt(Math.pow(jJ.clientX - OJ.clientX, 2) + Math.pow(jJ.clientY - OJ.clientY, 2));
+                                    r = Math.atan2(jJ.clientY - OJ.clientY, jJ.clientX - OJ.clientX);
+                                    B.aimDirection = r, nS[cS].rotation = r, B.shooting = !0, (S = (new Date).getTime()) - sJ > 20 ? (wJ(), sJ = S) : kJ = !0, w >= .4 * Y && (H.x = c.x + Math.cos(r) * Y * .4, H.y = c.y + Math.sin(r) * Y * .4)
                                 }
                             }
-                I.preventDefault()
+                Z.preventDefault()
             }
     }
 
-    function dZ(I, s) {
-        var x = new DataView(new ArrayBuffer(2 + (I ? 4 : 0)));
-        x.setUint8(0, 12), x.setUint8(1, s ? 1 : 0), I && x.setInt32(2, I), i.send(x.buffer)
+    function vJ(Z, S) {
+        var Y = new DataView(new ArrayBuffer(2 + (Z ? 4 : 0)));
+        Y.setUint8(0, 12), Y.setUint8(1, S ? 1 : 0), Z && Y.setInt32(2, Z), E.send(Y.buffer)
     }
-    var rZ = 0,
-        vZ = !1;
+    var gJ = 0,
+        BJ = !1;
 
-    function UZ(I) {
-        if (WZ || !R || UW || 2 == aI || 4 == aI || (document.getElementById("respawn").style.display = "block"), (0 != j || oo) && (4 != aI || !R))
-            if (2 == aI && R) dZ();
+    function VJ(Z) {
+        if (JJ || !V || Bo || 2 == KZ || 4 == KZ || (document.getElementById("respawn").style.display = "block"), (0 != A || wr) && (4 != KZ || !V))
+            if (2 == KZ && V) vJ();
             else {
-                if (0 == I.button) U.shooting = !0, oZ(), $I.visible = !1, I.preventDefault();
-                else if (2 == I.button && !U.shooting) {
-                    var s = (new Date).getTime();
-                    s - rZ > 200 ? (IZ(), rZ = s) : vZ = !0, 3 == aI && (vZ = !0)
+                if (0 == Z.button) B.shooting = !0, wJ(), DZ.visible = !1, Z.preventDefault();
+                else if (2 == Z.button && !B.shooting) {
+                    var S = (new Date).getTime();
+                    S - gJ > 200 ? (SJ(), gJ = S) : BJ = !0, 3 == KZ && (BJ = !0)
                 }
                 window.focus()
             }
     }
 
-    function RZ(I) {
-        if ((0 != j || oo) && (4 != aI || !R)) {
-            if (0 == I.button) {
-                if (U.shooting = !1, oZ(), $I.visible = !!$Z, oo)
-                    for (var s in $Z = null, $I.visible = !1, zs) {
-                        var x = zs[s],
-                            C = lW();
-                        if (C.x = nW(C.x), C.y = nW(C.y), x.position.dst(C) < MI) {
-                            var W = new DataView(new ArrayBuffer(9));
-                            return W.setInt32(1, x.dotId), W.setInt32(5, 0), void rW(W)
+    function UJ(Z) {
+        if ((0 != A || wr) && (4 != KZ || !V)) {
+            if (0 == Z.button) {
+                if (B.shooting = !1, wJ(), DZ.visible = !!MJ, wr)
+                    for (var S in MJ = null, DZ.visible = !1, xS) {
+                        var Y = xS[S],
+                            _ = ZJ();
+                        if (_.x = Wo(_.x), _.y = Wo(_.y), Y.position.dst(_) < GZ) {
+                            var o = new DataView(new ArrayBuffer(9));
+                            return o.setInt32(1, Y.dotId), o.setInt32(5, 0), void vo(o)
                         }
                     }
-            } else 2 == I.button && 3 == aI && (vZ = !1);
+            } else 2 == Z.button && 3 == KZ && (BJ = !1);
             0
         }
     }
-    var fZ = [!1, !1, !1, !1],
-        mZ = !1,
-        kZ = !1,
-        yZ = !1;
+    var pJ = [!1, !1, !1, !1],
+        $J = !1,
+        tJ = !1,
+        IJ = !1;
 
-    function VZ() {
-        if ((WZ || bs[Ts]) && 1 != NI)
-            if (fZ[0] || fZ[1] || fZ[2] || fZ[3]) {
-                var I = 0,
-                    s = 0;
-                fZ[0] ? s -= 1 : fZ[1] && (s += 1), fZ[2] ? I -= 1 : fZ[3] && (I += 1);
-                var x = Math.atan2(s, I);
-                U.moving && U.moveDirection == x || (U.moving = !0, U.moveDirection = x, oZ()), WZ && (UI = 0)
-            } else U.moving = !1, oZ()
+    function iJ() {
+        if ((JJ || nS[cS]) && 1 != wZ)
+            if (pJ[0] || pJ[1] || pJ[2] || pJ[3]) {
+                var Z = 0,
+                    S = 0;
+                pJ[0] ? S -= 1 : pJ[1] && (S += 1), pJ[2] ? Z -= 1 : pJ[3] && (Z += 1);
+                var Y = Math.atan2(S, Z);
+                B.moving && B.moveDirection == Y || (B.moving = !0, B.moveDirection = Y, wJ()), JJ && (BZ = 0)
+            } else B.moving = !1, wJ()
     }
-    var KZ = !1;
+    var zJ = !1;
 
-    function pZ(I) {
-        if (I.isTrusted && I instanceof KeyboardEvent && (0 != j || oo) && (4 != aI || !R)) {
-            var s = "string" == typeof I.code && I.code.length > 0,
-                x = document.getElementById("chat-input");
-            if (!(x && document.activeElement == x)) {
-                if (s && "KeyW" == I.code || !s && 87 == I.keyCode || !ss && 38 == I.keyCode) fZ[0] = !0, VZ();
-                else if (s && "KeyS" == I.code || !s && 83 == I.keyCode || !ss && 40 == I.keyCode) fZ[1] = !0, VZ();
-                else if (s && "KeyA" == I.code || !s && 65 == I.keyCode || !ss && 37 == I.keyCode) fZ[2] = !0, VZ();
-                else if (s && "KeyD" == I.code || !s && 68 == I.keyCode || !ss && 39 == I.keyCode) fZ[3] = !0, VZ();
-                else if (s && "Space" == I.code || !s && 32 == I.keyCode) {
-                    if (!KZ && !U.shooting) {
-                        KZ = !0;
-                        var C = (new Date).getTime();
-                        C - rZ > 200 ? (IZ(), rZ = C) : vZ = !0, 3 == aI && (vZ = !0)
+    function eJ(Z) {
+        if (Z.isTrusted && Z instanceof KeyboardEvent && (0 != A || wr) && (4 != KZ || !V)) {
+            var S = "string" == typeof Z.code && Z.code.length > 0,
+                Y = document.getElementById("chat-input");
+            if (!(Y && document.activeElement == Y)) {
+                if (S && "KeyW" == Z.code || !S && 87 == Z.keyCode || !SS && 38 == Z.keyCode) pJ[0] = !0, iJ();
+                else if (S && "KeyS" == Z.code || !S && 83 == Z.keyCode || !SS && 40 == Z.keyCode) pJ[1] = !0, iJ();
+                else if (S && "KeyA" == Z.code || !S && 65 == Z.keyCode || !SS && 37 == Z.keyCode) pJ[2] = !0, iJ();
+                else if (S && "KeyD" == Z.code || !S && 68 == Z.keyCode || !SS && 39 == Z.keyCode) pJ[3] = !0, iJ();
+                else if (S && "Space" == Z.code || !S && 32 == Z.keyCode) {
+                    if (!zJ && !B.shooting) {
+                        zJ = !0;
+                        var _ = (new Date).getTime();
+                        _ - gJ > 200 ? (SJ(), gJ = _) : BJ = !0, 3 == KZ && (BJ = !0)
                     }
-                } else if (ss && 37 == I.keyCode) kZ = !0;
-                else if (ss && 39 == I.keyCode) yZ = !0;
-                else if (ss && 38 == I.keyCode) U.shooting = !0, oZ(), $I.visible = !1;
-                else if (s && "KeyE" == I.code || !s && 69 == I.keyCode) vI || MW();
-                else if (16 == I.keyCode) vI || MW();
-                else if (s && "Digit1" == I.code || !s && 49 == I.keyCode) sZ(0);
-                else if (s && "Digit2" == I.code || !s && 50 == I.keyCode) sZ(1);
-                else if (s && "Digit3" == I.code || !s && 51 == I.keyCode) sZ(2);
-                else if (s && "Digit4" == I.code || !s && 52 == I.keyCode) sZ(3);
-                else if (s && "Digit5" == I.code || !s && 53 == I.keyCode) sZ(4);
-                else if (s && "Digit6" == I.code || !s && 54 == I.keyCode) sZ(5);
-                else if (s && "Digit7" == I.code || !s && 55 == I.keyCode) sZ(6);
-                else if (66 == I.keyCode) {
-                    (W = document.getElementById("xp-block")).style.opacity && 1 != W.style.opacity ? 0 == W.style.opacity ? W.style.opacity = 1 : .5 == W.style.opacity && (W.style.opacity = 0) : W.style.opacity = .5
-                } else if (76 == I.keyCode) {
-                    var W;
-                    (W = document.getElementById("leaderboard-block")).style.opacity && 1 != W.style.opacity ? 0 == W.style.opacity ? W.style.opacity = 1 : .5 == W.style.opacity && (W.style.opacity = 0) : W.style.opacity = .5
-                } else if (73 == I.keyCode) document.getElementById("settings-popup").style.display = "block" == document.getElementById("settings-popup").style.display ? "none" : "block";
-                else if (9 == I.keyCode);
-                else if (!(9 == I.keyCode || I.keyCode >= 65 && I.keyCode <= 90 || 60 == I.keyCode)) return;
-                R || I.preventDefault()
+                } else if (SS && 37 == Z.keyCode) tJ = !0;
+                else if (SS && 39 == Z.keyCode) IJ = !0;
+                else if (SS && 38 == Z.keyCode) B.shooting = !0, wJ(), DZ.visible = !1;
+                else if (S && "KeyE" == Z.code || !S && 69 == Z.keyCode) gZ || Go();
+                else if (16 == Z.keyCode) gZ || Go();
+                else if (S && "Digit1" == Z.code || !S && 49 == Z.keyCode) YJ(0);
+                else if (S && "Digit2" == Z.code || !S && 50 == Z.keyCode) YJ(1);
+                else if (S && "Digit3" == Z.code || !S && 51 == Z.keyCode) YJ(2);
+                else if (S && "Digit4" == Z.code || !S && 52 == Z.keyCode) YJ(3);
+                else if (S && "Digit5" == Z.code || !S && 53 == Z.keyCode) YJ(4);
+                else if (S && "Digit6" == Z.code || !S && 54 == Z.keyCode) YJ(5);
+                else if (S && "Digit7" == Z.code || !S && 55 == Z.keyCode) YJ(6);
+                else if (66 == Z.keyCode) {
+                    (o = document.getElementById("xp-block")).style.opacity && 1 != o.style.opacity ? 0 == o.style.opacity ? o.style.opacity = 1 : .5 == o.style.opacity && (o.style.opacity = 0) : o.style.opacity = .5
+                } else if (76 == Z.keyCode) {
+                    var o;
+                    (o = document.getElementById("leaderboard-block")).style.opacity && 1 != o.style.opacity ? 0 == o.style.opacity ? o.style.opacity = 1 : .5 == o.style.opacity && (o.style.opacity = 0) : o.style.opacity = .5
+                } else if (73 == Z.keyCode) document.getElementById("settings-popup").style.display = "block" == document.getElementById("settings-popup").style.display ? "none" : "block";
+                else if (9 == Z.keyCode);
+                else if (!(9 == Z.keyCode || Z.keyCode >= 65 && Z.keyCode <= 90 || 60 == Z.keyCode)) return;
+                V || Z.preventDefault()
             }
         }
     }
-    var _Z = 0;
+    var xJ = 0;
 
-    function zZ(I) {
-        if (I.isTrusted && I instanceof KeyboardEvent) {
-            var s = 4 == aI && !!R;
-            if (0 != j || oo || s) {
-                var x = document.getElementById("chat-input"),
-                    C = x && document.activeElement == x,
-                    W = "string" == typeof I.code && I.code.length > 0;
-                if (s) 13 == I.keyCode && (C ? (x.value.length > 0 && zC(x.value), x.value = "", x.blur()) : qZ());
-                else if (C) 13 == I.keyCode && (x.value.length > 0 && zC(x.value), x.value = "", x.blur(), document.getElementById("chat-block").classList.remove("typing"));
-                else if (W && "KeyW" == I.code || !W && 87 == I.keyCode || !ss && 38 == I.keyCode) fZ[0] = !1, VZ();
-                else if (W && "KeyS" == I.code || !W && 83 == I.keyCode || !ss && 40 == I.keyCode) fZ[1] = !1, VZ();
-                else if (W && "KeyA" == I.code || !W && 65 == I.keyCode || !ss && 37 == I.keyCode) fZ[2] = !1, VZ();
-                else if (W && "KeyD" == I.code || !W && 68 == I.keyCode || !ss && 39 == I.keyCode) fZ[3] = !1, VZ();
-                else if (W && "Space" == I.code || !W && 32 == I.keyCode) KZ = !1, 3 == aI && (vZ = !1);
-                else if (ss && 37 == I.keyCode) kZ = !1;
-                else if (ss && 39 == I.keyCode) yZ = !1;
-                else if (ss && 38 == I.keyCode) U.shooting = !1, oZ(), $I.visible = !!$Z;
-                else if (ss && 40 == I.keyCode) {
-                    if (!U.shooting) {
-                        var Z = (new Date).getTime();
-                        Z - rZ > 200 ? (IZ(), rZ = Z) : vZ = !0
+    function uJ(Z) {
+        if (Z.isTrusted && Z instanceof KeyboardEvent) {
+            var S = 4 == KZ && !!V;
+            if (0 != A || wr || S) {
+                var Y = document.getElementById("chat-input"),
+                    _ = Y && document.activeElement == Y,
+                    o = "string" == typeof Z.code && Z.code.length > 0;
+                if (S) 13 == Z.keyCode && (_ ? (Y.value.length > 0 && x_(Y.value), Y.value = "", Y.blur()) : LJ());
+                else if (_) 13 == Z.keyCode && (Y.value.length > 0 && x_(Y.value), Y.value = "", Y.blur(), document.getElementById("chat-block").classList.remove("typing"));
+                else if (o && "KeyW" == Z.code || !o && 87 == Z.keyCode || !SS && 38 == Z.keyCode) pJ[0] = !1, iJ();
+                else if (o && "KeyS" == Z.code || !o && 83 == Z.keyCode || !SS && 40 == Z.keyCode) pJ[1] = !1, iJ();
+                else if (o && "KeyA" == Z.code || !o && 65 == Z.keyCode || !SS && 37 == Z.keyCode) pJ[2] = !1, iJ();
+                else if (o && "KeyD" == Z.code || !o && 68 == Z.keyCode || !SS && 39 == Z.keyCode) pJ[3] = !1, iJ();
+                else if (o && "Space" == Z.code || !o && 32 == Z.keyCode) zJ = !1, 3 == KZ && (BJ = !1);
+                else if (SS && 37 == Z.keyCode) tJ = !1;
+                else if (SS && 39 == Z.keyCode) IJ = !1;
+                else if (SS && 38 == Z.keyCode) B.shooting = !1, wJ(), DZ.visible = !!MJ;
+                else if (SS && 40 == Z.keyCode) {
+                    if (!B.shooting) {
+                        var J = (new Date).getTime();
+                        J - gJ > 200 ? (SJ(), gJ = J) : BJ = !0
                     }
-                } else if (W && "KeyC" == I.code || !W && 67 == I.keyCode) xs && (_Z++, Cs = !Cs, TZ(), U.moving = !1, oZ(), _Z < 4 && vC("Move with mouse " + (Cs ? "ENABLED" : "DISABLED") + " (shortcut: C)", 2e3));
-                else if (WZ && (W && "KeyJ" == I.code || !W && 74 == I.keyCode)) {
-                    var u = document.getElementById("xp-block");
-                    u.style.display = "block" == u.style.display ? "none" : "block", u.getElementsByClassName("xp-bar")[0].style.display = "none", u.getElementsByClassName("text")[1].style.display = "none";
-                    for (var o = "", N = 0; N < $s; N++) {
-                        var i = Hs[N + (ZI >= 1 ? 1 : 0)];
-                        16252714 == i && (i = 13817893);
-                        var t = Gx(i, .2);
-                        o += '<div class="bar" id="map-control-bar-team-' + ((ZI >= 1 ? 1 : 0) + N) + '" style="background: linear-gradient(to bottom, ' + mu(i) + ", " + mu(t) + ');"></div>'
+                } else if (o && "KeyC" == Z.code || !o && 67 == Z.keyCode) YS && (xJ++, _S = !_S, HJ(), B.moving = !1, wJ(), xJ < 4 && g_("Move with mouse " + (_S ? "ENABLED" : "DISABLED") + " (shortcut: C)", 2e3));
+                else if (JJ && (o && "KeyJ" == Z.code || !o && 74 == Z.keyCode)) {
+                    var R = document.getElementById("xp-block");
+                    R.style.display = "block" == R.style.display ? "none" : "block", R.getElementsByClassName("xp-bar")[0].style.display = "none", R.getElementsByClassName("text")[1].style.display = "none";
+                    for (var r = "", w = 0; w < DS; w++) {
+                        var E = dS[w + (JZ >= 1 ? 1 : 0)];
+                        16252714 == E && (E = 13817893);
+                        var m = jY(E, .2);
+                        r += '<div class="bar" id="map-control-bar-team-' + ((JZ >= 1 ? 1 : 0) + w) + '" style="background: linear-gradient(to bottom, ' + $R(E) + ", " + $R(m) + ');"></div>'
                     }
-                    document.getElementById("score-bars").innerHTML = o
-                } else if (WZ && (W && "KeyI" == I.code || !W && 73 == I.keyCode)) {
-                    var a = document.getElementById("fps");
-                    a.style.display = "block" == a.style.display ? "none" : "block"
-                } else if (WZ && (W && "KeyO" == I.code || !W && 79 == I.keyCode)) ZZ(2);
-                else if (WZ && (W && "KeyR" == I.code || !W && 82 == I.keyCode)) ZZ(5);
-                else if (WZ && (W && "KeyT" == I.code || !W && 84 == I.keyCode)) clearInterval(uC), uC = null;
-                else if (WZ && (W && "KeyY" == I.code || !W && 89 == I.keyCode)) clearInterval(oC);
-                else if (WZ && (W && "KeyN" == I.code || !W && 78 == I.keyCode)) ZZ(6);
-                else if (WZ && (W && 77 == I.keyCode || !W && 77 == I.keyCode)) "none" == V.style.transform ? (document.getElementById("minimap").style.width = .375 * V.width + "px", document.getElementById("minimap").style.height = .375 * V.height + "px", V.style.transform = "scale(0.375)") : (document.getElementById("minimap").style.width = V.width + "px", document.getElementById("minimap").style.height = V.height + "px", V.style.transform = "none");
-                else if (WZ && (W && 70 == I.keyCode || !W && 70 == I.keyCode)) {
-                    var e = Math.min(window.innerWidth, window.innerHeight) - 32;
-                    document.getElementById("minimap").style.width = e + "px", document.getElementById("minimap").style.height = e / V.width * V.height + "px", V.style.transform = "scale(" + e / 256 + ")"
-                } else if (WZ && (W && "KeyH" == I.code || !W && 72 == I.keyCode)) document.getElementById("admin-player-list") ? document.body.removeChild(document.getElementById("admin-player-list")) : ZZ(8);
+                    document.getElementById("score-bars").innerHTML = r
+                } else if (JJ && (o && "KeyI" == Z.code || !o && 73 == Z.keyCode)) {
+                    var K = document.getElementById("fps");
+                    K.style.display = "block" == K.style.display ? "none" : "block"
+                } else if (JJ && (o && "KeyO" == Z.code || !o && 79 == Z.keyCode)) RJ(2);
+                else if (JJ && (o && "KeyR" == Z.code || !o && 82 == Z.keyCode)) RJ(5);
+                else if (JJ && (o && "KeyT" == Z.code || !o && 84 == Z.keyCode)) clearInterval(R_), R_ = null;
+                else if (JJ && (o && "KeyY" == Z.code || !o && 89 == Z.keyCode)) clearInterval(r_);
+                else if (JJ && (o && "KeyN" == Z.code || !o && 78 == Z.keyCode)) RJ(6);
+                else if (JJ && (o && 77 == Z.keyCode || !o && 77 == Z.keyCode)) "none" == I.style.transform ? (document.getElementById("minimap").style.width = .375 * I.width + "px", document.getElementById("minimap").style.height = .375 * I.height + "px", I.style.transform = "scale(0.375)") : (document.getElementById("minimap").style.width = I.width + "px", document.getElementById("minimap").style.height = I.height + "px", I.style.transform = "none");
+                else if (JJ && (o && 70 == Z.keyCode || !o && 70 == Z.keyCode)) {
+                    var O = Math.min(window.innerWidth, window.innerHeight) - 32;
+                    document.getElementById("minimap").style.width = O + "px", document.getElementById("minimap").style.height = O / I.width * I.height + "px", I.style.transform = "scale(" + O / 256 + ")"
+                } else if (JJ && (o && "KeyH" == Z.code || !o && 72 == Z.keyCode)) document.getElementById("admin-player-list") ? document.body.removeChild(document.getElementById("admin-player-list")) : RJ(8);
                 else {
-                    9 == I.keyCode ? 1 != aI && 2 != aI || (QW ? jW() : (jW(), QW = !0)) : 13 == I.keyCode ? qZ() : "KeyP" == I.code ? (vC("grid version = " + (bZ = (bZ + 1) % 2), 3e3), TZ()) : "KeyO" != I.code || oo || vC("interpolation = " + (ou = !ou), 3e3)
+                    9 == Z.keyCode ? 1 != KZ && 2 != KZ || (Ao ? fo() : (fo(), Ao = !0)) : 13 == Z.keyCode ? LJ() : "KeyP" == Z.code ? (g_("grid version = " + (cJ = (cJ + 1) % 2), 3e3), HJ()) : "KeyO" != Z.code || wr || g_("interpolation = " + (wR = !wR), 3e3)
                 }
             }
         }
     }
 
-    function qZ() {
-        var I = document.getElementById("chat-input");
-        if (!Zs && (1 == aI || 2 == aI || 4 == aI || WZ)) {
-            if (!KI && !pI) return void _C("Chat is disabled for anonymous players. Sign-in with an account to use the chat.", Ws ? "info-dark" : "info");
-            pC(), document.getElementById("chat-block").classList.add("typing"), document.getElementById("chat-history-full").scrollTop = document.getElementById("chat-history-full").scrollHeight, I.focus(), fZ = [!1, !1, !1, !1], VZ(), 4 == aI && document.getElementById("chat-block").classList.contains("gm-1v1-lobby") && anime.timeline({
+    function LJ() {
+        var Z = document.getElementById("chat-input");
+        if (!JS && (1 == KZ || 2 == KZ || 4 == KZ || JJ)) {
+            if (!iZ && !zZ) return void e_("Chat is disabled for anonymous players. Sign-in with an account to use the chat.", oS ? "info-dark" : "info");
+            z_(), document.getElementById("chat-block").classList.add("typing"), document.getElementById("chat-history-full").scrollTop = document.getElementById("chat-history-full").scrollHeight, Z.focus(), pJ = [!1, !1, !1, !1], iJ(), 4 == KZ && document.getElementById("chat-block").classList.contains("gm-1v1-lobby") && anime.timeline({
                 targets: "#chat-input",
                 delay: 200,
                 duration: 0,
@@ -22957,622 +22961,622 @@ var defly = function() {
         }
     }
 
-    function YZ(I) {}
-    var bZ = 0;
+    function nJ(Z) {}
+    var cJ = 0;
 
-    function TZ() {
-        a.resize(window.innerWidth, window.innerHeight), lI = QI, Is = jI;
-        var I = window.innerWidth / window.innerHeight;
-        if (lI < Is * I ? Is = lI / I : lI = Is * I, Ex && (ax = Math.min(tx().dpcm(), window.innerHeight / 6), lI *= .75, Is *= .75, B && (B.width = 1 * ax, B.height = 1 * ax, B.x = window.innerWidth - .75 * ax, B.y = window.innerHeight - .75 * ax, B.visible = !0)), 0 != j || oo) {
-            var s = bs[Ts] || bs[UI] || R;
-            if (s) {
-                var x = s.x - lI / 2,
-                    C = s.y - Is / 2,
-                    W = window.innerWidth / lI,
-                    Z = window.innerHeight / Is;
-                e.setTransform(-x * W, -C * Z, W, Z, 0, 0, 0, 0, 0)
+    function HJ() {
+        K.resize(window.innerWidth, window.innerHeight), hZ = qZ, ZS = AZ;
+        var Z = window.innerWidth / window.innerHeight;
+        if (hZ < ZS * Z ? ZS = hZ / Z : hZ = ZS * Z, CY && (KY = Math.min(mY().dpcm(), window.innerHeight / 6), hZ *= .75, ZS *= .75, b && (b.width = 1 * KY, b.height = 1 * KY, b.x = window.innerWidth - .75 * KY, b.y = window.innerHeight - .75 * KY, b.visible = !0)), 0 != A || wr) {
+            var S = nS[cS] || nS[BZ] || V;
+            if (S) {
+                var Y = S.x - hZ / 2,
+                    _ = S.y - ZS / 2,
+                    o = window.innerWidth / hZ,
+                    J = window.innerHeight / ZS;
+                O.setTransform(-Y * o, -_ * J, o, J, 0, 0, 0, 0, 0)
             }
-            G.removeChildren();
-            var u = 1 / W;
-            if (u <= 1) {
-                var o = Math.round(Us / u) * u;
-                o <= 0 && (o = 1e-6);
-                var N = Math.floor(window.innerWidth / o / W) + 2,
-                    i = Math.floor(window.innerHeight / o / Z) + 2;
-                if (0 == bZ) {
-                    for (var t = 0; t <= N; t++) {
-                        (J = new PIXI.Sprite(v.gridpixel)).width = 1 / W, J.height = Math.min(wI, i * o), J.x = t * o, J.y = 0, J.x <= HI && G.addChild(J), 0 != Xs || 0 != t && t != N && J.x != HI ? J.tint = Ws ? 2236962 : 14540253 : J.tint = 4473924
+            j.removeChildren();
+            var R = 1 / o;
+            if (R <= 1) {
+                var r = Math.round(BS / R) * R;
+                r <= 0 && (r = 1e-6);
+                var w = Math.floor(window.innerWidth / r / o) + 2,
+                    E = Math.floor(window.innerHeight / r / J) + 2;
+                if (0 == cJ) {
+                    for (var m = 0; m <= w; m++) {
+                        (a = new PIXI.Sprite(g.gridpixel)).width = 1 / o, a.height = Math.min(lZ, E * r), a.x = m * r, a.y = 0, a.x <= dZ && j.addChild(a), 0 != MS || 0 != m && m != w && a.x != dZ ? a.tint = oS ? 2236962 : 14540253 : a.tint = 4473924
                     }
-                    for (t = 0; t <= i; t++) {
-                        var J;
-                        (J = new PIXI.Sprite(v.gridpixel)).width = Math.min(HI, N * o), J.height = 1 / Z, J.x = 0, J.y = t * o, J.y <= wI && G.addChild(J), 0 != Xs || 0 != t && t != i && J.y != wI ? J.tint = Ws ? 2236962 : 14540253 : J.tint = 4473924
+                    for (m = 0; m <= E; m++) {
+                        var a;
+                        (a = new PIXI.Sprite(g.gridpixel)).width = Math.min(dZ, w * r), a.height = 1 / J, a.x = 0, a.y = m * r, a.y <= lZ && j.addChild(a), 0 != MS || 0 != m && m != E && a.y != lZ ? a.tint = oS ? 2236962 : 14540253 : a.tint = 4473924
                     }
-                    var A = G.children[0];
-                    G.removeChild(A), G.addChild(A)
-                } else if (1 == bZ) {
-                    var F = new PIXI.Graphics;
-                    for (t = 0; t <= N; t++) 0 != Xs || 0 != t && t != N ? F.lineStyle(1 / W / 2 / 2, Ws ? 4473924 : 8947848) : F.lineStyle(1 / W, Ws ? 8947848 : 4473924), F.moveTo(t * o, 0).lineTo(t * o, i * o);
-                    for (t = 0; t <= i; t++) 0 != Xs || 0 != t && t != i ? F.lineStyle(1 / W / 2 / 2, Ws ? 4473924 : 8947848) : F.lineStyle(1 / W, Ws ? 8947848 : 4473924), F.moveTo(0, t * o).lineTo(N * o, t * o);
-                    G.addChild(F)
+                    var s = j.children[0];
+                    j.removeChild(s), j.addChild(s)
+                } else if (1 == cJ) {
+                    var k = new PIXI.Graphics;
+                    for (m = 0; m <= w; m++) 0 != MS || 0 != m && m != w ? k.lineStyle(1 / o / 2 / 2, oS ? 4473924 : 8947848) : k.lineStyle(1 / o, oS ? 8947848 : 4473924), k.moveTo(m * r, 0).lineTo(m * r, E * r);
+                    for (m = 0; m <= E; m++) 0 != MS || 0 != m && m != E ? k.lineStyle(1 / o / 2 / 2, oS ? 4473924 : 8947848) : k.lineStyle(1 / o, oS ? 8947848 : 4473924), k.moveTo(0, m * r).lineTo(w * r, m * r);
+                    j.addChild(k)
                 }
             }
-            if (0 == Xs) S.removeChildren();
-            else if (1 == Xs) {
-                S.removeChildren(), (g = new PIXI.Graphics).lineStyle(1 / W, 4473924, 1, .5), g.moveTo(0, wI / 2).lineTo(HI / 4, 0).lineTo(3 * HI / 4, 0).lineTo(HI, wI / 2).lineTo(3 * HI / 4, wI).lineTo(HI / 4, wI).lineTo(0, wI / 2), S.addChild(g)
-            } else if (2 == Xs) {
-                var g;
-                S.removeChildren(), (g = new PIXI.Graphics).lineStyle(1 / W, 4473924, 1, .5), g.drawEllipse(HI / 2, wI / 2, HI / 2, wI / 2), S.addChild(g)
+            if (0 == MS) X.removeChildren();
+            else if (1 == MS) {
+                X.removeChildren(), (N = new PIXI.Graphics).lineStyle(1 / o, 4473924, 1, .5), N.moveTo(0, lZ / 2).lineTo(dZ / 4, 0).lineTo(3 * dZ / 4, 0).lineTo(dZ, lZ / 2).lineTo(3 * dZ / 4, lZ).lineTo(dZ / 4, lZ).lineTo(0, lZ / 2), X.addChild(N)
+            } else if (2 == MS) {
+                var N;
+                X.removeChildren(), (N = new PIXI.Graphics).lineStyle(1 / o, 4473924, 1, .5), N.drawEllipse(dZ / 2, lZ / 2, dZ / 2, lZ / 2), X.addChild(N)
             }
-            for (t = 0; t < E.children.length; t++) E.children[t] instanceof PIXI.Text && (E.children[t].scale.set(1 / e.scale.x), E.children[t].style.fontSize = Math.round(window.innerHeight / 60));
-            h && q.removeChild(h), Cs && ((h = new PIXI.Sprite(v.shoot)).width = 4 * cI * 2 * e.scale.x, h.height = 4 * cI * 2 * e.scale.y, h.tint = Ws ? 16777215 : 0, h.alpha = .1, h.anchor.set(.5), h.position.set(window.innerWidth / 2, window.innerHeight / 2), q.addChild(h))
+            for (m = 0; m < C.children.length; m++) C.children[m] instanceof PIXI.Text && (C.children[m].scale.set(1 / O.scale.x), C.children[m].style.fontSize = Math.round(window.innerHeight / 60));
+            F && u.removeChild(F), _S && ((F = new PIXI.Sprite(g.shoot)).width = 4 * QZ * 2 * O.scale.x, F.height = 4 * QZ * 2 * O.scale.y, F.tint = oS ? 16777215 : 0, F.alpha = .1, F.anchor.set(.5), F.position.set(window.innerWidth / 2, window.innerHeight / 2), u.addChild(F))
         }
     }
 
-    function DZ(I, s, x) {
-        var C = new PIXI.Text(x, {
+    function yJ(Z, S, Y) {
+        var _ = new PIXI.Text(Y, {
             fontFamily: "Arial",
             fontSize: 26,
             fontWeight: 700,
-            fill: Ws ? 16777215 : Gx(Wx(Ts), -.7),
+            fill: oS ? 16777215 : jY(oY(cS), -.7),
             align: "center"
         });
-        C.x = I, C.y = s, C.anchor.set(.5), C.scale.set(.03), J.addChild(C), anime({
-            targets: C,
-            y: s - 5,
+        _.x = Z, _.y = S, _.anchor.set(.5), _.scale.set(.03), a.addChild(_), anime({
+            targets: _,
+            y: S - 5,
             alpha: {
                 value: 0,
                 easing: "easeInQuad"
             },
             easing: "linear",
             duration: 1e3,
-            complete: function(I) {
+            complete: function(Z) {
                 return function() {
-                    J.removeChild(I)
+                    a.removeChild(Z)
                 }
-            }(C)
+            }(_)
         })
     }
 
-    function BZ() {}
+    function bJ() {}
 
-    function hZ(I) {
-        I
+    function FJ(Z) {
+        Z
     }
 
-    function OZ(I) {
-        for (; I < 2 * Math.PI;) I += 2 * Math.PI;
-        for (; I > 2 * Math.PI;) I -= 2 * Math.PI;
-        return I
+    function DJ(Z) {
+        for (; Z < 2 * Math.PI;) Z += 2 * Math.PI;
+        for (; Z > 2 * Math.PI;) Z -= 2 * Math.PI;
+        return Z
     }
-    var $Z = null;
+    var MJ = null;
 
-    function XZ(I, s, x) {
-        this.gridSize = x;
-        var C = Math.ceil((I + 1) / x),
-            W = Math.ceil((s + 1) / x);
+    function PJ(Z, S, Y) {
+        this.gridSize = Y;
+        var _ = Math.ceil((Z + 1) / Y),
+            o = Math.ceil((S + 1) / Y);
         this.grid = [];
-        for (var Z = 0; Z < C; Z++) {
-            this.grid[Z] = [];
-            for (var u = 0; u < W; u++) this.grid[Z][u] = new Set
+        for (var J = 0; J < _; J++) {
+            this.grid[J] = [];
+            for (var R = 0; R < o; R++) this.grid[J][R] = new Set
         }
     }
 
-    function PZ(I, s, x, C) {
-        var W = 0,
-            Z = Math.abs(x - I),
-            u = Math.abs(C - s),
-            o = 2 * Z,
-            N = 2 * u,
-            i = I < x ? 1 : -1,
-            t = s < C ? 1 : -1,
-            a = I,
-            e = s,
-            G = [];
-        if (Z >= u)
-            for (; G.push(a, e), a != x;) a += i, (W += N) > Z && (e += t, W -= o);
+    function QJ(Z, S, Y, _) {
+        var o = 0,
+            J = Math.abs(Y - Z),
+            R = Math.abs(_ - S),
+            r = 2 * J,
+            w = 2 * R,
+            E = Z < Y ? 1 : -1,
+            m = S < _ ? 1 : -1,
+            K = Z,
+            O = S,
+            j = [];
+        if (J >= R)
+            for (; j.push(K, O), K != Y;) K += E, (o += w) > J && (O += m, o -= r);
         else
-            for (; G.push(a, e), e != C;) e += t, (W += o) > u && (a += i, W -= N);
-        return G
+            for (; j.push(K, O), O != _;) O += m, (o += r) > R && (K += E, o -= w);
+        return j
     }
 
-    function cZ(I, s, x, C, W) {
-        var Z = (x.x - I.x) * (s.x - I.x) + (x.y - I.y) * (s.y - I.y),
-            u = I.dst(s);
-        if ((Z /= u * u) < 0) var o = new PIXI.Point(I.x, I.y);
-        else if (Z > 1) o = new PIXI.Point(s.x, s.y);
+    function GJ(Z, S, Y, _, o) {
+        var J = (Y.x - Z.x) * (S.x - Z.x) + (Y.y - Z.y) * (S.y - Z.y),
+            R = Z.dst(S);
+        if ((J /= R * R) < 0) var r = new PIXI.Point(Z.x, Z.y);
+        else if (J > 1) r = new PIXI.Point(S.x, S.y);
         else {
-            var N = new PIXI.Point(s.x, s.y).sub(I);
-            o = new PIXI.Point(I.x, I.y).add(N.scl(Z))
+            var w = new PIXI.Point(S.x, S.y).sub(Z);
+            r = new PIXI.Point(Z.x, Z.y).add(w.scl(J))
         }
-        return (u = o.dst(x)) < C ? (W.copy(o), W.sub(x).nor(), C - u) : 1 / 0
+        return (R = r.dst(Y)) < _ ? (o.copy(r), o.sub(Y).nor(), _ - R) : 1 / 0
     }
 
-    function MZ(I, s) {
-        var x = new PIXI.Point;
-        I.lastX = I.x, I.lastY = I.y;
-        var C = s ? (1 + .3 * AI[0] / 8) * (1 == dI && vI ? 1.5 : 1) : 1;
-        if (I.moving) I.sx += Math.cos(I.moveDirection) * fs * C * 1 / 60, I.sy += Math.sin(I.moveDirection) * fs * C * 1 / 60;
+    function WJ(Z, S) {
+        var Y = new PIXI.Point;
+        Z.lastX = Z.x, Z.lastY = Z.y;
+        var _ = S ? (1 + .3 * sZ[0] / 8) * (1 == TZ && gZ ? 1.5 : 1) : 1;
+        if (Z.moving) Z.sx += Math.cos(Z.moveDirection) * US * _ * 1 / 60, Z.sy += Math.sin(Z.moveDirection) * US * _ * 1 / 60;
         else {
-            var W = Math.sqrt(I.sx * I.sx + I.sy * I.sy),
-                Z = Math.atan2(I.sy, I.sx) + Math.PI;
-            I.sx += Math.cos(Z) * Math.min(W, ms * C * 1 / 60), I.sy += Math.sin(Z) * Math.min(W, ms * C * 1 / 60)
+            var o = Math.sqrt(Z.sx * Z.sx + Z.sy * Z.sy),
+                J = Math.atan2(Z.sy, Z.sx) + Math.PI;
+            Z.sx += Math.cos(J) * Math.min(o, pS * _ * 1 / 60), Z.sy += Math.sin(J) * Math.min(o, pS * _ * 1 / 60)
         }
-        var u = Math.sqrt(I.sx * I.sx + I.sy * I.sy),
-            o = Rs * C;
-        if (u > o) {
-            Z = Math.atan2(I.sy, I.sx);
-            I.sx = Math.cos(Z) * o, I.sy = Math.sin(Z) * o
+        var R = Math.sqrt(Z.sx * Z.sx + Z.sy * Z.sy),
+            r = VS * _;
+        if (R > r) {
+            J = Math.atan2(Z.sy, Z.sx);
+            Z.sx = Math.cos(J) * r, Z.sy = Math.sin(J) * r
         }
-        if (I.x += 1 * I.sx / 60, I.y += 1 * I.sy / 60, tC(I.position), I.moving && (ZI >= 1 || 2 == aI) && 1 != hs[I.playerId])
-            for (var N in qs) {
-                var i = qs[N];
-                if (1 == i.owner) {
-                    var t = cZ(i.dot1.position, i.dot2.position, I.position, cI / cs * ks, x);
-                    if (isFinite(t)) {
-                        I.x = I.lastX + x.x * ys * -.25, I.y = I.lastY + x.y * ys * -.25;
+        if (Z.x += 1 * Z.sx / 60, Z.y += 1 * Z.sy / 60, m_(Z.position), Z.moving && (JZ >= 1 || 2 == KZ) && 1 != bS[Z.playerId])
+            for (var w in uS) {
+                var E = uS[w];
+                if (1 == E.owner) {
+                    var m = GJ(E.dot1.position, E.dot2.position, Z.position, QZ / QS * $S, Y);
+                    if (isFinite(m)) {
+                        Z.x = Z.lastX + Y.x * tS * -.25, Z.y = Z.lastY + Y.y * tS * -.25;
                         break
                     }
                 }
             }
     }
 
-    function nZ(I, s, x) {
-        return (I.x - s.x) * (x.y - s.y) - (I.y - s.y) * (x.x - s.x)
+    function dJ(Z, S, Y) {
+        return (Z.x - S.x) * (Y.y - S.y) - (Z.y - S.y) * (Y.x - S.x)
     }
 
-    function HZ(I, s) {
-        if (I.position.dst(s.position) < MI + nI && s.shield && 1 == s.shield.state && I.lastPosition) {
-            var x = function(I, s, x, C) {
-                var W = s.x - I.x,
-                    Z = s.y - I.y,
-                    u = x.x - I.x,
-                    o = x.y - I.y,
-                    N = W * W + Z * Z,
-                    i = (W * u + Z * o) / N,
-                    t = i * i - (u * u + o * o - C * C) / N;
-                if (t < 0) return null;
-                var a = Math.sqrt(t),
-                    e = -i + a,
-                    G = -i - a,
-                    S = new PIXI.Point(I.x - W * e, I.y - Z * e);
-                return S.dst(I) <= I.dst(s) ? S : 0 == t ? (console.error("error getCircleSegmentIntersectionPoint", I, s, x, C), null) : (S.set(I.x - W * G, I.y - Z * G), S)
-            }(I.lastPosition, I.position, s.position, MI + nI);
-            if (x) {
-                var C = I.position.cpy().sub(I.lastPosition),
-                    W = s.position.cpy().sub(x).nor(),
-                    Z = C.cpy().sub(W.cpy().scl(2 * C.dot(W))),
-                    u = I.position.cpy();
-                I.position.set(x.x, x.y), I.position.add(Z.nor().scl(x.dst(u)));
-                var o = Math.sqrt(I.sx * I.sx + I.sy * I.sy);
-                return Z.nor().scl(o), I.sx = Z.x, I.sy = Z.y, (ts || as) && (I.rotation = Math.atan2(I.sy, I.sx)), !0
+    function lJ(Z, S) {
+        if (Z.position.dst(S.position) < GZ + WZ && S.shield && 1 == S.shield.state && Z.lastPosition) {
+            var Y = function(Z, S, Y, _) {
+                var o = S.x - Z.x,
+                    J = S.y - Z.y,
+                    R = Y.x - Z.x,
+                    r = Y.y - Z.y,
+                    w = o * o + J * J,
+                    E = (o * R + J * r) / w,
+                    m = E * E - (R * R + r * r - _ * _) / w;
+                if (m < 0) return null;
+                var K = Math.sqrt(m),
+                    O = -E + K,
+                    j = -E - K,
+                    X = new PIXI.Point(Z.x - o * O, Z.y - J * O);
+                return X.dst(Z) <= Z.dst(S) ? X : 0 == m ? (console.error("error getCircleSegmentIntersectionPoint", Z, S, Y, _), null) : (X.set(Z.x - o * j, Z.y - J * j), X)
+            }(Z.lastPosition, Z.position, S.position, GZ + WZ);
+            if (Y) {
+                var _ = Z.position.cpy().sub(Z.lastPosition),
+                    o = S.position.cpy().sub(Y).nor(),
+                    J = _.cpy().sub(o.cpy().scl(2 * _.dot(o))),
+                    R = Z.position.cpy();
+                Z.position.set(Y.x, Y.y), Z.position.add(J.nor().scl(Y.dst(R)));
+                var r = Math.sqrt(Z.sx * Z.sx + Z.sy * Z.sy);
+                return J.nor().scl(r), Z.sx = J.x, Z.sy = J.y, (mS || KS) && (Z.rotation = Math.atan2(Z.sy, Z.sx)), !0
             }
         }
         return !1
     }
-    XZ.prototype.add = function(I, s) {
-        this.grid[Math.floor(s.x / this.gridSize)][Math.floor(s.y / this.gridSize)].add(I)
-    }, XZ.prototype.addLine = function(I, s, x) {
-        for (var C = PZ(Math.floor(s.x / this.gridSize), Math.floor(s.y / this.gridSize), Math.floor(x.x / this.gridSize), Math.floor(x.y / this.gridSize)), W = 0; W < C.length; W += 2) this.grid[C[W]][C[W + 1]].add(I)
-    }, XZ.prototype.addZone = function(I, s, x, C, W) {
-        for (var Z = Math.floor(s / this.gridSize), u = Math.floor(C / this.gridSize), o = Math.floor(x / this.gridSize), N = Math.floor(W / this.gridSize), i = Z; i <= o; i++)
-            for (var t = u; t <= N; t++) this.grid[i][t].add(I)
-    }, XZ.prototype.remove = function(I, s) {
-        this.grid[Math.floor(s.x / this.gridSize)][Math.floor(s.y / this.gridSize)].delete(I)
-    }, XZ.prototype.removeLine = function(I, s, x) {
-        for (var C = PZ(Math.floor(s.x / this.gridSize), Math.floor(s.y / this.gridSize), Math.floor(x.x / this.gridSize), Math.floor(x.y / this.gridSize)), W = 0; W < C.length; W += 2) this.grid[C[W]][C[W + 1]].delete(I)
-    }, XZ.prototype.removeZone = function(I, s, x, C, W) {
-        for (var Z = Math.floor(s / this.gridSize), u = Math.floor(C / this.gridSize), o = Math.floor(x / this.gridSize), N = Math.floor(W / this.gridSize), i = Z; i <= o; i++)
-            for (var t = u; t <= N; t++) this.grid[i][t].delete(I)
-    }, XZ.prototype.update = function(I, s, x) {
-        var C = Math.floor(s.x / this.gridSize),
-            W = Math.floor(s.y / this.gridSize),
-            Z = Math.floor(x.x / this.gridSize),
-            u = Math.floor(x.y / this.gridSize);
-        C == Z && W == u || (this.grid[C][W].delete(I), this.grid[Z][u].add(I))
-    }, XZ.prototype.getAllInRange = function(I, s, x) {
-        for (var C = new Set, W = Math.floor(I.x / this.gridSize), Z = Math.floor(I.y / this.gridSize), u = -s; u <= s; u++)
-            for (var o = -x; o <= x; o++) W + u >= 0 && W + u < this.grid.length && Z + o >= 0 && Z + o < this.grid[0].length && this.grid[W + u][Z + o].forEach(function(I) {
-                C.add(I)
+    PJ.prototype.add = function(Z, S) {
+        this.grid[Math.floor(S.x / this.gridSize)][Math.floor(S.y / this.gridSize)].add(Z)
+    }, PJ.prototype.addLine = function(Z, S, Y) {
+        for (var _ = QJ(Math.floor(S.x / this.gridSize), Math.floor(S.y / this.gridSize), Math.floor(Y.x / this.gridSize), Math.floor(Y.y / this.gridSize)), o = 0; o < _.length; o += 2) this.grid[_[o]][_[o + 1]].add(Z)
+    }, PJ.prototype.addZone = function(Z, S, Y, _, o) {
+        for (var J = Math.floor(S / this.gridSize), R = Math.floor(_ / this.gridSize), r = Math.floor(Y / this.gridSize), w = Math.floor(o / this.gridSize), E = J; E <= r; E++)
+            for (var m = R; m <= w; m++) this.grid[E][m].add(Z)
+    }, PJ.prototype.remove = function(Z, S) {
+        this.grid[Math.floor(S.x / this.gridSize)][Math.floor(S.y / this.gridSize)].delete(Z)
+    }, PJ.prototype.removeLine = function(Z, S, Y) {
+        for (var _ = QJ(Math.floor(S.x / this.gridSize), Math.floor(S.y / this.gridSize), Math.floor(Y.x / this.gridSize), Math.floor(Y.y / this.gridSize)), o = 0; o < _.length; o += 2) this.grid[_[o]][_[o + 1]].delete(Z)
+    }, PJ.prototype.removeZone = function(Z, S, Y, _, o) {
+        for (var J = Math.floor(S / this.gridSize), R = Math.floor(_ / this.gridSize), r = Math.floor(Y / this.gridSize), w = Math.floor(o / this.gridSize), E = J; E <= r; E++)
+            for (var m = R; m <= w; m++) this.grid[E][m].delete(Z)
+    }, PJ.prototype.update = function(Z, S, Y) {
+        var _ = Math.floor(S.x / this.gridSize),
+            o = Math.floor(S.y / this.gridSize),
+            J = Math.floor(Y.x / this.gridSize),
+            R = Math.floor(Y.y / this.gridSize);
+        _ == J && o == R || (this.grid[_][o].delete(Z), this.grid[J][R].add(Z))
+    }, PJ.prototype.getAllInRange = function(Z, S, Y) {
+        for (var _ = new Set, o = Math.floor(Z.x / this.gridSize), J = Math.floor(Z.y / this.gridSize), R = -S; R <= S; R++)
+            for (var r = -Y; r <= Y; r++) o + R >= 0 && o + R < this.grid.length && J + r >= 0 && J + r < this.grid[0].length && this.grid[o + R][J + r].forEach(function(Z) {
+                _.add(Z)
             });
-        var N = [];
-        return C.forEach(function(I) {
-            N.push(I)
-        }), N
-    }, XZ.prototype.getAllInRect = function(I, s, x, C) {
-        for (var W = new Set, Z = Math.floor(I / this.gridSize), u = Math.floor(x / this.gridSize), o = Math.floor(s / this.gridSize), N = Math.floor(C / this.gridSize), i = Z; i <= o; i++)
-            for (var t = u; t <= N; t++) this.grid[i][t].forEach(function(I) {
-                W.add(I)
+        var w = [];
+        return _.forEach(function(Z) {
+            w.push(Z)
+        }), w
+    }, PJ.prototype.getAllInRect = function(Z, S, Y, _) {
+        for (var o = new Set, J = Math.floor(Z / this.gridSize), R = Math.floor(Y / this.gridSize), r = Math.floor(S / this.gridSize), w = Math.floor(_ / this.gridSize), E = J; E <= r; E++)
+            for (var m = R; m <= w; m++) this.grid[E][m].forEach(function(Z) {
+                o.add(Z)
             });
-        var a = [];
-        return W.forEach(function(I) {
-            a.push(I)
-        }), a
-    }, PIXI.ObservablePoint.prototype.dst = function(I) {
-        var s = I.x - this.x,
-            x = I.y - this.y;
-        return Math.sqrt(s * s + x * x)
-    }, PIXI.ObservablePoint.prototype.dst2 = function(I) {
-        var s = I.x - this.x,
-            x = I.y - this.y;
-        return s * s + x * x
-    }, PIXI.ObservablePoint.prototype.dst2XY = function(I, s) {
-        var x = I - this.x,
-            C = s - this.y;
-        return x * x + C * C
-    }, PIXI.ObservablePoint.prototype.sub = function(I) {
-        return this.x -= I.x, this.y -= I.y, this
-    }, PIXI.ObservablePoint.prototype.add = function(I) {
-        return this.x += I.x, this.y += I.y, this
-    }, PIXI.ObservablePoint.prototype.scl = function(I) {
-        return this.x *= I, this.y *= I, this
-    }, PIXI.ObservablePoint.prototype.len = function(I) {
+        var K = [];
+        return o.forEach(function(Z) {
+            K.push(Z)
+        }), K
+    }, PIXI.ObservablePoint.prototype.dst = function(Z) {
+        var S = Z.x - this.x,
+            Y = Z.y - this.y;
+        return Math.sqrt(S * S + Y * Y)
+    }, PIXI.ObservablePoint.prototype.dst2 = function(Z) {
+        var S = Z.x - this.x,
+            Y = Z.y - this.y;
+        return S * S + Y * Y
+    }, PIXI.ObservablePoint.prototype.dst2XY = function(Z, S) {
+        var Y = Z - this.x,
+            _ = S - this.y;
+        return Y * Y + _ * _
+    }, PIXI.ObservablePoint.prototype.sub = function(Z) {
+        return this.x -= Z.x, this.y -= Z.y, this
+    }, PIXI.ObservablePoint.prototype.add = function(Z) {
+        return this.x += Z.x, this.y += Z.y, this
+    }, PIXI.ObservablePoint.prototype.scl = function(Z) {
+        return this.x *= Z, this.y *= Z, this
+    }, PIXI.ObservablePoint.prototype.len = function(Z) {
         return Math.sqrt(this.x * this.x + this.y * this.y)
-    }, PIXI.ObservablePoint.prototype.len2 = function(I) {
+    }, PIXI.ObservablePoint.prototype.len2 = function(Z) {
         return this.x * this.x + this.y * this.y
     }, PIXI.ObservablePoint.prototype.nor = function() {
-        var I = this.len2();
-        return 0 == I || 1 == I ? this : this.scl(1 / Math.sqrt(I))
+        var Z = this.len2();
+        return 0 == Z || 1 == Z ? this : this.scl(1 / Math.sqrt(Z))
     }, PIXI.ObservablePoint.prototype.cpy = function() {
         return new PIXI.Point(this.x, this.y)
-    }, PIXI.ObservablePoint.prototype.rotate90 = function(I) {
-        var s = this.x;
-        return I >= 0 ? (this.x = -this.y, this.y = s) : (this.x = this.y, y = -s), this
-    }, PIXI.ObservablePoint.prototype.dot = function(I) {
-        return this.x * I.x + this.y * I.y
+    }, PIXI.ObservablePoint.prototype.rotate90 = function(Z) {
+        var S = this.x;
+        return Z >= 0 ? (this.x = -this.y, this.y = S) : (this.x = this.y, y = -S), this
+    }, PIXI.ObservablePoint.prototype.dot = function(Z) {
+        return this.x * Z.x + this.y * Z.y
     }, PIXI.Point.prototype.dst = PIXI.ObservablePoint.prototype.dst, PIXI.Point.prototype.dst2 = PIXI.ObservablePoint.prototype.dst2, PIXI.Point.prototype.dst2XY = PIXI.ObservablePoint.prototype.dst2XY, PIXI.Point.prototype.sub = PIXI.ObservablePoint.prototype.sub, PIXI.Point.prototype.add = PIXI.ObservablePoint.prototype.add, PIXI.Point.prototype.scl = PIXI.ObservablePoint.prototype.scl, PIXI.Point.prototype.len = PIXI.ObservablePoint.prototype.len, PIXI.Point.prototype.len2 = PIXI.ObservablePoint.prototype.len2, PIXI.Point.prototype.nor = PIXI.ObservablePoint.prototype.nor, PIXI.Point.prototype.cpy = PIXI.ObservablePoint.prototype.cpy, PIXI.Point.prototype.rotate90 = PIXI.ObservablePoint.prototype.rotate90, PIXI.Point.prototype.dot = PIXI.ObservablePoint.prototype.dot;
-    var wZ = new PIXI.Point;
+    var qJ = new PIXI.Point;
 
-    function QZ(I, s) {
-        var x = function(I, s, x, C, W) {
-            var Z = (x.x - I.x) * (s.x - I.x) + (x.y - I.y) * (s.y - I.y),
-                u = I.dst(s);
-            if ((Z /= u * u) < 0 || Z > 1) return 1 / 0;
-            var o = new PIXI.Point(s.x, s.y).sub(I),
-                N = new PIXI.Point(I.x, I.y).add(o.scl(Z));
-            return (u = N.dst(x)) < C ? (W.copy(x), W.sub(N).nor(), u) : 1 / 0
-        }(s.dot1.position, s.dot2.position, I.position, nI, wZ);
-        if (isFinite(x) && I.lastPosition) {
-            var C = I.position.cpy().sub(I.lastPosition);
-            if (Math.sign(nZ(I.position, s.dot1.position, s.dot2.position)) != Math.sign(nZ(I.lastPosition, s.dot1.position, s.dot2.position)) && wZ.scl(-1), C.dot(wZ) < 0) {
-                var W = s.dot2.position.cpy().sub(s.dot1.position).rotate90(1).nor(),
-                    Z = C.cpy().sub(W.cpy().scl(2 * C.dot(W)));
-                I.position.sub(C.scl(x / MI)).add(Z.cpy().scl(MI - x / MI));
-                var u = Math.sqrt(I.sx * I.sx + I.sy * I.sy);
-                return Z.nor().scl(u), I.sx = Z.x, I.sy = Z.y, (ts || as) && (I.rotation = Math.atan2(I.sy, I.sx)), !0
+    function AJ(Z, S) {
+        var Y = function(Z, S, Y, _, o) {
+            var J = (Y.x - Z.x) * (S.x - Z.x) + (Y.y - Z.y) * (S.y - Z.y),
+                R = Z.dst(S);
+            if ((J /= R * R) < 0 || J > 1) return 1 / 0;
+            var r = new PIXI.Point(S.x, S.y).sub(Z),
+                w = new PIXI.Point(Z.x, Z.y).add(r.scl(J));
+            return (R = w.dst(Y)) < _ ? (o.copy(Y), o.sub(w).nor(), R) : 1 / 0
+        }(S.dot1.position, S.dot2.position, Z.position, WZ, qJ);
+        if (isFinite(Y) && Z.lastPosition) {
+            var _ = Z.position.cpy().sub(Z.lastPosition);
+            if (Math.sign(dJ(Z.position, S.dot1.position, S.dot2.position)) != Math.sign(dJ(Z.lastPosition, S.dot1.position, S.dot2.position)) && qJ.scl(-1), _.dot(qJ) < 0) {
+                var o = S.dot2.position.cpy().sub(S.dot1.position).rotate90(1).nor(),
+                    J = _.cpy().sub(o.cpy().scl(2 * _.dot(o)));
+                Z.position.sub(_.scl(Y / GZ)).add(J.cpy().scl(GZ - Y / GZ));
+                var R = Math.sqrt(Z.sx * Z.sx + Z.sy * Z.sy);
+                return J.nor().scl(R), Z.sx = J.x, Z.sy = J.y, (mS || KS) && (Z.rotation = Math.atan2(Z.sy, Z.sx)), !0
             }
         }
         return !1
     }
 
-    function jZ(I, s) {
-        var x = new PIXI.Point;
-        if (I)
-            for (var C in bs)
-                if (C != Ts) {
-                    var W = bs[C];
-                    if (W.lastX = W.x, W.lastY = W.y, W.x += 1 * W.sx / 60, W.y += 1 * W.sy / 60, tC(W.position), 2 == aI && (0 != W.sx || 0 != W.sy))
-                        for (var Z in qs) {
-                            if (1 == (e = qs[Z]).owner && hs[C] != e.owner) {
-                                var u = cZ(e.dot1.position, e.dot2.position, W.position, cI / cs * ks, x);
-                                if (isFinite(u)) {
-                                    W.x = W.lastX + x.x * ys * -.25, W.y = W.lastY + x.y * ys * -.25;
+    function fJ(Z, S) {
+        var Y = new PIXI.Point;
+        if (Z)
+            for (var _ in nS)
+                if (_ != cS) {
+                    var o = nS[_];
+                    if (o.lastX = o.x, o.lastY = o.y, o.x += 1 * o.sx / 60, o.y += 1 * o.sy / 60, m_(o.position), 2 == KZ && (0 != o.sx || 0 != o.sy))
+                        for (var J in uS) {
+                            if (1 == (O = uS[J]).owner && bS[_] != O.owner) {
+                                var R = GJ(O.dot1.position, O.dot2.position, o.position, QZ / QS * $S, Y);
+                                if (isFinite(R)) {
+                                    o.x = o.lastX + Y.x * tS * -.25, o.y = o.lastY + Y.y * tS * -.25;
                                     break
                                 }
                             }
                         }
-                } if (s) {
-            var o = {};
-            for (var N in eI) eI[N].lifetime--, eI[N].lifetime <= 0 ? o[N] = !0 : (eI[N].lastPosition = eI[N].position.cpy(), eI[N].x += 1 * eI[N].sx / 60, eI[N].y += 1 * eI[N].sy / 60, !eI[N].endoflife && eI[N].lifetime <= 20 && (eI[N].endoflife = !0, anime({
-                targets: eI[N],
+                } if (S) {
+            var r = {};
+            for (var w in OZ) OZ[w].lifetime--, OZ[w].lifetime <= 0 ? r[w] = !0 : (OZ[w].lastPosition = OZ[w].position.cpy(), OZ[w].x += 1 * OZ[w].sx / 60, OZ[w].y += 1 * OZ[w].sy / 60, !OZ[w].endoflife && OZ[w].lifetime <= 20 && (OZ[w].endoflife = !0, anime({
+                targets: OZ[w],
                 alpha: 0,
-                width: 1.25 * eI[N].width,
-                height: 1.25 * eI[N].height,
+                width: 1.25 * OZ[w].width,
+                height: 1.25 * OZ[w].height,
                 duration: 1e3 / 3,
                 easing: "easeInCubic"
             })));
-            for (var N in o) d.removeChild(eI[N]), delete eI[N];
-            for (var N in eI) {
-                if (!((a = eI[N]).initialTurn >= sI))
-                    if (O)
-                        for (var i = O.getAllInRange(a.position, 0, 0), t = 0; t < i.length; t++) {
-                            if ((u = i[t]).owner != a.owner && HZ(a, u)) break
+            for (var w in r) T.removeChild(OZ[w]), delete OZ[w];
+            for (var w in OZ) {
+                if (!((K = OZ[w]).initialTurn >= SZ))
+                    if (D)
+                        for (var E = D.getAllInRange(K.position, 0, 0), m = 0; m < E.length; m++) {
+                            if ((R = E[m]).owner != K.owner && lJ(K, R)) break
                         } else
-                            for (var t in zs) {
-                                if ((u = zs[t]).owner != a.owner && HZ(a, u)) break
+                            for (var m in xS) {
+                                if ((R = xS[m]).owner != K.owner && lJ(K, R)) break
                             }
             }
-            I: for (var N in eI) {
-                var a = eI[N];
-                if (X)
-                    for (i = X.getAllInRange(a.position, 0, 0), t = 0; t < i.length; t++) {
-                        if ((e = i[t]).owner != a.owner && QZ(a, e)) continue I
+            Z: for (var w in OZ) {
+                var K = OZ[w];
+                if (M)
+                    for (E = M.getAllInRange(K.position, 0, 0), m = 0; m < E.length; m++) {
+                        if ((O = E[m]).owner != K.owner && AJ(K, O)) continue Z
                     } else
-                        for (var t in qs) {
-                            var e;
-                            if ((e = qs[t]).owner != a.owner && QZ(a, e)) continue I
+                        for (var m in uS) {
+                            var O;
+                            if ((O = uS[m]).owner != K.owner && AJ(K, O)) continue Z
                         }
             }
         }
     }
 
-    function LZ(I) {
-        for (var s = 0; s < I.lines.length; s++) {
-            var x = I.lines[s];
-            if (x.leftZoneId && Ys[x.leftZoneId] || x.rightZoneId && Ys[x.rightZoneId]) return !0
+    function hJ(Z) {
+        for (var S = 0; S < Z.lines.length; S++) {
+            var Y = Z.lines[S];
+            if (Y.leftZoneId && LS[Y.leftZoneId] || Y.rightZoneId && LS[Y.rightZoneId]) return !0
         }
         return !1
     }
 
-    function lZ(I) {
-        var s = (new Date).getTime();
-        if (j > 0 || oo) {
-            sI++;
-            for (var x = !1; xI.length > 0 && xI[0].turn <= sI;) SC(xI[0].dv), x = !0, xI.splice(0, 1);
-            if (jZ(!x && (2 != aI || 1 != Ks), !0), R) x || bs[Ts] && !bs[Ts].visible && MZ(bs[Ts], !0);
+    function ZR(Z) {
+        var S = (new Date).getTime();
+        if (A > 0 || wr) {
+            SZ++;
+            for (var Y = !1; YZ.length > 0 && YZ[0].turn <= SZ;) X_(YZ[0].dv), Y = !0, YZ.splice(0, 1);
+            if (fJ(!Y && (2 != KZ || 1 != iS), !0), V) Y || nS[cS] && !nS[cS].visible && WJ(nS[cS], !0);
             else {
-                for (; oI.length > 0 && oI[0].turn <= sI;) bs[Ts] && (bs[Ts].shooting = oI[0].input.shooting, bs[Ts].moving = oI[0].input.moving, bs[Ts].aimDirection = oI[0].input.aimDirection, bs[Ts].moveDirection = oI[0].input.moveDirection), oI.splice(0, 1);
-                x || Cu || vI && 5 == dI || 2 == aI && 1 == Ks || 4 == aI && sI < 300 || MZ(bs[Ts], !0)
+                for (; rZ.length > 0 && rZ[0].turn <= SZ;) nS[cS] && (nS[cS].shooting = rZ[0].input.shooting, nS[cS].moving = rZ[0].input.moving, nS[cS].aimDirection = rZ[0].input.aimDirection, nS[cS].moveDirection = rZ[0].input.moveDirection), rZ.splice(0, 1);
+                Y || oR || gZ && 5 == TZ || 2 == KZ && 1 == iS || 4 == KZ && SZ < 300 || WJ(nS[cS], !0)
             }
         }
-        var C = 3 == aI && bs[Ts];
-        for (var W in zs) {
-            var Z = zs[W];
-            if (Z.shield) {
-                var u = Z.shield,
-                    o = C && Z.owner != Ts && Z.owner != UI && Z.position.dst2(bs[Ts].position) <= 6.25;
-                if (0 == u.state && u.lastAppearTurn <= sI - 300 && LZ(Z) && !o) {
-                    if (u.width = 2 * MI * 1.709089011247097, u.height = 2 * MI * 1.709089011247097, Z.dotBlastAnim) {
+        var _ = 3 == KZ && nS[cS];
+        for (var o in xS) {
+            var J = xS[o];
+            if (J.shield) {
+                var R = J.shield,
+                    r = _ && J.owner != cS && J.owner != BZ && J.position.dst2(nS[cS].position) <= 6.25;
+                if (0 == R.state && R.lastAppearTurn <= SZ - 300 && hJ(J) && !r) {
+                    if (R.width = 2 * GZ * 1.709089011247097, R.height = 2 * GZ * 1.709089011247097, J.dotBlastAnim) {
                         try {
-                            Z.dotBlastAnim.pause()
-                        } catch (I) {}
-                        Z.dotBlastAnim = null
+                            J.dotBlastAnim.pause()
+                        } catch (Z) {}
+                        J.dotBlastAnim = null
                     }
-                    eu ? u.alpha = 1 : Z.shieldAppearAnim = anime({
-                        targets: u,
+                    jR ? R.alpha = 1 : J.shieldAppearAnim = anime({
+                        targets: R,
                         alpha: 1,
                         duration: 250,
                         easing: "linear",
-                        complete: function(I) {
+                        complete: function(Z) {
                             return function() {
-                                0 != I.state || Z.dotBlastAnim || (I.alpha = 0), Z.shieldAppearAnim = null
+                                0 != Z.state || J.dotBlastAnim || (Z.alpha = 0), J.shieldAppearAnim = null
                             }
-                        }(u)
-                    }), u.state = 1, u.lastAppearTurn = Z.creationTurn + 300 * Math.floor((sI - Z.creationTurn) / 300)
+                        }(R)
+                    }), R.state = 1, R.lastAppearTurn = J.creationTurn + 300 * Math.floor((SZ - J.creationTurn) / 300)
                 }
-                1 == u.state && sI >= u.lastAppearTurn + 300 * u.appearPercent && u.appearPercent < 1 ? (eu ? u.alpha = 0 : anime({
-                    targets: u,
+                1 == R.state && SZ >= R.lastAppearTurn + 300 * R.appearPercent && R.appearPercent < 1 ? (jR ? R.alpha = 0 : anime({
+                    targets: R,
                     alpha: 0,
                     duration: 250,
                     easing: "linear"
-                }), u.state = 0) : 1 == u.state && o && (u.alpha = 0, u.state = 0, u.lastAppearTurn = 0, SW(Z))
+                }), R.state = 0) : 1 == R.state && r && (R.alpha = 0, R.state = 0, R.lastAppearTurn = 0, Xo(J))
             }
         }
-        dI >= 0 && (rI += 100 / (60 * xx[dI]), vI || cW());
-        s = (new Date).getTime();
-        if (AZ && s - uZ >= 20 ? oZ() : ss && (kZ || yZ) && bs[Ts] && (kZ && (U.aimDirection -= .05), yZ && (U.aimDirection += .05), bs[Ts].rotation = U.aimDirection, oZ()), (!R || WZ) && s - uZ > 500 && oZ(), vZ && s - rZ > 200 && (IZ(), rZ = s, 3 == aI && (vZ = !0)), 2 == aI && ps > 0 && (4 == Ks && ps > 20 && ps - I / 1e3 <= 20 && (document.getElementById("countdown-value").className = "animated pulse huge"), 3 == Ks & ps > .5 && ps - I / 1e3 <= .5 && UC(), ps -= I / 1e3, QC(), U.moving && !R && (2 == Bs && 4 == Ks || 3 == Bs && 2 == Ks)))
-            for (var N = 0; N < qC.length; N++) {
-                if (4 != Ks || qC[N].progress.visible) Math.sqrt(Math.pow(qC[N].x - bs[Ts].x, 2) + Math.pow(qC[N].y - bs[Ts].y, 2)) < qC[N].radius && vC(2 == Bs ? "Stay still to defuse the bomb" : "Stay still to plant the bomb", 100)
+        TZ >= 0 && (vZ += 100 / (60 * YY[TZ]), gZ || Qo());
+        S = (new Date).getTime();
+        if (kJ && S - rJ >= 20 ? wJ() : SS && (tJ || IJ) && nS[cS] && (tJ && (B.aimDirection -= .05), IJ && (B.aimDirection += .05), nS[cS].rotation = B.aimDirection, wJ()), (!V || JJ) && S - rJ > 500 && wJ(), BJ && S - gJ > 200 && (SJ(), gJ = S, 3 == KZ && (BJ = !0)), 2 == KZ && zS > 0 && (4 == iS && zS > 20 && zS - Z / 1e3 <= 20 && (document.getElementById("countdown-value").className = "animated pulse huge"), 3 == iS & zS > .5 && zS - Z / 1e3 <= .5 && B_(), zS -= Z / 1e3, q_(), B.moving && !V && (2 == yS && 4 == iS || 3 == yS && 2 == iS)))
+            for (var w = 0; w < u_.length; w++) {
+                if (4 != iS || u_[w].progress.visible) Math.sqrt(Math.pow(u_[w].x - nS[cS].x, 2) + Math.pow(u_[w].y - nS[cS].y, 2)) < u_[w].radius && g_(2 == yS ? "Stay still to defuse the bomb" : "Stay still to plant the bomb", 100)
             }
     }
 
-    function Iu(I, s, x) {
-        var C = I * Math.PI * 2 * s,
-            W = I * (2 * Math.PI * x + Math.PI / 2);
-        return Math.sin(C) * Math.cos(W)
+    function SR(Z, S, Y) {
+        var _ = Z * Math.PI * 2 * S,
+            o = Z * (2 * Math.PI * Y + Math.PI / 2);
+        return Math.sin(_) * Math.cos(o)
     }
 
-    function su(I) {
-        return I * (2 - I)
+    function YR(Z) {
+        return Z * (2 - Z)
     }
-    var xu, Cu = !1,
-        Wu = !1,
-        Zu = !1,
-        uu = !1,
-        ou = !1,
-        Nu = 0;
+    var _R, oR = !1,
+        JR = !1,
+        RR = !1,
+        rR = !1,
+        wR = !1,
+        ER = 0;
 
-    function iu(I) {
-        var s = performance.now(),
-            x = Nu ? s - Nu : 0;
-        Nu = s;
-        var C, W, Z, u = bs[UI] || bs[Ts] || R;
-        if (u) {
-            var o = {
-                x: u.x,
-                y: u.y
+    function mR(Z) {
+        var S = performance.now(),
+            Y = ER ? S - ER : 0;
+        ER = S;
+        var _, o, J, R = nS[BZ] || nS[cS] || V;
+        if (R) {
+            var r = {
+                x: R.x,
+                y: R.y
             };
-            if (R && sI - f <= 90) o = R;
-            else if (R && sI - f > 90 && sI - f < 120) {
-                var N = (sI - f - 90) / 30;
-                o = {
-                    x: R.x * (1 - N) + u.x * N,
-                    y: R.y * (1 - N) + u.y * N
+            if (V && SZ - U <= 90) r = V;
+            else if (V && SZ - U > 90 && SZ - U < 120) {
+                var w = (SZ - U - 90) / 30;
+                r = {
+                    x: V.x * (1 - w) + R.x * w,
+                    y: V.y * (1 - w) + R.y * w
                 }
             }
-            if (ou) {
-                var i = {
-                    x: o.x,
-                    y: o.y
+            if (wR) {
+                var E = {
+                    x: r.x,
+                    y: r.y
                 };
-                xu && (o.x = o.x * I + xu.x * (1 - I), o.y = o.y * I + xu.y * (1 - I)), xu = i
+                _R && (r.x = r.x * Z + _R.x * (1 - Z), r.y = r.y * Z + _R.y * (1 - Z)), _R = E
             }
-            var t = o.x - lI / 2,
-                S = o.y - Is / 2,
-                J = 0,
-                A = 0;
-            if (TI) {
-                var F = (new Date).getTime() - DI;
-                if (F > 1e3) TI = !1, e.rotation = 0;
+            var m = r.x - hZ / 2,
+                X = r.y - ZS / 2,
+                a = 0,
+                s = 0;
+            if (cZ) {
+                var k = (new Date).getTime() - HZ;
+                if (k > 1e3) cZ = !1, O.rotation = 0;
                 else {
-                    var E = F / 1e3;
-                    J = 1 * Iu(E, Math.PI, Math.PI / 2) * su(1 - E), A = 1 * Iu(E, .33 * Math.PI, .66 * Math.PI) * su(1 - E)
+                    var C = k / 1e3;
+                    a = 1 * SR(C, Math.PI, Math.PI / 2) * YR(1 - C), s = 1 * SR(C, .33 * Math.PI, .66 * Math.PI) * YR(1 - C)
                 }
             }
-            if (e.position.set((-t + J) * e.scale.x, (-S + A) * e.scale.y), G.position.set(Math.floor(t / Us) * Us, Math.floor(S / Us) * Us), G.x < 0 && (G.x = 0), G.y < 0 && (G.y = 0), G.x + G.width > HI && (G.x = HI - G.width), G.y + G.height > wI && (G.y = wI - G.height), 0 == bZ) {
-                var d = 1 / e.scale.x,
-                    r = e.position.x % 1 * d,
-                    k = e.position.y % 1 * d;
-                G.position.x = Math.round(G.position.x / d) * d - r + d / 2 * 0, G.position.y = Math.round(G.position.y / d) * d - k + d / 2 * 0
+            if (O.position.set((-m + a) * O.scale.x, (-X + s) * O.scale.y), j.position.set(Math.floor(m / BS) * BS, Math.floor(X / BS) * BS), j.x < 0 && (j.x = 0), j.y < 0 && (j.y = 0), j.x + j.width > dZ && (j.x = dZ - j.width), j.y + j.height > lZ && (j.y = lZ - j.height), 0 == cJ) {
+                var T = 1 / O.scale.x,
+                    v = O.position.x % 1 * T,
+                    $ = O.position.y % 1 * T;
+                j.position.x = Math.round(j.position.x / T) * T - v + T / 2 * 0, j.position.y = Math.round(j.position.y / T) * T - $ + T / 2 * 0
             }
-            var y = lW(o);
-            if ($I && $Z) {
-                W = $Z, Z = y, (C = $I).rotation = Math.atan2(nW(Z.y) - W.y, nW(Z.x) - W.x), C.x = (W.x + Math.cos(C.rotation) * (.9 * W.size) + nW(Z.x) - Math.cos(C.rotation) * (.9 * XI.width / 2)) / 2, C.y = (W.y + Math.sin(C.rotation) * (.9 * W.size) + nW(Z.y) - Math.sin(C.rotation) * (.9 * XI.width / 2)) / 2, C.width = Math.sqrt(Math.pow(W.x - nW(Z.x), 2) + Math.pow(W.y - nW(Z.y), 2)) - .9 * (W.size + XI.width / 2);
-                var V = $Z.position.dst(y);
-                $I.visible = !R && !U.shooting && V < LI, $I.height = V > .8 * LI ? (1 - V / LI) / .2 * ys : ys
+            var t = ZJ(r);
+            if (DZ && MJ) {
+                o = MJ, J = t, (_ = DZ).rotation = Math.atan2(Wo(J.y) - o.y, Wo(J.x) - o.x), _.x = (o.x + Math.cos(_.rotation) * (.9 * o.size) + Wo(J.x) - Math.cos(_.rotation) * (.9 * MZ.width / 2)) / 2, _.y = (o.y + Math.sin(_.rotation) * (.9 * o.size) + Wo(J.y) - Math.sin(_.rotation) * (.9 * MZ.width / 2)) / 2, _.width = Math.sqrt(Math.pow(o.x - Wo(J.x), 2) + Math.pow(o.y - Wo(J.y), 2)) - .9 * (o.size + MZ.width / 2);
+                var I = MJ.position.dst(t);
+                DZ.visible = !V && !B.shooting && I < fZ, DZ.height = I > .8 * fZ ? (1 - I / fZ) / .2 * tS : tS
             }
-            XI.visible = !R && !U.shooting, XI.visible && XI.position.set(nW(y.x), nW(y.y))
+            MZ.visible = !V && !B.shooting, MZ.visible && MZ.position.set(Wo(t.x), Wo(t.y))
         }
-        if (ou) {
-            for (var K in bs) {
-                (p = bs[K]).realX = p.x, p.realY = p.y, p.lastVisualX && (p.x = p.x * I + p.lastVisualX * (1 - I), p.y = p.y * I + p.lastVisualY * (1 - I)), p.lastVisualX = p.realX, p.lastVisualY = p.realY
+        if (wR) {
+            for (var i in nS) {
+                (z = nS[i]).realX = z.x, z.realY = z.y, z.lastVisualX && (z.x = z.x * Z + z.lastVisualX * (1 - Z), z.y = z.y * Z + z.lastVisualY * (1 - Z)), z.lastVisualX = z.realX, z.lastVisualY = z.realY
             }
-            for (var K in eI) {
-                (T = eI[K]).realX = T.x, T.realY = T.y, T.lastVisualX && (T.x = T.x * I + T.lastVisualX * (1 - I), T.y = T.y * I + T.lastVisualY * (1 - I)), T.lastVisualX = T.realX, T.lastVisualY = T.realY
+            for (var i in OZ) {
+                (c = OZ[i]).realX = c.x, c.realY = c.y, c.lastVisualX && (c.x = c.x * Z + c.lastVisualX * (1 - Z), c.y = c.y * Z + c.lastVisualY * (1 - Z)), c.lastVisualX = c.realX, c.lastVisualY = c.realY
             }
         }
-        for (var K in bs)
-            for (var p = bs[K], _ = 0; _ < p.rotors.length; _++) {
-                var Y = p.rotors[_];
-                if (Y.noRotation ? Y.sprite.rotation = -p.rotation : 0 != Y.speed && (Y.sprite.baseRotation -= Y.speed * x / 1e3, Y.fixedRotation ? Y.sprite.rotation = Y.sprite.baseRotation : Y.sprite.rotation = Y.sprite.baseRotation - p.rotation), 1 == Y.visibility) {
-                    var b = K == Ts ? bs[K].moving : 0 != bs[K].sx || 0 != bs[K].sy;
-                    Y.sprite.visible = b, _s && K != Ts && (bs[K].usernameText.visible = b, bs[K].badge && (bs[K].badge.visible = b))
-                } else if (2 == Y.visibility) {
-                    b = K == Ts ? bs[K].moving : 0 != bs[K].sx || 0 != bs[K].sy;
-                    Y.sprite.visible = !b
+        for (var i in nS)
+            for (var z = nS[i], e = 0; e < z.rotors.length; e++) {
+                var L = z.rotors[e];
+                if (L.noRotation ? L.sprite.rotation = -z.rotation : 0 != L.speed && (L.sprite.baseRotation -= L.speed * Y / 1e3, L.fixedRotation ? L.sprite.rotation = L.sprite.baseRotation : L.sprite.rotation = L.sprite.baseRotation - z.rotation), 1 == L.visibility) {
+                    var n = i == cS ? nS[i].moving : 0 != nS[i].sx || 0 != nS[i].sy;
+                    L.sprite.visible = n, eS && i != cS && (nS[i].usernameText.visible = n, nS[i].badge && (nS[i].badge.visible = n))
+                } else if (2 == L.visibility) {
+                    n = i == cS ? nS[i].moving : 0 != nS[i].sx || 0 != nS[i].sy;
+                    L.sprite.visible = !n
                 }
             }
-        for (var K in bs) bs[K].shield.position.set(bs[K].position.x, bs[K].position.y), bs[K].usernameText.position.set(bs[K].position.x, bs[K].position.y - 1.3 * cI), bs[K].badge && bs[K].badge.position.set(bs[K].position.x - bs[K].usernameText.width / 2 - bs[K].badge.width / 2 - .5 * cI, bs[K].usernameText.y);
-        if (bs[Ts] && sI > 300 && (bs[Ts].usernameText.alpha = sI > 360 ? 0 : 1 - (sI - 300) / 60, bs[Ts].badge && (bs[Ts].badge.alpha = bs[Ts].usernameText.alpha)), 1 != aI && 2 != aI || function() {
-                if (QW) {
-                    for (var I in bs)
-                        if (hs[I] == Bs) {
-                            for (var s = !1, x = 0; x < wW.length; x++)
-                                if (wW[x].playerId == I) {
-                                    s = !0;
+        for (var i in nS) nS[i].shield.position.set(nS[i].position.x, nS[i].position.y), nS[i].usernameText.position.set(nS[i].position.x, nS[i].position.y - 1.3 * QZ), nS[i].badge && nS[i].badge.position.set(nS[i].position.x - nS[i].usernameText.width / 2 - nS[i].badge.width / 2 - .5 * QZ, nS[i].usernameText.y);
+        if (nS[cS] && SZ > 300 && (nS[cS].usernameText.alpha = SZ > 360 ? 0 : 1 - (SZ - 300) / 60, nS[cS].badge && (nS[cS].badge.alpha = nS[cS].usernameText.alpha)), 1 != KZ && 2 != KZ || function() {
+                if (Ao) {
+                    for (var Z in nS)
+                        if (bS[Z] == yS) {
+                            for (var S = !1, Y = 0; Y < qo.length; Y++)
+                                if (qo[Y].playerId == Z) {
+                                    S = !0;
                                     break
-                                } if (!s) {
-                                var C = new PIXI.Sprite(v.marker2);
-                                C.width = cI, C.height = C.width / C.texture.width * C.texture.height, C.anchor.set(.5), C.tint = Wx(I), C.playerId = I, g.addChild(C), wW.push(C);
-                                var W = new PIXI.Text(RI[I] ? RI[I] : "", {
+                                } if (!S) {
+                                var _ = new PIXI.Sprite(g.marker2);
+                                _.width = QZ, _.height = _.width / _.texture.width * _.texture.height, _.anchor.set(.5), _.tint = oY(Z), _.playerId = Z, N.addChild(_), qo.push(_);
+                                var o = new PIXI.Text(VZ[Z] ? VZ[Z] : "", {
                                     fontFamily: "Arial",
                                     fontSize: Math.round(window.innerHeight / 60),
-                                    fill: Ws ? 16777215 : 0,
+                                    fill: oS ? 16777215 : 0,
                                     align: "center"
                                 });
-                                W.anchor.set(.5), W.scale.set(1 / e.scale.x), C.playerText = W, g.addChild(W)
+                                o.anchor.set(.5), o.scale.set(1 / O.scale.x), _.playerText = o, N.addChild(o)
                             }
-                        } for (x = 0; x < wW.length; x++) {
-                        var Z = wW[x],
-                            u = bs[Z.playerId];
-                        if (u) {
-                            var o = e.localTransform.apply(u.position, new PIXI.Point);
-                            if (o.x < 0 || o.y < 0 || o.x > window.innerWidth || o.y > window.innerHeight) {
-                                var N = LW(o);
-                                N && (Z.visible = !0, Z.playerText.visible = !0, e.localTransform.applyInverse(new PIXI.Point(N.x, N.y), Z.position), Z.rotation = Math.atan2(o.y - window.innerHeight / 2, o.x - window.innerWidth / 2), 0 == N.s ? (Z.x -= Z.width / 2, Z.playerText.x = Z.x - Z.width / 2 - Z.playerText.width / 2, Z.playerText.y = Z.y + Math.sin(Z.rotation + Math.PI) * Z.width * 1.2) : 1 == N.s ? (Z.y += Z.height / 2, Z.playerText.x = Z.x + Math.cos(Z.rotation + Math.PI) * Z.height * 1.2, Z.playerText.y = Z.y + Z.height + Z.playerText.height / 2) : 2 == N.s ? (Z.x += Z.width / 2, Z.playerText.x = Z.x + Z.width / 2 + Z.playerText.width / 2, Z.playerText.y = Z.y + Math.sin(Z.rotation + Math.PI) * Z.width * 1.2) : (Z.y -= Z.height / 2, Z.playerText.x = Z.x + Math.cos(Z.rotation + Math.PI) * Z.height * 1.2, Z.playerText.y = Z.y - Z.height - Z.playerText.height / 2))
-                            } else Z.visible = !1, Z.playerText.visible = !1
-                        } else g.removeChild(wW[x].playerText), g.removeChild(wW[x]), wW.splice(x, 1), x--
+                        } for (Y = 0; Y < qo.length; Y++) {
+                        var J = qo[Y],
+                            R = nS[J.playerId];
+                        if (R) {
+                            var r = O.localTransform.apply(R.position, new PIXI.Point);
+                            if (r.x < 0 || r.y < 0 || r.x > window.innerWidth || r.y > window.innerHeight) {
+                                var w = ho(r);
+                                w && (J.visible = !0, J.playerText.visible = !0, O.localTransform.applyInverse(new PIXI.Point(w.x, w.y), J.position), J.rotation = Math.atan2(r.y - window.innerHeight / 2, r.x - window.innerWidth / 2), 0 == w.s ? (J.x -= J.width / 2, J.playerText.x = J.x - J.width / 2 - J.playerText.width / 2, J.playerText.y = J.y + Math.sin(J.rotation + Math.PI) * J.width * 1.2) : 1 == w.s ? (J.y += J.height / 2, J.playerText.x = J.x + Math.cos(J.rotation + Math.PI) * J.height * 1.2, J.playerText.y = J.y + J.height + J.playerText.height / 2) : 2 == w.s ? (J.x += J.width / 2, J.playerText.x = J.x + J.width / 2 + J.playerText.width / 2, J.playerText.y = J.y + Math.sin(J.rotation + Math.PI) * J.width * 1.2) : (J.y -= J.height / 2, J.playerText.x = J.x + Math.cos(J.rotation + Math.PI) * J.height * 1.2, J.playerText.y = J.y - J.height - J.playerText.height / 2))
+                            } else J.visible = !1, J.playerText.visible = !1
+                        } else N.removeChild(qo[Y].playerText), N.removeChild(qo[Y]), qo.splice(Y, 1), Y--
                     }
                 }
-            }(), a.render(e), a.render(z, void 0, !1), ou) {
-            for (var K in bs) {
-                (p = bs[K]).x = p.realX, p.y = p.realY
+            }(), K.render(O), K.render(x, void 0, !1), wR) {
+            for (var i in nS) {
+                (z = nS[i]).x = z.realX, z.y = z.realY
             }
-            for (var K in eI) {
-                var T;
-                (T = eI[K]).x = T.realX, T.y = T.realY
+            for (var i in OZ) {
+                var c;
+                (c = OZ[i]).x = c.realX, c.y = c.realY
             }
-        }(Ex || Cs) && a.render(q, void 0, !1), MC && a.render(MC, void 0, !1), j > 0 && !R && (new Date).getTime() - JC > 1e3 ? (Cu = !0, document.getElementById("internet-issue").style.display = "block") : Cu && (document.getElementById("internet-issue").style.display = "none", Cu = !1), (0 == aI || 3 == aI) && iI < 3 && sI >= 600 && !WZ && (Wu ? !Zu && sI >= 1800 ? vC("Level up by enclosing big areas with your towers", 100) : m >= 1 && !uu && vC("Upgrade your copter! " + (Ex ? "Tap" : "Click") + ' a <img src="img/plus-4-64.png">', 100) : vC(Ex ? "Build a tower by pressing the BUILD button" : "Build a tower with right-click or SPACE key", 100))
+        }(CY || _S) && K.render(u, void 0, !1), G_ && K.render(G_, void 0, !1), A > 0 && !V && (new Date).getTime() - a_ > 1e3 ? (oR = !0, document.getElementById("internet-issue").style.display = "block") : oR && (document.getElementById("internet-issue").style.display = "none", oR = !1), (0 == KZ || 3 == KZ) && EZ < 3 && SZ >= 600 && !JJ && (JR ? !RR && SZ >= 1800 ? g_("Level up by enclosing big areas with your towers", 100) : p >= 1 && !rR && g_("Upgrade your copter! " + (CY ? "Tap" : "Click") + ' a <img src="img/plus-4-64.png">', 100) : g_(CY ? "Build a tower by pressing the BUILD button" : "Build a tower with right-click or SPACE key", 100))
     }
-    var tu = 60,
-        au = 0,
-        eu = !1;
+    var KR = 60,
+        OR = 0,
+        jR = !1;
 
-    function Gu(I, s) {
-        document.getElementById("fps").textContent = "server: " + n + " fps: " + Math.round(I) + " ping: " + Math.round(u), s && (console.log("panic: simulation is too late, dropping updates"), MainLoop.resetFrameDelta(), oo || (sI = II)), sI > tu && (tu += ++au < 10 ? 600 : 3600, Math.round(I), Math.round(u)), eu = I < 30
+    function XR(Z, S) {
+        document.getElementById("fps").textContent = "server: " + W + " fps: " + Math.round(Z) + " ping: " + Math.round(R), S && (console.log("panic: simulation is too late, dropping updates"), MainLoop.resetFrameDelta(), wr || (SZ = ZZ)), SZ > KR && (KR += ++OR < 10 ? 600 : 3600, Math.round(Z), Math.round(R)), jR = Z < 30
     }
-    var Su, Ju, Au, Fu;
-    KI = !1, pI = !1;
+    var aR, sR, kR, NR;
+    iZ = !1, zZ = !1;
 
-    function gu(I) {
-        if (!pI) {
-            var s = I.getBasicProfile();
-            KI = !0, Su = I.getAuthResponse().id_token, Au = s.getImageUrl(), Uu(), (Fu = s.getEmail()).endsWith("@gmail.com") || Fu.endsWith("@googlemail.com") || Fu.endsWith("@icloud.com") || Fu.endsWith("@hotmail.com") || Fu.endsWith("@yahoo.com") || (document.getElementById("account-warning").style.display = "block")
+    function CR(Z) {
+        if (!zZ) {
+            var S = Z.getBasicProfile();
+            iZ = !0, aR = Z.getAuthResponse().id_token, kR = S.getImageUrl(), VR(), (NR = S.getEmail()).endsWith("@gmail.com") || NR.endsWith("@googlemail.com") || NR.endsWith("@icloud.com") || NR.endsWith("@hotmail.com") || NR.endsWith("@yahoo.com") || (document.getElementById("account-warning").style.display = "block")
         }
     }
 
-    function Eu() {
-        if (x = null, "undefined" != typeof Storage) try {
+    function TR() {
+        if (Y = null, "undefined" != typeof Storage) try {
             localStorage.removeItem("sessionId")
-        } catch (I) {
-            console.log(I)
+        } catch (Z) {
+            console.log(Z)
         }
     }
 
-    function du() {
+    function vR() {
         gapi.auth2.getAuthInstance().signOut().then(function() {
-            console.log("User signed out from google."), KI = !1, Eu(), document.getElementById("account-warning").style.display = "none"
+            console.log("User signed out from google."), iZ = !1, TR(), document.getElementById("account-warning").style.display = "none"
         })
     }
 
-    function ru(I) {
-        console.log("Facebook login status", I), KI || ("connected" === I.status ? (pI = !0, Ju = I.authResponse.accessToken, FB.api("/me?fields=picture,email&redirect=false", function(I) {
-            I && I.picture && I.picture.data && (Au = I.picture.data.url), I && I.email && (Fu = I.email), Uu()
-        })) : (pI && Eu(), pI = !1))
+    function gR(Z) {
+        console.log("Facebook login status", Z), iZ || ("connected" === Z.status ? (zZ = !0, sR = Z.authResponse.accessToken, FB.api("/me?fields=picture,email&redirect=false", function(Z) {
+            Z && Z.picture && Z.picture.data && (kR = Z.picture.data.url), Z && Z.email && (NR = Z.email), VR()
+        })) : (zZ && TR(), zZ = !1))
     }
 
-    function vu() {
-        var I = new XMLHttpRequest;
-        I.onreadystatechange = function() {
-            if (4 == I.readyState && 200 == I.status)
-                if (-1 != I.responseText.indexOf("ERROR")) console.error("loginOnServer returned ERROR"), Ru();
+    function BR() {
+        var Z = new XMLHttpRequest;
+        Z.onreadystatechange = function() {
+            if (4 == Z.readyState && 200 == Z.status)
+                if (-1 != Z.responseText.indexOf("ERROR")) console.error("loginOnServer returned ERROR"), UR();
                 else {
-                    var s = I.responseText.split("\n");
-                    x = s[0];
-                    s[1];
-                    Vu = s[2].split(" ").map(Number);
-                    s[3];
-                    if (Ku = new Number(s[4]), s.length >= 6 && (pu = new Number(s[5]) > 0) && (document.getElementById("curse-promo") && (document.getElementById("curse-promo").style.display = "none"), document.getElementById("banner-on-homepage") && (document.getElementById("banner-on-homepage").style.display = "none")), s.length >= 7 && (_u = parseInt(s[6])), document.getElementById("coins-owned").innerHTML = Math.floor(Ku), "undefined" != typeof Storage) try {
-                        localStorage.setItem("sessionId", x)
-                    } catch (I) {
-                        console.log(I)
+                    var S = Z.responseText.split("\n");
+                    Y = S[0];
+                    S[1];
+                    iR = S[2].split(" ").map(Number);
+                    S[3];
+                    if (zR = new Number(S[4]), S.length >= 6 && (eR = new Number(S[5]) > 0) && (document.getElementById("curse-promo") && (document.getElementById("curse-promo").style.display = "none"), document.getElementById("banner-on-homepage") && (document.getElementById("banner-on-homepage").style.display = "none")), S.length >= 7 && (xR = parseInt(S[6])), document.getElementById("coins-owned").innerHTML = Math.floor(zR), "undefined" != typeof Storage) try {
+                        localStorage.setItem("sessionId", Y)
+                    } catch (Z) {
+                        console.log(Z)
                     }
-                    v && $u(!0), window.location.search.startsWith("?my-account") ? Wo() : "?tourney-mgr" == window.location.search ? vo() : 0 == window.location.search.indexOf("?tourney-join") && function() {
-                        var I = document.getElementById("username").value.substring(0, 14);
-                        if (I = window.prompt("Please enter your tournament username. Warning: this can't be changed afterwards: ", I)) {
-                            var s = new XMLHttpRequest;
-                            s.onreadystatechange = function() {
-                                4 == s.readyState && 200 == s.status ? -1 != s.responseText.indexOf("ERROR") ? alert(s.responseText.replace("ERROR\n", "")) : vo() : 4 == s.readyState && 200 != s.status && s.onerror(s.status)
-                            }, s.onerror = function(I) {
-                                kC((new Date).toLocaleTimeString() + " - Error joining team", "error")
+                    g && MR(!0), window.location.search.startsWith("?my-account") ? Jr() : "?tourney-mgr" == window.location.search ? gr() : 0 == window.location.search.indexOf("?tourney-join") && function() {
+                        var Z = document.getElementById("username").value.substring(0, 14);
+                        if (Z = window.prompt("Please enter your tournament username. Warning: this can't be changed afterwards: ", Z)) {
+                            var S = new XMLHttpRequest;
+                            S.onreadystatechange = function() {
+                                4 == S.readyState && 200 == S.status ? -1 != S.responseText.indexOf("ERROR") ? alert(S.responseText.replace("ERROR\n", "")) : gr() : 4 == S.readyState && 200 != S.status && S.onerror(S.status)
+                            }, S.onerror = function(Z) {
+                                $_((new Date).toLocaleTimeString() + " - Error joining team", "error")
                             };
-                            var C = window.location.search.replace("?tourney-join&c=", "");
-                            s.open("GET", M + "/tourney/useInviteCode?s=" + (x || "") + "&c=" + encodeURIComponent(C) + "&n=" + encodeURIComponent(I), !0), s.send(null)
+                            var _ = window.location.search.replace("?tourney-join&c=", "");
+                            S.open("GET", G + "/tourney/useInviteCode?s=" + (Y || "") + "&c=" + encodeURIComponent(_) + "&n=" + encodeURIComponent(Z), !0), S.send(null)
                         }
                     }()
                 }
-            else 4 == I.readyState && 200 != I.status && I.onerror(I.status)
-        }, I.onerror = function(I) {
-            kC((new Date).toLocaleTimeString() + " - Error at login on server", "error"), console.error("loginOnServer error"), Ru()
-        }, I.open("POST", M + "/login?s=" + (x || "") + (KI ? "&a=1" : "") + (!KI && pI ? "&a=2" : "") + "&app=" + (document.getElementById("privacy-policy-checkbox").checked ? 1 : 0) + "&ecs=" + (document.getElementById("emailing-consent-checkbox").checked ? 1 : 0) + "&ect=" + encodeURIComponent(document.getElementById("emailing-consent-text").innerHTML), !0), KI ? I.send(Su) : pI ? I.send(Ju) : I.send(null)
+            else 4 == Z.readyState && 200 != Z.status && Z.onerror(Z.status)
+        }, Z.onerror = function(Z) {
+            $_((new Date).toLocaleTimeString() + " - Error at login on server", "error"), console.error("loginOnServer error"), UR()
+        }, Z.open("POST", G + "/login?s=" + (Y || "") + (iZ ? "&a=1" : "") + (!iZ && zZ ? "&a=2" : "") + "&app=" + (document.getElementById("privacy-policy-checkbox").checked ? 1 : 0) + "&ecs=" + (document.getElementById("emailing-consent-checkbox").checked ? 1 : 0) + "&ect=" + encodeURIComponent(document.getElementById("emailing-consent-text").innerHTML), !0), iZ ? Z.send(aR) : zZ ? Z.send(sR) : Z.send(null)
     }
 
-    function Uu() {
-        document.getElementById("login-popup").style.display = "none", document.getElementById("unconnected-block").style.display = "none", document.getElementById("connected-block").style.display = "block", document.getElementById("profile-picture").src = Au, document.getElementById("respawn-not-connected").style.display = "none", document.getElementById("respawn-not-connected-gm2").style.display = "none", document.getElementById("respawn-not-connected-gm4").style.display = "none", vu()
+    function VR() {
+        document.getElementById("login-popup").style.display = "none", document.getElementById("unconnected-block").style.display = "none", document.getElementById("connected-block").style.display = "block", document.getElementById("profile-picture").src = kR, document.getElementById("respawn-not-connected").style.display = "none", document.getElementById("respawn-not-connected-gm2").style.display = "none", document.getElementById("respawn-not-connected-gm4").style.display = "none", BR()
     }
 
-    function Ru() {
-        return KI && du(), pI && FB.logout(ru), document.getElementById("connected-block").style.display = "none", document.getElementById("unconnected-block").style.display = "block", Xu(1), Pu(0), !1
+    function UR() {
+        return iZ && vR(), zZ && FB.logout(gR), document.getElementById("connected-block").style.display = "none", document.getElementById("unconnected-block").style.display = "block", PR(1), QR(0), !1
     }
 
-    function fu() {
+    function pR() {
         document.getElementById("login-popup").style.display = "block", void 0 !== window.gapi && void 0 !== window.gapi.auth2 || (document.getElementById("google-login-button").innerHTML = '<div class="blocked">Your browser is blocking Google API. Unblock to sign-in with Google.</div>')
     }
 
-    function mu(I) {
-        return "rgb(" + [(16711680 & (I >>>= 0)) >>> 16, (65280 & I) >>> 8, 255 & I].join(",") + ")"
+    function $R(Z) {
+        return "rgb(" + [(16711680 & (Z >>>= 0)) >>> 16, (65280 & Z) >>> 8, 255 & Z].join(",") + ")"
     }
-    var ku = [],
-        yu = {
+    var tR = [],
+        IR = {
             skinFacebookLiked: !1,
             skinTwitterTweet: !1,
             skinTwitterFollow: !1,
@@ -23580,40 +23584,40 @@ var defly = function() {
             skinFacebookShare: !1,
             skinDiscordJoin: !1
         },
-        Vu = [],
-        Ku = 0,
-        pu = !1,
-        _u = 0;
+        iR = [],
+        zR = 0,
+        eR = !1,
+        xR = 0;
 
-    function zu(I, s, x, C, W, Z, u, o) {
-        I.className += " locked";
-        var N = document.createElement("a");
-        x && (N.href = x, N.target = "_blank"), N.innerHTML = C, N.className = "button " + W, I.appendChild(N), o || N.addEventListener("click", function() {
-            if (I.className = "card", I.getElementsByTagName("a")[0].style.display = "none", Z) {
-                yu[Z] = !0;
+    function uR(Z, S, Y, _, o, J, R, r) {
+        Z.className += " locked";
+        var w = document.createElement("a");
+        Y && (w.href = Y, w.target = "_blank"), w.innerHTML = _, w.className = "button " + o, Z.appendChild(w), r || w.addEventListener("click", function() {
+            if (Z.className = "card", Z.getElementsByTagName("a")[0].style.display = "none", J) {
+                IR[J] = !0;
                 try {
-                    localStorage.setItem(Z, !0)
-                } catch (I) {}
+                    localStorage.setItem(J, !0)
+                } catch (Z) {}
             }
-            "undefined" != typeof gtag && gtag("event", u, {
+            "undefined" != typeof gtag && gtag("event", R, {
                 event_category: "Click"
             })
         })
     }
 
-    function qu(I, s) {
+    function LR(Z, S) {
         document.getElementById("skin-popup").style.pointerEvents = "none";
-        var C = new XMLHttpRequest;
-        C.onreadystatechange = function() {
-            if (4 == C.readyState && 200 == C.status) {
-                if (document.getElementById("skin-popup").style.pointerEvents = "auto", "OK" != C.responseText) return void alert("An error occured during the transation, please try again or contact us");
-                Ku -= s, Vu.push(I), $u(!0), document.getElementById("coins-owned").innerHTML = Math.floor(Ku)
-            } else 4 == C.readyState && 200 != C.status && C.onerror(C.status)
-        }, C.onerror = function(I) {
-            document.getElementById("skin-popup").style.pointerEvents = "auto", console.log(I), alert("An error occured during the transation, please try again or contact us")
-        }, C.open("POST", M + "/buyskin?s=" + x + "&skin=" + I, !0), C.send(null)
+        var _ = new XMLHttpRequest;
+        _.onreadystatechange = function() {
+            if (4 == _.readyState && 200 == _.status) {
+                if (document.getElementById("skin-popup").style.pointerEvents = "auto", "OK" != _.responseText) return void alert("An error occured during the transation, please try again or contact us");
+                zR -= S, iR.push(Z), MR(!0), document.getElementById("coins-owned").innerHTML = Math.floor(zR)
+            } else 4 == _.readyState && 200 != _.status && _.onerror(_.status)
+        }, _.onerror = function(Z) {
+            document.getElementById("skin-popup").style.pointerEvents = "auto", console.log(Z), alert("An error occured during the transation, please try again or contact us")
+        }, _.open("POST", G + "/buyskin?s=" + Y + "&skin=" + Z, !0), _.send(null)
     }
-    var Yu = [{
+    var nR = [{
             name: "Holidays",
             list: [68, 64, 65, 66, 67, 69, 70]
         }, {
@@ -23659,895 +23663,895 @@ var defly = function() {
             name: "Elite",
             list: [71, 79, 96, 97, 98, 99, 136]
         }],
-        bu = -1;
+        cR = -1;
 
-    function Tu(I) {
-        for (var s = 0; s < Yu.length; s++)
-            if (-1 !== Yu[s].list.indexOf(I)) return s;
+    function HR(Z) {
+        for (var S = 0; S < nR.length; S++)
+            if (-1 !== nR[S].list.indexOf(Z)) return S;
         return -1
     }
 
-    function Du(I) {
-        return 1 == I || (2 == I ? yu.skinFacebookLiked : 3 == I || (4 == I ? yu.skinTwitterFollow : 5 == I ? yu.skinTwitterTweet : 6 == I ? yu.skinYoutubeSubscribe : 7 == I ? KI || pI : 8 == I ? yu.skinDiscordJoin : -1 !== Vu.indexOf(I)))
+    function yR(Z) {
+        return 1 == Z || (2 == Z ? IR.skinFacebookLiked : 3 == Z || (4 == Z ? IR.skinTwitterFollow : 5 == Z ? IR.skinTwitterTweet : 6 == Z ? IR.skinYoutubeSubscribe : 7 == Z ? iZ || zZ : 8 == Z ? IR.skinDiscordJoin : -1 !== iR.indexOf(Z)))
     }
 
-    function Bu(I) {
-        for (var s = Tu(I), x = 0; x < Yu[s].list.length; x++)
-            if (Yu[s].list[x] != I && !Du(Yu[s].list[x])) return !1;
+    function bR(Z) {
+        for (var S = HR(Z), Y = 0; Y < nR[S].list.length; Y++)
+            if (nR[S].list[Y] != Z && !yR(nR[S].list[Y])) return !1;
         return !0
     }
 
-    function hu(I) {
-        document.getElementById("skin-tab-" + bu).className = "skin-tab", document.getElementById("skin-tab-" + I).className = "skin-tab selected", bu = I, $u(!0)
+    function FR(Z) {
+        document.getElementById("skin-tab-" + cR).className = "skin-tab", document.getElementById("skin-tab-" + Z).className = "skin-tab selected", cR = Z, MR(!0)
     }
 
-    function Ou(I, s, x) {
-        var C = document.createElement("div");
-        return C.setAttribute("id", "skin-tab-" + I), C.className = "skin-tab" + (x ? " selected" : ""), C.innerHTML = s, C.addEventListener("click", function() {
-            hu(I)
-        }), C
+    function DR(Z, S, Y) {
+        var _ = document.createElement("div");
+        return _.setAttribute("id", "skin-tab-" + Z), _.className = "skin-tab" + (Y ? " selected" : ""), _.innerHTML = S, _.addEventListener("click", function() {
+            FR(Z)
+        }), _
     }
 
-    function $u(I) {
-        I && (document.getElementById("skin-homepage-canvas").innerHTML = "", document.getElementById("skin-popup-canvas").innerHTML = "", document.getElementById("skin-list").innerHTML = ""), Cx[-1] = Ms[yI >= 0 ? yI : 0], mI[-1] = kI;
-        var s = xC(-1, 50);
-        document.getElementById("skin-homepage-canvas").appendChild(s);
-        var x = xC(-1, 100);
-        document.getElementById("skin-popup-canvas").appendChild(x), ku = [s, x];
-        for (var C = document.getElementById("skin-tabs"); C.firstChild;) C.removeChild(C.firstChild);
-        C.appendChild(Ou(-1, "All", -1 == bu));
-        for (var W = 0; W < Yu.length; W++) C.appendChild(Ou(W, Yu[W].name, bu == W));
-        var Z, u, o, N, i = (Z = new Date, u = Z.getMonth() + 1, o = Z.getDate(), N = [], 2 == u && N.push(64), (3 == u && o >= 15 || 4 == u && o <= 14) && N.push(65), 4 == u && N.push(66), (10 == u && o >= 15 || 11 == u && o <= 14) && N.push(67), 12 == u && N.push(68), 1 == u && N.push(69), N),
-            t = [71, 79, 80, 96, 97, 98, 99, 136],
-            a = [64, 65, 66, 67, 68, 69],
-            e = i.concat([1, 2, 3, 4, 5, 6, 8, 7, 9, 10, 107, 13, 14, 18, 108, 81, 19, 11, 12, 89, 109, 110, 90, 122, 123, 124, 91, 17, 40, 33, 34, 16, 50, 51, 111, 125, 92, 20, 21, 93, 15, 29, 41, 35, 46, 52, 53, 94, 112, 126, 127, 42, 43, 36, 37, 24, 25, 47, 54, 44, 38, 23, 30, 31, 55, 57, 58, 59, 60, 61, 62, 95, 113, 128, 48, 22, 26, 27, 28, 32, 45, 39, 49, 56, 63]); - 1 != bu && (e = Yu[bu].list);
-        for (W = 0; W < e.length; W++) {
-            var G = e[W];
-            if (jx[G]) {
-                Cx[-1] = Ms[yI >= 0 ? yI : 0], mI[-1] = G;
-                var S = xC(-1, 64)
+    function MR(Z) {
+        Z && (document.getElementById("skin-homepage-canvas").innerHTML = "", document.getElementById("skin-popup-canvas").innerHTML = "", document.getElementById("skin-list").innerHTML = ""), _Y[-1] = GS[tZ >= 0 ? tZ : 0], pZ[-1] = $Z;
+        var S = Y_(-1, 50);
+        document.getElementById("skin-homepage-canvas").appendChild(S);
+        var Y = Y_(-1, 100);
+        document.getElementById("skin-popup-canvas").appendChild(Y), tR = [S, Y];
+        for (var _ = document.getElementById("skin-tabs"); _.firstChild;) _.removeChild(_.firstChild);
+        _.appendChild(DR(-1, "All", -1 == cR));
+        for (var o = 0; o < nR.length; o++) _.appendChild(DR(o, nR[o].name, cR == o));
+        var J, R, r, w, E = (J = new Date, R = J.getMonth() + 1, r = J.getDate(), w = [], 2 == R && w.push(64), (3 == R && r >= 15 || 4 == R && r <= 14) && w.push(65), 4 == R && w.push(66), (10 == R && r >= 15 || 11 == R && r <= 14) && w.push(67), 12 == R && w.push(68), 1 == R && w.push(69), w),
+            m = [71, 79, 80, 96, 97, 98, 99, 136],
+            K = [64, 65, 66, 67, 68, 69],
+            O = E.concat([1, 2, 3, 4, 5, 6, 8, 7, 9, 10, 107, 13, 14, 18, 108, 81, 19, 11, 12, 89, 109, 110, 90, 122, 123, 124, 91, 17, 40, 33, 34, 16, 50, 51, 111, 125, 92, 20, 21, 93, 15, 29, 41, 35, 46, 52, 53, 94, 112, 126, 127, 42, 43, 36, 37, 24, 25, 47, 54, 44, 38, 23, 30, 31, 55, 57, 58, 59, 60, 61, 62, 95, 113, 128, 48, 22, 26, 27, 28, 32, 45, 39, 49, 56, 63]); - 1 != cR && (O = nR[cR].list);
+        for (o = 0; o < O.length; o++) {
+            var j = O[o];
+            if (AY[j]) {
+                _Y[-1] = GS[tZ >= 0 ? tZ : 0], pZ[-1] = j;
+                var X = Y_(-1, 64)
             } else {
-                (S = document.createElement("div")).innerHTML = "?", S.style.width = "64px", S.style.height = S.style.width, S.style.position = "relative", S.style.display = "inline-block", S.style.lineHeight = S.style.height, S.style.fontSize = "3vh"
+                (X = document.createElement("div")).innerHTML = "?", X.style.width = "64px", X.style.height = X.style.width, X.style.position = "relative", X.style.display = "inline-block", X.style.lineHeight = X.style.height, X.style.fontSize = "3vh"
             }
-            var J = document.createElement("div"),
-                A = -1 !== [26, 27, 28, 32, 39, 45, 49, 56, 63, 70, 95, 113, 128].indexOf(G);
-            J.className = "card" + (A ? " highlight" : "") + (G >= 64 && G <= 70 ? " season" : ""), J.style.cursor = "pointer", J.appendChild(S);
-            var F = -1 == Vu.indexOf(G);
-            if (!jx[G] || F && (-1 !== t.indexOf(G) || -1 !== a.indexOf(G) && -1 === i.indexOf(G))) - 1 != t.indexOf(G) ? zu(J, 0, void 0, "Tourney prize", "disabled", void 0, void 0, !0) : zu(J, 0, void 0, "Unavailable", "disabled", void 0, void 0, !0);
-            else if (2 != G || yu.skinFacebookLiked)
-                if (4 != G || yu.skinTwitterFollow)
-                    if (5 != G || yu.skinTwitterTweet)
-                        if (6 != G || yu.skinYoutubeSubscribe)
-                            if (8 != G || yu.skinDiscordJoin)
-                                if (7 != G || KI || pI) {
-                                    if ((G >= 81 && G <= 88 || G >= 100 && G <= 106) && F) KI || pI ? pu ? function(I) {
-                                        zu(J, 0, void 0, "Premium", "login", void 0, "SkinActivatePremiumSkin", !0), J.getElementsByTagName("a")[0].addEventListener("click", function() {
-                                            return qu(I, 0), !1
+            var a = document.createElement("div"),
+                s = -1 !== [26, 27, 28, 32, 39, 45, 49, 56, 63, 70, 95, 113, 128].indexOf(j);
+            a.className = "card" + (s ? " highlight" : "") + (j >= 64 && j <= 70 ? " season" : ""), a.style.cursor = "pointer", a.appendChild(X);
+            var k = -1 == iR.indexOf(j);
+            if (!AY[j] || k && (-1 !== m.indexOf(j) || -1 !== K.indexOf(j) && -1 === E.indexOf(j))) - 1 != m.indexOf(j) ? uR(a, 0, void 0, "Tourney prize", "disabled", void 0, void 0, !0) : uR(a, 0, void 0, "Unavailable", "disabled", void 0, void 0, !0);
+            else if (2 != j || IR.skinFacebookLiked)
+                if (4 != j || IR.skinTwitterFollow)
+                    if (5 != j || IR.skinTwitterTweet)
+                        if (6 != j || IR.skinYoutubeSubscribe)
+                            if (8 != j || IR.skinDiscordJoin)
+                                if (7 != j || iZ || zZ) {
+                                    if ((j >= 81 && j <= 88 || j >= 100 && j <= 106) && k) iZ || zZ ? eR ? function(Z) {
+                                        uR(a, 0, void 0, "Premium", "login", void 0, "SkinActivatePremiumSkin", !0), a.getElementsByTagName("a")[0].addEventListener("click", function() {
+                                            return LR(Z, 0), !1
                                         })
-                                    }(G) : (zu(J, 0, void 0, "Premium", "login", void 0, "SkinShowAccount", !0), J.getElementsByTagName("a")[0].addEventListener("click", function() {
-                                        return Wo(), !1
-                                    })) : (zu(J, 0, void 0, "Premium", "login", void 0, "SkinCreateAccount", !0), J.getElementsByTagName("a")[0].addEventListener("click", function() {
-                                        return fu(), !1
+                                    }(j) : (uR(a, 0, void 0, "Premium", "login", void 0, "SkinShowAccount", !0), a.getElementsByTagName("a")[0].addEventListener("click", function() {
+                                        return Jr(), !1
+                                    })) : (uR(a, 0, void 0, "Premium", "login", void 0, "SkinCreateAccount", !0), a.getElementsByTagName("a")[0].addEventListener("click", function() {
+                                        return pR(), !1
                                     }));
-                                    else if (G >= 9 && F) {
-                                        var g = 1e6;
-                                        if (9 != G && 10 != G || (g = 500), 13 != G && 14 != G || (g = 1e3), 11 != G && 12 != G || (g = 2e3), 17 == G && (g = 5e3), 18 == G && (g = 1e3), 19 == G && (g = 2e3), 64 == G && (g = 5e3), 65 == G && (g = 5e3), 66 == G && (g = 5e3), 67 == G && (g = 5e3), 68 == G && (g = 5e3), 69 == G && (g = 5e3), 70 == G && (g = 1e4), 20 == G && (g = 7500), 21 == G && (g = 7500), 15 == G && (g = 1e4), 29 == G && (g = 1e4), 24 == G && (g = 15e3), 25 == G && (g = 15e3), 30 == G && (g = 2e4), 26 == G && (g = 2e4), 27 == G && (g = 2e4), 28 == G && (g = 2e4), 31 == G && (g = 2e4), 32 == G && (g = 3e4), 16 == G && (g = 5e3), 46 == G && (g = 1e4), 47 == G && (g = 15e3), 23 == G && (g = 2e4), 48 == G && (g = 25e3), 22 == G && (g = 25e3), 49 == G && (g = 3e4), 40 == G && (g = 5e3), 41 == G && (g = 1e4), 42 == G && (g = 15e3), 43 == G && (g = 15e3), 44 == G && (g = 2e4), 45 == G && (g = 3e4), 33 == G && (g = 5e3), 34 == G && (g = 5e3), 35 == G && (g = 1e4), 36 == G && (g = 15e3), 37 == G && (g = 15e3), 38 == G && (g = 2e4), 39 == G && (g = 3e4), 50 == G && (g = 5e3), 51 == G && (g = 5e3), 52 == G && (g = 1e4), 53 == G && (g = 1e4), 54 == G && (g = 15e3), 55 == G && (g = 2e4), 56 == G && (g = 25e3), G >= 57 && G <= 62 && (g = 2e4), 63 == G && (g = 2e4), 89 == G && (g = 2e3), 90 == G && (g = 3e3), 91 == G && (g = 4e3), 92 == G && (g = 6e3), 93 == G && (g = 8e3), 94 == G && (g = 1e4), 95 == G && (g = 2e4), 107 == G && (g = 500), 108 == G && (g = 1e3), 109 == G && (g = 2e3), 110 == G && (g = 2e3), 111 == G && (g = 5e3), 112 == G && (g = 1e4), 113 == G && (g = 2e4), 122 == G && (g = 3e3), 123 == G && (g = 3e3), 124 == G && (g = 3e3), 125 == G && (g = 5e3), 126 == G && (g = 1e4), 127 == G && (g = 1e4), 128 == G && (g = 2e4), A && !Bu(G)) {
-                                            ! function(I) {
-                                                zu(J, 0, void 0, "Unavailable", "disabled", void 0, void 0, !0), J.getElementsByTagName("a")[0].addEventListener("click", function() {
-                                                    alert("You must buy all skins in " + Yu[Tu(I)].name + " to unlock this skin")
+                                    else if (j >= 9 && k) {
+                                        var N = 1e6;
+                                        if (9 != j && 10 != j || (N = 500), 13 != j && 14 != j || (N = 1e3), 11 != j && 12 != j || (N = 2e3), 17 == j && (N = 5e3), 18 == j && (N = 1e3), 19 == j && (N = 2e3), 64 == j && (N = 5e3), 65 == j && (N = 5e3), 66 == j && (N = 5e3), 67 == j && (N = 5e3), 68 == j && (N = 5e3), 69 == j && (N = 5e3), 70 == j && (N = 1e4), 20 == j && (N = 7500), 21 == j && (N = 7500), 15 == j && (N = 1e4), 29 == j && (N = 1e4), 24 == j && (N = 15e3), 25 == j && (N = 15e3), 30 == j && (N = 2e4), 26 == j && (N = 2e4), 27 == j && (N = 2e4), 28 == j && (N = 2e4), 31 == j && (N = 2e4), 32 == j && (N = 3e4), 16 == j && (N = 5e3), 46 == j && (N = 1e4), 47 == j && (N = 15e3), 23 == j && (N = 2e4), 48 == j && (N = 25e3), 22 == j && (N = 25e3), 49 == j && (N = 3e4), 40 == j && (N = 5e3), 41 == j && (N = 1e4), 42 == j && (N = 15e3), 43 == j && (N = 15e3), 44 == j && (N = 2e4), 45 == j && (N = 3e4), 33 == j && (N = 5e3), 34 == j && (N = 5e3), 35 == j && (N = 1e4), 36 == j && (N = 15e3), 37 == j && (N = 15e3), 38 == j && (N = 2e4), 39 == j && (N = 3e4), 50 == j && (N = 5e3), 51 == j && (N = 5e3), 52 == j && (N = 1e4), 53 == j && (N = 1e4), 54 == j && (N = 15e3), 55 == j && (N = 2e4), 56 == j && (N = 25e3), j >= 57 && j <= 62 && (N = 2e4), 63 == j && (N = 2e4), 89 == j && (N = 2e3), 90 == j && (N = 3e3), 91 == j && (N = 4e3), 92 == j && (N = 6e3), 93 == j && (N = 8e3), 94 == j && (N = 1e4), 95 == j && (N = 2e4), 107 == j && (N = 500), 108 == j && (N = 1e3), 109 == j && (N = 2e3), 110 == j && (N = 2e3), 111 == j && (N = 5e3), 112 == j && (N = 1e4), 113 == j && (N = 2e4), 122 == j && (N = 3e3), 123 == j && (N = 3e3), 124 == j && (N = 3e3), 125 == j && (N = 5e3), 126 == j && (N = 1e4), 127 == j && (N = 1e4), 128 == j && (N = 2e4), s && !bR(j)) {
+                                            ! function(Z) {
+                                                uR(a, 0, void 0, "Unavailable", "disabled", void 0, void 0, !0), a.getElementsByTagName("a")[0].addEventListener("click", function() {
+                                                    alert("You must buy all skins in " + nR[HR(Z)].name + " to unlock this skin")
                                                 })
-                                            }(G)
-                                        } else zu(J, 0, void 0, '<img src="img/coin.png"> <span>' + g + "</span>", "buy", void 0, "SkinBuy", !0), J.getElementsByTagName("a")[0].addEventListener("click", function(I, s) {
+                                            }(j)
+                                        } else uR(a, 0, void 0, '<img src="img/coin.png"> <span>' + N + "</span>", "buy", void 0, "SkinBuy", !0), a.getElementsByTagName("a")[0].addEventListener("click", function(Z, S) {
                                             return function() {
-                                                if (!KI && !pI) return alert("You must login first to buy skins"), fu(), !1;
-                                                Ku < s ? alert("You don't have enough coins to buy this skin (you own " + Math.floor(Ku) + " coins)") : confirm("You own " + Math.floor(Ku) + " coins. Buy skin for " + s + " coins?") && qu(I, s)
+                                                if (!iZ && !zZ) return alert("You must login first to buy skins"), pR(), !1;
+                                                zR < S ? alert("You don't have enough coins to buy this skin (you own " + Math.floor(zR) + " coins)") : confirm("You own " + Math.floor(zR) + " coins. Buy skin for " + S + " coins?") && LR(Z, S)
                                             }
-                                        }(G, g))
+                                        }(j, N))
                                     }
-                                } else zu(J, 0, void 0, "Sign up", "login", void 0, "SkinCreateAccount", !0), J.getElementsByTagName("a")[0].addEventListener("click", function() {
-                                    return fu(), !1
+                                } else uR(a, 0, void 0, "Sign up", "login", void 0, "SkinCreateAccount", !0), a.getElementsByTagName("a")[0].addEventListener("click", function() {
+                                    return pR(), !1
                                 });
-            else zu(J, 0, "https://discord.gg/NXuuhv7", "Join discord", "discord", "skinDiscordJoin", "SkinDiscordJoin");
-            else zu(J, 0, "https://www.youtube.com/channel/UCJw-612ZzkWmZuU5QsP_T-g?sub_confirmation=1", "Subscribe", "youtube", "skinYoutubeSubscribe", "SkinYoutubeSubscribe");
+            else uR(a, 0, "https://discord.gg/NXuuhv7", "Join discord", "discord", "skinDiscordJoin", "SkinDiscordJoin");
+            else uR(a, 0, "https://www.youtube.com/channel/UCJw-612ZzkWmZuU5QsP_T-g?sub_confirmation=1", "Subscribe", "youtube", "skinYoutubeSubscribe", "SkinYoutubeSubscribe");
             else {
-                var E = ["I've played this game way too much today", "I'm loving this game!", "don't play this game it will ruin your social life", "this game is going to ruin my social life", "I'm addicted to this game", "This game is so addictive", "Best game ever!"];
-                zu(J, 0, "https://twitter.com/intent/tweet?url=http%3A%2F%2Fdefly.io&hashtags=gaming,indiegames,deflyio&text=" + encodeURIComponent(E[Math.floor(Math.random() * E.length)]), "Tweet", "twitter", "skinTwitterTweet", "SkinTwitterTweet")
-            } else zu(J, 0, "https://twitter.com/DeflyIo", "Follow", "twitter", "skinTwitterFollow", "SkinTwitterFollow");
-            else zu(J, 0, "https://www.facebook.com/deflyiogame/", "Like", "facebook", "skinFacebookLiked", "SkinFacebookLiked");
-            document.getElementById("skin-list").appendChild(J), ku.push(S), J.addEventListener("click", function(I) {
+                var C = ["I've played this game way too much today", "I'm loving this game!", "don't play this game it will ruin your social life", "this game is going to ruin my social life", "I'm addicted to this game", "This game is so addictive", "Best game ever!"];
+                uR(a, 0, "https://twitter.com/intent/tweet?url=http%3A%2F%2Fdefly.io&hashtags=gaming,indiegames,deflyio&text=" + encodeURIComponent(C[Math.floor(Math.random() * C.length)]), "Tweet", "twitter", "skinTwitterTweet", "SkinTwitterTweet")
+            } else uR(a, 0, "https://twitter.com/DeflyIo", "Follow", "twitter", "skinTwitterFollow", "SkinTwitterFollow");
+            else uR(a, 0, "https://www.facebook.com/deflyiogame/", "Like", "facebook", "skinFacebookLiked", "SkinFacebookLiked");
+            document.getElementById("skin-list").appendChild(a), tR.push(X), a.addEventListener("click", function(Z) {
                 return function() {
-                    (2 != I || yu.skinFacebookLiked) && (4 != I || yu.skinTwitterFollow) && (5 != I || yu.skinTwitterTweet) && (6 != I || yu.skinYoutubeSubscribe) && (8 != I || yu.skinDiscordJoin) && (7 != I || KI || pI) && (I >= 9 && !KI && !pI || I >= 9 && -1 == Vu.indexOf(I) || Xu(I))
+                    (2 != Z || IR.skinFacebookLiked) && (4 != Z || IR.skinTwitterFollow) && (5 != Z || IR.skinTwitterTweet) && (6 != Z || IR.skinYoutubeSubscribe) && (8 != Z || IR.skinDiscordJoin) && (7 != Z || iZ || zZ) && (Z >= 9 && !iZ && !zZ || Z >= 9 && -1 == iR.indexOf(Z) || PR(Z))
                 }
-            }(G))
+            }(j))
         }
-        if (!I)
-            for (W = 0; W < Ms.length; W++) {
-                var d = document.createElement("div");
-                d.style.backgroundColor = mu(Ms[W]), d.style.width = "32px", d.style.height = "32px", d.style.display = "inline-block", d.style.cursor = "pointer", d.style.marginLeft = "2px", d.addEventListener("click", function(I) {
+        if (!Z)
+            for (o = 0; o < GS.length; o++) {
+                var T = document.createElement("div");
+                T.style.backgroundColor = $R(GS[o]), T.style.width = "32px", T.style.height = "32px", T.style.display = "inline-block", T.style.cursor = "pointer", T.style.marginLeft = "2px", T.addEventListener("click", function(Z) {
                     return function() {
-                        Pu(I)
+                        QR(Z)
                     }
-                }(W)), document.getElementById("color-list").appendChild(d)
+                }(o)), document.getElementById("color-list").appendChild(T)
             }
     }
 
-    function Xu(I, s) {
-        kI = I;
-        for (var x = 0; x < 2; x++) {
-            mI[-1] = I;
-            var C = ku[x],
-                W = xC(-1, C.offsetWidth);
-            C.parentNode.replaceChild(W, C), ku[x] = W
+    function PR(Z, S) {
+        $Z = Z;
+        for (var Y = 0; Y < 2; Y++) {
+            pZ[-1] = Z;
+            var _ = tR[Y],
+                o = Y_(-1, _.offsetWidth);
+            _.parentNode.replaceChild(o, _), tR[Y] = o
         }
-        if (!s && "undefined" != typeof Storage) try {
-            localStorage.setItem("playerSkin", kI)
-        } catch (I) {
-            console.log(I)
+        if (!S && "undefined" != typeof Storage) try {
+            localStorage.setItem("playerSkin", $Z)
+        } catch (Z) {
+            console.log(Z)
         }
         "undefined" != typeof gtag && gtag("event", "ChangeSkinModel", {
             event_category: "Click",
-            value: I
+            value: Z
         })
     }
 
-    function Pu(I, s) {
-        yI = I;
-        for (var x = 0; x < ku.length; x++)
-            if (ku[x].skinId) {
-                Cx[-1] = Ms[yI >= 0 ? yI : 0], mI[-1] = ku[x].skinId;
-                var C = ku[x],
-                    W = xC(-1, C.offsetWidth);
-                C.parentNode.replaceChild(W, C), ku[x] = W
-            } if (!s && "undefined" != typeof Storage) try {
-            localStorage.setItem("playerSkinColor", yI)
-        } catch (I) {
-            console.log(I)
+    function QR(Z, S) {
+        tZ = Z;
+        for (var Y = 0; Y < tR.length; Y++)
+            if (tR[Y].skinId) {
+                _Y[-1] = GS[tZ >= 0 ? tZ : 0], pZ[-1] = tR[Y].skinId;
+                var _ = tR[Y],
+                    o = Y_(-1, _.offsetWidth);
+                _.parentNode.replaceChild(o, _), tR[Y] = o
+            } if (!S && "undefined" != typeof Storage) try {
+            localStorage.setItem("playerSkinColor", tZ)
+        } catch (Z) {
+            console.log(Z)
         }
         "undefined" != typeof gtag && gtag("event", "ChangeSkinColor", {
             event_category: "Click",
-            value: I
+            value: Z
         })
     }
-    var cu, Mu, nu = 999,
-        Hu = {};
+    var GR, WR, dR = 999,
+        lR = {};
 
-    function wu(I) {
-        var s = new FileReader;
-        s.onload = function() {
-            var x = "data:image/png;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(s.result)));
-            Hu[I.name] = x, v[I.name] = PIXI.Texture.fromImage(x), localStorage.setItem("skinEditorImages", JSON.stringify(Hu)), Lu()
-        }, s.readAsArrayBuffer(I)
+    function qR(Z) {
+        var S = new FileReader;
+        S.onload = function() {
+            var Y = "data:image/png;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(S.result)));
+            lR[Z.name] = Y, g[Z.name] = PIXI.Texture.fromImage(Y), localStorage.setItem("skinEditorImages", JSON.stringify(lR)), hR()
+        }, S.readAsArrayBuffer(Z)
     }
 
-    function Qu() {
-        if (delete bs[-2], mI[-2] = nu, CC(-2), Mu.stage.removeChildren(), Mu.stage.addChild(bs[-2]), document.getElementById("show-collision-circle").checked) {
-            var I = new PIXI.Graphics;
-            I.lineStyle(1, 16711680), I.drawCircle(0, 0, cI / cs * ks), bs[-2].addChild(I)
+    function AR() {
+        if (delete nS[-2], pZ[-2] = dR, __(-2), WR.stage.removeChildren(), WR.stage.addChild(nS[-2]), document.getElementById("show-collision-circle").checked) {
+            var Z = new PIXI.Graphics;
+            Z.lineStyle(1, 16711680), Z.drawCircle(0, 0, QZ / QS * $S), nS[-2].addChild(Z)
         }
-        Mu.stage.setTransform(Mu.width / 2 / Mu.resolution, Mu.height / 2 / Mu.resolution, 1 / jx[nu].size, 1 / jx[nu].size, 0, 0, 0, 0, 0), localStorage.setItem("skinEditorSkinModel", JSON.stringify(jx[nu]))
+        WR.stage.setTransform(WR.width / 2 / WR.resolution, WR.height / 2 / WR.resolution, 1 / AY[dR].size, 1 / AY[dR].size, 0, 0, 0, 0, 0), localStorage.setItem("skinEditorSkinModel", JSON.stringify(AY[dR]))
     }
 
-    function ju(I, s) {
-        var x = '<option name=""></option>';
-        for (var C in Hu) x += "<option " + (I.img == C ? "selected " : "") + 'name="' + C + '">' + C + "</option>";
-        var W = document.createElement("div"),
-            Z = document.createElement("span");
-        Z.innerHTML = "Rotor: ";
-        var u = document.createElement("select");
-        u.innerHTML = x;
-        var o = document.createElement("span");
-        o.innerHTML = " X: ";
-        var N = document.createElement("input");
-        N.setAttribute("type", "number"), N.setAttribute("step", "0.1"), N.setAttribute("value", I.x);
-        var i = document.createElement("span");
-        i.innerHTML = " Y: ";
-        var t = document.createElement("input");
-        t.setAttribute("type", "number"), t.setAttribute("step", "0.1"), t.setAttribute("value", I.y);
-        var a = document.createElement("span");
-        a.innerHTML = " RPS: ";
-        var e = document.createElement("input");
-        e.setAttribute("type", "number"), e.setAttribute("step", "0.1"), e.setAttribute("value", I.speed / Math.PI / 2);
-        var G = document.createElement("span");
-        G.innerHTML = " Size: ";
-        var S = document.createElement("input");
-        S.setAttribute("type", "number"), S.setAttribute("step", "0.1"), S.setAttribute("value", I.size);
-        var J = document.createElement("span");
-        J.innerHTML = " Layer: ";
-        var A = document.createElement("input");
-        A.setAttribute("type", "number"), A.setAttribute("value", I.layer);
-        var F = document.createElement("span");
-        F.innerHTML = " Visibility: ";
-        var g = document.createElement("input");
-        g.setAttribute("type", "number"), g.setAttribute("title", "0=always\n1=only when moving\n2=only when standing still"), g.setAttribute("value", I.visibility);
-        var E = document.createElement("span");
-        E.innerHTML = " FixedRot";
-        var d = document.createElement("input");
-        d.setAttribute("type", "checkbox"), d.setAttribute("title", "on = rotation is not cumulative with copter hull"), I.fixedRotation && d.setAttribute("checked", "");
+    function fR(Z, S) {
+        var Y = '<option name=""></option>';
+        for (var _ in lR) Y += "<option " + (Z.img == _ ? "selected " : "") + 'name="' + _ + '">' + _ + "</option>";
+        var o = document.createElement("div"),
+            J = document.createElement("span");
+        J.innerHTML = "Rotor: ";
+        var R = document.createElement("select");
+        R.innerHTML = Y;
         var r = document.createElement("span");
-        r.innerHTML = " NoRot";
-        var v = document.createElement("input");
-        v.setAttribute("type", "checkbox"), v.setAttribute("title", "on = the rotor does not rotate and has fixed direction independent from copter direction"), I.noRotation && v.setAttribute("checked", "");
-        var U = document.createElement("span");
-        U.innerHTML = " Tinted";
-        var R = document.createElement("input");
-        R.setAttribute("type", "checkbox"), R.setAttribute("title", "on = rotor is tinted with player color"), I.tinted && R.setAttribute("checked", "");
-        var f = document.createElement("button");
+        r.innerHTML = " X: ";
+        var w = document.createElement("input");
+        w.setAttribute("type", "number"), w.setAttribute("step", "0.1"), w.setAttribute("value", Z.x);
+        var E = document.createElement("span");
+        E.innerHTML = " Y: ";
+        var m = document.createElement("input");
+        m.setAttribute("type", "number"), m.setAttribute("step", "0.1"), m.setAttribute("value", Z.y);
+        var K = document.createElement("span");
+        K.innerHTML = " RPS: ";
+        var O = document.createElement("input");
+        O.setAttribute("type", "number"), O.setAttribute("step", "0.1"), O.setAttribute("value", Z.speed / Math.PI / 2);
+        var j = document.createElement("span");
+        j.innerHTML = " Size: ";
+        var X = document.createElement("input");
+        X.setAttribute("type", "number"), X.setAttribute("step", "0.1"), X.setAttribute("value", Z.size);
+        var a = document.createElement("span");
+        a.innerHTML = " Layer: ";
+        var s = document.createElement("input");
+        s.setAttribute("type", "number"), s.setAttribute("value", Z.layer);
+        var k = document.createElement("span");
+        k.innerHTML = " Visibility: ";
+        var N = document.createElement("input");
+        N.setAttribute("type", "number"), N.setAttribute("title", "0=always\n1=only when moving\n2=only when standing still"), N.setAttribute("value", Z.visibility);
+        var C = document.createElement("span");
+        C.innerHTML = " FixedRot";
+        var T = document.createElement("input");
+        T.setAttribute("type", "checkbox"), T.setAttribute("title", "on = rotation is not cumulative with copter hull"), Z.fixedRotation && T.setAttribute("checked", "");
+        var v = document.createElement("span");
+        v.innerHTML = " NoRot";
+        var g = document.createElement("input");
+        g.setAttribute("type", "checkbox"), g.setAttribute("title", "on = the rotor does not rotate and has fixed direction independent from copter direction"), Z.noRotation && g.setAttribute("checked", "");
+        var B = document.createElement("span");
+        B.innerHTML = " Tinted";
+        var V = document.createElement("input");
+        V.setAttribute("type", "checkbox"), V.setAttribute("title", "on = rotor is tinted with player color"), Z.tinted && V.setAttribute("checked", "");
+        var U = document.createElement("button");
 
-        function m() {
-            I.img = u.value, I.x = parseFloat(N.value), I.y = parseFloat(t.value), I.speed = parseFloat(e.value) * Math.PI * 2, I.size = parseFloat(S.value), I.layer = Math.max(0, A.value), I.visibility = g.value, I.fixedRotation = d.checked, I.noRotation = v.checked, I.tinted = R.checked, Qu()
+        function p() {
+            Z.img = R.value, Z.x = parseFloat(w.value), Z.y = parseFloat(m.value), Z.speed = parseFloat(O.value) * Math.PI * 2, Z.size = parseFloat(X.value), Z.layer = Math.max(0, s.value), Z.visibility = N.value, Z.fixedRotation = T.checked, Z.noRotation = g.checked, Z.tinted = V.checked, AR()
         }
-        return f.className = "button", f.innerHTML = "remove", W.appendChild(Z), W.appendChild(u), W.appendChild(o), W.appendChild(N), W.appendChild(i), W.appendChild(t), W.appendChild(a), W.appendChild(e), W.appendChild(G), W.appendChild(S), W.appendChild(J), W.appendChild(A), W.appendChild(F), W.appendChild(g), W.appendChild(E), W.appendChild(d), W.appendChild(r), W.appendChild(v), W.appendChild(U), W.appendChild(R), W.appendChild(f), u.addEventListener("change", m), N.addEventListener("input", m), t.addEventListener("input", m), e.addEventListener("input", m), S.addEventListener("input", m), A.addEventListener("input", m), g.addEventListener("input", m), d.addEventListener("input", m), v.addEventListener("input", m), R.addEventListener("input", m), f.addEventListener("click", function() {
-            jx[nu].rotors.splice(s, 1), Qu(), Lu()
-        }), W
+        return U.className = "button", U.innerHTML = "remove", o.appendChild(J), o.appendChild(R), o.appendChild(r), o.appendChild(w), o.appendChild(E), o.appendChild(m), o.appendChild(K), o.appendChild(O), o.appendChild(j), o.appendChild(X), o.appendChild(a), o.appendChild(s), o.appendChild(k), o.appendChild(N), o.appendChild(C), o.appendChild(T), o.appendChild(v), o.appendChild(g), o.appendChild(B), o.appendChild(V), o.appendChild(U), R.addEventListener("change", p), w.addEventListener("input", p), m.addEventListener("input", p), O.addEventListener("input", p), X.addEventListener("input", p), s.addEventListener("input", p), N.addEventListener("input", p), T.addEventListener("input", p), g.addEventListener("input", p), V.addEventListener("input", p), U.addEventListener("click", function() {
+            AY[dR].rotors.splice(S, 1), AR(), hR()
+        }), o
     }
 
-    function Lu() {
-        var I = '<option name=""></option>';
-        for (var s in Hu) I += '<option name="' + s + '">' + s + "</option>";
-        document.getElementById("skin-editor-base").innerHTML = I, document.getElementById("skin-editor-notint").innerHTML = I, document.getElementById("skin-editor-size").value = jx[nu].size;
-        for (var x = document.getElementById("skin-editor-rotors"); x.firstChild;) x.removeChild(x.firstChild);
-        for (var s in jx[nu].rotors) {
-            var C = ju(jx[nu].rotors[s], s);
-            x.appendChild(C)
+    function hR() {
+        var Z = '<option name=""></option>';
+        for (var S in lR) Z += '<option name="' + S + '">' + S + "</option>";
+        document.getElementById("skin-editor-base").innerHTML = Z, document.getElementById("skin-editor-notint").innerHTML = Z, document.getElementById("skin-editor-size").value = AY[dR].size;
+        for (var Y = document.getElementById("skin-editor-rotors"); Y.firstChild;) Y.removeChild(Y.firstChild);
+        for (var S in AY[dR].rotors) {
+            var _ = fR(AY[dR].rotors[S], S);
+            Y.appendChild(_)
         }
-        var W = document.createElement("button");
-        W.innerHTML = "Add rotor", W.className = "button", x.appendChild(W), W.addEventListener("click", function() {
-            jx[nu].rotors.push({
+        var o = document.createElement("button");
+        o.innerHTML = "Add rotor", o.className = "button", Y.appendChild(o), o.addEventListener("click", function() {
+            AY[dR].rotors.push({
                 img: "rotor1",
                 x: 0,
                 y: 0,
                 speed: 4 * Math.PI,
                 size: 1
-            }), Lu()
-        }), document.getElementById("skin-editor-base").value = jx[nu].base, document.getElementById("skin-editor-notint").value = jx[nu].notint
+            }), hR()
+        }), document.getElementById("skin-editor-base").value = AY[dR].base, document.getElementById("skin-editor-notint").value = AY[dR].notint
     }
 
-    function lu() {
-        cI = 64;
-        var I = PIXI.autoDetectRenderer(128, 128, {
+    function Zr() {
+        QZ = 64;
+        var Z = PIXI.autoDetectRenderer(128, 128, {
             antialias: !0,
             transparent: !1,
-            resolution: l * ix
+            resolution: h * EY
         });
-        I.plugins.interaction && (I.plugins.interaction.destroy(), I.plugins.interaction = null), I.plugins.accessibility && (I.plugins.accessibility.destroy(), I.plugins.accessibility = null), I.backgroundColor = 15923199, Mu = I;
-        var s = new PIXI.Container;
-        I.stage = s, s.setTransform(I.width / 2 / l, I.height / 2 / l, 1, 1, 0, 0, 0, 0, 0), document.getElementById("skin-editor-canvas").appendChild(I.view), jx[nu] = {
+        Z.plugins.interaction && (Z.plugins.interaction.destroy(), Z.plugins.interaction = null), Z.plugins.accessibility && (Z.plugins.accessibility.destroy(), Z.plugins.accessibility = null), Z.backgroundColor = 15923199, WR = Z;
+        var S = new PIXI.Container;
+        Z.stage = S, S.setTransform(Z.width / 2 / h, Z.height / 2 / h, 1, 1, 0, 0, 0, 0, 0), document.getElementById("skin-editor-canvas").appendChild(Z.view), AY[dR] = {
             base: "",
             notint: "",
             rotors: [],
             size: 1
         };
         try {
-            if (localStorage.getItem("skinEditorSkinModel") && (jx[nu] = JSON.parse(localStorage.getItem("skinEditorSkinModel"))), localStorage.getItem("skinEditorImages"))
-                for (var x in Hu = JSON.parse(localStorage.getItem("skinEditorImages"))) v[x] = PIXI.Texture.fromImage(Hu[x])
-        } catch (I) {}
-        Lu(), mI[-2] = nu, Cx[-2] = Ms[yI >= 0 ? yI : 0], setTimeout(Qu, 0), Mu.stance = 1, cu = setInterval(function() {
-            for (var x = bs[-2], C = 0; C < x.rotors.length; C++) {
-                var W = x.rotors[C];
-                W.noRotation ? W.sprite.rotation = -x.rotation : 0 != W.speed && (W.sprite.baseRotation -= W.speed * (1e3 / 60) / 1e3, W.fixedRotation ? W.sprite.rotation = W.sprite.baseRotation : W.sprite.rotation = W.sprite.baseRotation - x.rotation);
-                var Z = 0 != Mu.stance;
-                1 == W.visibility ? W.sprite.visible = Z : 2 == W.visibility && (W.sprite.visible = !Z)
+            if (localStorage.getItem("skinEditorSkinModel") && (AY[dR] = JSON.parse(localStorage.getItem("skinEditorSkinModel"))), localStorage.getItem("skinEditorImages"))
+                for (var Y in lR = JSON.parse(localStorage.getItem("skinEditorImages"))) g[Y] = PIXI.Texture.fromImage(lR[Y])
+        } catch (Z) {}
+        hR(), pZ[-2] = dR, _Y[-2] = GS[tZ >= 0 ? tZ : 0], setTimeout(AR, 0), WR.stance = 1, GR = setInterval(function() {
+            for (var Y = nS[-2], _ = 0; _ < Y.rotors.length; _++) {
+                var o = Y.rotors[_];
+                o.noRotation ? o.sprite.rotation = -Y.rotation : 0 != o.speed && (o.sprite.baseRotation -= o.speed * (1e3 / 60) / 1e3, o.fixedRotation ? o.sprite.rotation = o.sprite.baseRotation : o.sprite.rotation = o.sprite.baseRotation - Y.rotation);
+                var J = 0 != WR.stance;
+                1 == o.visibility ? o.sprite.visible = J : 2 == o.visibility && (o.sprite.visible = !J)
             }
-            I.render(s)
-        }, 1e3 / 60), defly.closeSkinEditor = Io, defly.saveSkin = so, defly.clearSkin = function() {
-            localStorage.removeItem("skinEditorImages"), localStorage.removeItem("skinEditorSkinModel"), jx[nu] = {
+            Z.render(S)
+        }, 1e3 / 60), defly.closeSkinEditor = Sr, defly.saveSkin = Yr, defly.clearSkin = function() {
+            localStorage.removeItem("skinEditorImages"), localStorage.removeItem("skinEditorSkinModel"), AY[dR] = {
                 base: "",
                 notint: "",
                 rotors: [],
                 size: 1
-            }, Hu = {}, Qu(), Lu()
-        }, document.getElementById("skin-upload-input").addEventListener("change", xo), document.getElementById("skin-editor-input").addEventListener("change", function() {
-            ! function(I) {
-                for (var s = 0; s < I.files.length; s++) wu(I.files[s])
+            }, lR = {}, AR(), hR()
+        }, document.getElementById("skin-upload-input").addEventListener("change", _r), document.getElementById("skin-editor-input").addEventListener("change", function() {
+            ! function(Z) {
+                for (var S = 0; S < Z.files.length; S++) qR(Z.files[S])
             }(document.getElementById("skin-editor-input"))
         }), document.getElementById("skin-editor-size").addEventListener("input", function() {
-            jx[nu].size = parseFloat(document.getElementById("skin-editor-size").value), Qu()
+            AY[dR].size = parseFloat(document.getElementById("skin-editor-size").value), AR()
         }), document.getElementById("skin-editor-base").addEventListener("change", function() {
-            jx[nu].base = document.getElementById("skin-editor-base").value, Qu()
+            AY[dR].base = document.getElementById("skin-editor-base").value, AR()
         }), document.getElementById("skin-editor-notint").addEventListener("change", function() {
-            jx[nu].notint = document.getElementById("skin-editor-notint").value, Qu()
-        }), document.getElementById("show-collision-circle").addEventListener("change", Qu), document.getElementById("stance-idle").addEventListener("click", function() {
-            Mu.stance = 0, document.getElementById("stance-idle").classList.remove("back"), document.getElementById("stance-moving").classList.add("back")
+            AY[dR].notint = document.getElementById("skin-editor-notint").value, AR()
+        }), document.getElementById("show-collision-circle").addEventListener("change", AR), document.getElementById("stance-idle").addEventListener("click", function() {
+            WR.stance = 0, document.getElementById("stance-idle").classList.remove("back"), document.getElementById("stance-moving").classList.add("back")
         }), document.getElementById("stance-moving").addEventListener("click", function() {
-            Mu.stance = 1, document.getElementById("stance-idle").classList.add("back"), document.getElementById("stance-moving").classList.remove("back")
+            WR.stance = 1, document.getElementById("stance-idle").classList.add("back"), document.getElementById("stance-moving").classList.remove("back")
         });
-        var C = "";
-        for (var x in v) C += '<option name="' + x + '">' + x + "</option>";
-        document.getElementById("skin-editor-game-sprites").innerHTML = C, document.getElementById("skin-editor-input2").addEventListener("change", function() {
-            var I = document.getElementById("skin-editor-input2").files[0],
-                s = new FileReader;
-            s.onload = function() {
-                var I = "data:image/png;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(s.result))),
-                    x = document.createElement("img");
-                x.src = I, v[document.getElementById("skin-editor-game-sprites").value] = PIXI.Texture.fromImage(x.src), document.getElementById("skin-editor-input2").value = ""
-            }, s.readAsArrayBuffer(I)
+        var _ = "";
+        for (var Y in g) _ += '<option name="' + Y + '">' + Y + "</option>";
+        document.getElementById("skin-editor-game-sprites").innerHTML = _, document.getElementById("skin-editor-input2").addEventListener("change", function() {
+            var Z = document.getElementById("skin-editor-input2").files[0],
+                S = new FileReader;
+            S.onload = function() {
+                var Z = "data:image/png;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array(S.result))),
+                    Y = document.createElement("img");
+                Y.src = Z, g[document.getElementById("skin-editor-game-sprites").value] = PIXI.Texture.fromImage(Y.src), document.getElementById("skin-editor-input2").value = ""
+            }, S.readAsArrayBuffer(Z)
         }), document.getElementById("skin-editor").style.display = "block"
     }
 
-    function Io() {
-        clearInterval(cu), document.getElementById("skin-editor").style.display = "none", Xu(nu, !0)
+    function Sr() {
+        clearInterval(GR), document.getElementById("skin-editor").style.display = "none", PR(dR, !0)
     }
 
-    function so() {
-        var I = {};
-        for (var s in I[jx[nu].base] = Hu[jx[nu].base], I[jx[nu].notint] = Hu[jx[nu].notint], jx[nu].rotors) I[jx[nu].rotors[s].img] = Hu[jx[nu].rotors[s].img];
-        var x = new Blob([JSON.stringify({
-            spec: jx[nu],
-            images: I
+    function Yr() {
+        var Z = {};
+        for (var S in Z[AY[dR].base] = lR[AY[dR].base], Z[AY[dR].notint] = lR[AY[dR].notint], AY[dR].rotors) Z[AY[dR].rotors[S].img] = lR[AY[dR].rotors[S].img];
+        var Y = new Blob([JSON.stringify({
+            spec: AY[dR],
+            images: Z
         })], {
             type: "text/plain;charset=utf-8"
         });
-        saveAs(x, (new Date).toISOString() + " defly.io skin.txt")
+        saveAs(Y, (new Date).toISOString() + " defly.io skin.txt")
     }
 
-    function xo() {
-        var I = document.getElementById("skin-upload-input").files[0],
-            s = new FileReader;
-        s.onload = function() {
-            var I = JSON.parse(s.result);
-            for (var x in console.log(I), jx[nu] = I.spec, I.images) {
-                var C = document.createElement("img");
-                C.src = I.images[x], Hu[x] = I.images[x], v[x] = PIXI.Texture.fromImage(C.src)
+    function _r() {
+        var Z = document.getElementById("skin-upload-input").files[0],
+            S = new FileReader;
+        S.onload = function() {
+            var Z = JSON.parse(S.result);
+            for (var Y in console.log(Z), AY[dR] = Z.spec, Z.images) {
+                var _ = document.createElement("img");
+                _.src = Z.images[Y], lR[Y] = Z.images[Y], g[Y] = PIXI.Texture.fromImage(_.src)
             }
-            localStorage.setItem("skinEditorImages", JSON.stringify(Hu)), Qu(), Lu(), document.getElementById("skin-upload-input").value = ""
-        }, s.readAsText(I)
+            localStorage.setItem("skinEditorImages", JSON.stringify(lR)), AR(), hR(), document.getElementById("skin-upload-input").value = ""
+        }, S.readAsText(Z)
     }
 
-    function Co(I) {
-        var s = I,
-            C = new XMLHttpRequest;
-        C.onreadystatechange = function() {
-            4 == C.readyState && C.status
-        }, C.onerror = function(I) {
-            alert("Error updating badge"), console.log(I)
-        }, C.open("POST", M + "/account/updateBadge?s=" + x + "&b=" + s, !0), C.send(null)
+    function or(Z) {
+        var S = Z,
+            _ = new XMLHttpRequest;
+        _.onreadystatechange = function() {
+            4 == _.readyState && _.status
+        }, _.onerror = function(Z) {
+            alert("Error updating badge"), console.log(Z)
+        }, _.open("POST", G + "/account/updateBadge?s=" + Y + "&b=" + S, !0), _.send(null)
     }
 
-    function Wo() {
-        if (KI || pI) {
-            var I = new XMLHttpRequest;
-            I.onreadystatechange = function() {
-                if (4 == I.readyState && 200 == I.status) {
-                    var s = I.responseText.split("\n");
-                    pu = parseInt(s[0]) > 0, Ku = s[1], document.getElementById("ma-coins").innerHTML = Math.floor(Ku), document.getElementById("account-premium").style.display = pu ? "block" : "none", document.getElementById("account-standard").style.display = pu ? "none" : "block", document.getElementById("reserved-nickname").value = s[2], document.getElementById("ma-player-name").innerHTML = document.getElementById("username").value;
-                    var x = parseInt(s[3]);
-                    s.length >= 5 && (document.getElementById("discord-id").value = s[4]);
-                    for (var C = '<span class="empty' + (0 == x ? " selected" : "") + '">NONE</span>', W = 1; W <= 47; W++) C += "<img " + (W == x ? 'class="selected" ' : "") + 'src="img/badges/' + W + '.png">';
-                    if (document.getElementById("badge-select").innerHTML = C, document.getElementById("badge-select").addEventListener("click", function(I) {
-                            if (console.log(I), "IMG" == I.target.tagName) {
-                                var s = I.target.src.split("/");
-                                Co(parseInt(s[s.length - 1]))
-                            } else Co(0);
-                            document.getElementById("badge-select").childNodes.forEach(function(I) {
-                                I.classList.remove("selected")
-                            }), I.target.classList.add("selected")
-                        }), document.getElementById("my-account-button") && (document.getElementById("my-account-button").enabled = !0, document.getElementById("my-account-button").innerHTML = ox("My Account")), document.getElementById("my-account").style.display = "block", !pu) {
-                        var Z = document.getElementById("change-discord-id-block");
-                        Z.parentElement.removeChild(Z), document.getElementById("change-discord-id-np").appendChild(Z)
+    function Jr() {
+        if (iZ || zZ) {
+            var Z = new XMLHttpRequest;
+            Z.onreadystatechange = function() {
+                if (4 == Z.readyState && 200 == Z.status) {
+                    var S = Z.responseText.split("\n");
+                    eR = parseInt(S[0]) > 0, zR = S[1], document.getElementById("ma-coins").innerHTML = Math.floor(zR), document.getElementById("account-premium").style.display = eR ? "block" : "none", document.getElementById("account-standard").style.display = eR ? "none" : "block", document.getElementById("reserved-nickname").value = S[2], document.getElementById("ma-player-name").innerHTML = document.getElementById("username").value;
+                    var Y = parseInt(S[3]);
+                    S.length >= 5 && (document.getElementById("discord-id").value = S[4]);
+                    for (var _ = '<span class="empty' + (0 == Y ? " selected" : "") + '">NONE</span>', o = 1; o <= 47; o++) _ += "<img " + (o == Y ? 'class="selected" ' : "") + 'src="img/badges/' + o + '.png">';
+                    if (document.getElementById("badge-select").innerHTML = _, document.getElementById("badge-select").addEventListener("click", function(Z) {
+                            if (console.log(Z), "IMG" == Z.target.tagName) {
+                                var S = Z.target.src.split("/");
+                                or(parseInt(S[S.length - 1]))
+                            } else or(0);
+                            document.getElementById("badge-select").childNodes.forEach(function(Z) {
+                                Z.classList.remove("selected")
+                            }), Z.target.classList.add("selected")
+                        }), document.getElementById("my-account-button") && (document.getElementById("my-account-button").enabled = !0, document.getElementById("my-account-button").innerHTML = rY("My Account")), document.getElementById("my-account").style.display = "block", !eR) {
+                        var J = document.getElementById("change-discord-id-block");
+                        J.parentElement.removeChild(J), document.getElementById("change-discord-id-np").appendChild(J)
                     }
-                } else 4 == I.readyState && 200 != I.status && I.onerror(I.status)
-            }, I.onerror = function(I) {
-                kC((new Date).toLocaleTimeString() + " - Error getting account info", "error"), console.log(I)
-            }, I.open("POST", M + "/account/myInfo?s=" + x, !0), I.send(null), document.getElementById("my-account-button") && (document.getElementById("my-account-button").enabled = !1, document.getElementById("my-account-button").innerHTML = ox("Loading..."))
-        } else fu()
+                } else 4 == Z.readyState && 200 != Z.status && Z.onerror(Z.status)
+            }, Z.onerror = function(Z) {
+                $_((new Date).toLocaleTimeString() + " - Error getting account info", "error"), console.log(Z)
+            }, Z.open("POST", G + "/account/myInfo?s=" + Y, !0), Z.send(null), document.getElementById("my-account-button") && (document.getElementById("my-account-button").enabled = !1, document.getElementById("my-account-button").innerHTML = rY("Loading..."))
+        } else pR()
     }
 
-    function Zo(I, s, x, C) {
-        switch (I) {
+    function Rr(Z, S, Y, _) {
+        switch (Z) {
             case 0:
             case 3:
             case 2:
-                return Math.floor(s / 100);
+                return Math.floor(S / 100);
             case 1:
-                return Math.floor(s / 200);
+                return Math.floor(S / 200);
             case 4:
-                return 10 * C
+                return 10 * _
         }
     }
-    var uo = ["FFA", "Team", "Defuse", "E-FFA", "1v1"];
-    var oo = !1,
-        No = 1,
-        io = [],
-        to = [];
+    var rr = ["FFA", "Team", "Defuse", "E-FFA", "1v1"];
+    var wr = !1,
+        Er = 1,
+        mr = [],
+        Kr = [];
 
-    function ao(I, s, x) {
-        io[I] || (io[I] = new PIXI.Sprite(v["capture-blue-" + (0 == I ? "A" : "B")]), io[I].width = 12, io[I].height = 12, io[I].anchor.set(.5), J.addChild(io[I])), io[I].position.set(s, x)
+    function Or(Z, S, Y) {
+        mr[Z] || (mr[Z] = new PIXI.Sprite(g["capture-blue-" + (0 == Z ? "A" : "B")]), mr[Z].width = 12, mr[Z].height = 12, mr[Z].anchor.set(.5), a.addChild(mr[Z])), mr[Z].position.set(S, Y)
     }
 
-    function eo(I, s, x) {
-        to[I] || (to[I] = new PIXI.Graphics, to[I].beginFill(ws[I], .5), to[I].drawRect(0, 0, 12, 12), J.addChild(to[I])), to[I].position.set(s, x)
+    function jr(Z, S, Y) {
+        Kr[Z] || (Kr[Z] = new PIXI.Graphics, Kr[Z].beginFill(lS[Z], .5), Kr[Z].drawRect(0, 0, 12, 12), a.addChild(Kr[Z])), Kr[Z].position.set(S, Y)
     }
 
-    function Go(I, s, x) {
-        var C = I.dst2(s);
-        if (0 == C) return I;
-        var W = ((x.x - I.x) * (s.x - I.x) + (x.y - I.y) * (s.y - I.y)) / C;
-        return W < 0 ? I : W > 1 ? s : new PIXI.Point(I.x + W * (s.x - I.x), I.y + W * (s.y - I.y))
+    function Xr(Z, S, Y) {
+        var _ = Z.dst2(S);
+        if (0 == _) return Z;
+        var o = ((Y.x - Z.x) * (S.x - Z.x) + (Y.y - Z.y) * (S.y - Z.y)) / _;
+        return o < 0 ? Z : o > 1 ? S : new PIXI.Point(Z.x + o * (S.x - Z.x), Z.y + o * (S.y - Z.y))
     }
 
-    function nZ(I, s, x) {
-        return (I.x - s.x) * (x.y - s.y) - (I.y - s.y) * (x.x - s.x)
+    function dJ(Z, S, Y) {
+        return (Z.x - S.x) * (Y.y - S.y) - (Z.y - S.y) * (Y.x - S.x)
     }
 
-    function So(I, s) {
-        return I.dot1 == s ? I.rotation : I.rotation > 0 ? I.rotation - Math.PI : I.rotation + Math.PI
+    function ar(Z, S) {
+        return Z.dot1 == S ? Z.rotation : Z.rotation > 0 ? Z.rotation - Math.PI : Z.rotation + Math.PI
     }
 
-    function Jo(I) {
-        var s = [];
-        for (var x in qs) qs[x].dot1 != I && qs[x].dot2 != I || s.push(qs[x]);
-        return s.sort(function(s, x) {
-            var C = OZ(So(s, I));
-            return OZ(So(x, I)) - C
-        }), s
+    function sr(Z) {
+        var S = [];
+        for (var Y in uS) uS[Y].dot1 != Z && uS[Y].dot2 != Z || S.push(uS[Y]);
+        return S.sort(function(S, Y) {
+            var _ = DJ(ar(S, Z));
+            return DJ(ar(Y, Z)) - _
+        }), S
     }
 
-    function Ao(I, s) {
-        for (var x = Jo(I), C = 0; C < x.length; C++)
-            if (x[C].dot1 == s || x[C].dot2 == s) return !0;
+    function kr(Z, S) {
+        for (var Y = sr(Z), _ = 0; _ < Y.length; _++)
+            if (Y[_].dot1 == S || Y[_].dot2 == S) return !0;
         return !1
     }
 
-    function Fo(I, s, x) {
-        void 0 === x && (x = []);
-        for (var C = [], W = 0; W < I.length; W++) {
-            var Z = I[W],
-                u = I[(W + 1) % I.length];
-            if (void 0 !== s) var o = s[W];
+    function Nr(Z, S, Y) {
+        void 0 === Y && (Y = []);
+        for (var _ = [], o = 0; o < Z.length; o++) {
+            var J = Z[o],
+                R = Z[(o + 1) % Z.length];
+            if (void 0 !== S) var r = S[o];
             else
-                for (var N in qs)
-                    if (qs[N].dot1 == Z && qs[N].dot2 == u || qs[N].dot1 == u && qs[N].dot2 == Z) {
-                        o = qs[N];
+                for (var w in uS)
+                    if (uS[w].dot1 == J && uS[w].dot2 == R || uS[w].dot1 == R && uS[w].dot2 == J) {
+                        r = uS[w];
                         break
-                    } C[W] = So(o, Z), x[W] = o.dot1 == Z
+                    } _[o] = ar(r, J), Y[o] = r.dot1 == J
         }
-        var i = 0,
-            t = 0;
-        for (W = 0; W < C.length; W++) i += OZ(OZ(C[W]) - OZ(C[(W + 1) % C.length] + Math.PI)), t += OZ(OZ(C[(W + 1) % C.length]) - OZ(C[W] + Math.PI));
-        return i > t
+        var E = 0,
+            m = 0;
+        for (o = 0; o < _.length; o++) E += DJ(DJ(_[o]) - DJ(_[(o + 1) % _.length] + Math.PI)), m += DJ(DJ(_[(o + 1) % _.length]) - DJ(_[o] + Math.PI));
+        return E > m
     }
 
-    function go(I) {
-        for (var s = [], x = null, C = 0; C < I.length; C++) {
-            var W = I[C];
-            if (x)
-                for (var Z in qs)
-                    if (qs[Z].dot1 == W && qs[Z].dot2 == x || qs[Z].dot2 == W && qs[Z].dot1 == x) {
-                        s.push(qs[Z]);
+    function Cr(Z) {
+        for (var S = [], Y = null, _ = 0; _ < Z.length; _++) {
+            var o = Z[_];
+            if (Y)
+                for (var J in uS)
+                    if (uS[J].dot1 == o && uS[J].dot2 == Y || uS[J].dot2 == o && uS[J].dot1 == Y) {
+                        S.push(uS[J]);
                         break
-                    } x = W
+                    } Y = o
         }
-        for (var Z in qs)
-            if (qs[Z].dot1 == I[0] && qs[Z].dot2 == x || qs[Z].dot2 == I[0] && qs[Z].dot1 == x) {
-                s.push(qs[Z]);
+        for (var J in uS)
+            if (uS[J].dot1 == Z[0] && uS[J].dot2 == Y || uS[J].dot2 == Z[0] && uS[J].dot1 == Y) {
+                S.push(uS[J]);
                 break
-            } var u = [],
-            o = Fo(I, s, u),
-            N = new DataView(new ArrayBuffer(15 + 5 * I.length));
-        N.setInt32(1, No++), N.setInt32(5, I[0].owner), N.setFloat32(9, 0), N.setInt16(13, I.length);
-        for (C = 0; C < s.length; C++) {
-            var i = s[C];
-            N.setInt32(15 + 5 * C, i.lineId), N.setUint8(15 + 5 * C + 4, o && u[C] || !o && !u[C] ? 0 : 1)
+            } var R = [],
+            r = Nr(Z, S, R),
+            w = new DataView(new ArrayBuffer(15 + 5 * Z.length));
+        w.setInt32(1, Er++), w.setInt32(5, Z[0].owner), w.setFloat32(9, 0), w.setInt16(13, Z.length);
+        for (_ = 0; _ < S.length; _++) {
+            var E = S[_];
+            w.setInt32(15 + 5 * _, E.lineId), w.setUint8(15 + 5 * _ + 4, r && R[_] || !r && !R[_] ? 0 : 1)
         }
-        uW(N, !1)
+        Ro(w, !1)
     }
 
-    function Eo() {
-        var I, s;
-        oo = !0, Hs.splice(0, 0, 5066061), js.splice(0, 0, "Walls"), HI = 210, wI = 120, cI = 1, MI = .6, nI = .3, ks = .6763066483560869, ys = .6, Rs = 7, fs = 96, ms = 48, 2 * (cI *= cs), LI = 1e3, QI = 70, jI = 40, Bs = 1, v["tower-kh"] = PIXI.Texture.fromImage("img/tower-kh.png"), U = {
+    function Tr() {
+        var Z, S;
+        wr = !0, dS.splice(0, 0, 5066061), AS.splice(0, 0, "Walls"), dZ = 210, lZ = 120, QZ = 1, GZ = .6, WZ = .3, $S = .6763066483560869, tS = .6, VS = 7, US = 96, pS = 48, 2 * (QZ *= QS), fZ = 1e3, qZ = 70, AZ = 40, yS = 1, g["tower-kh"] = PIXI.Texture.fromImage("img/tower-kh.png"), B = {
             shooting: !1,
             moving: !1,
             aimDirection: 0,
             moveDirection: 0
-        }, (I = document.createElement("div")).setAttribute("id", "defuse-editor-help"), I.innerHTML = '<div style="text-align:center"><div id="defuse-help-hide" class="button" onclick="$(\'#defuse-help-content\').toggle();$(\'#defuse-help-hide\').toggle();$(\'#defuse-help-show\').toggle();">Hide menu</div><div style="display:none" id="defuse-help-show" class="button" onclick="$(\'#defuse-help-content\').toggle();$(\'#defuse-help-hide\').toggle();$(\'#defuse-help-show\').toggle();">Show menu</div></div><div id="defuse-help-content"><div onclick="defly.editor.downloadMap();" class="button">Download the map file</div><div onclick="defly.editor.loadMap();" class="button">Load a map file</div><div onclick="defly.editor.mapDim();" class="button">Change map dimensions</div><div onclick="defly.editor.mapShape();" class="button">Switch map shape</div><div onclick="defly.editor.kothBounds();" class="button">Edit KOTH Bounds</div><div style="margin-top:16px;">Key bindings:</div><ul><li> WASD: move</li><li>Right-Click/space: build a tower</li><li>Left-Click: remove tower/cancel wall</li><li>+/- and mouse wheel: zoom</li><li>=: Reset zoom</li><li>F: color grey enclosed area (grey areas appear on the minimap)</li><li>G: snap cursor to grid</li><li>X: view/hide helicopter</li><li>Y: (DEFUSE) place bomb spot A</li><li>U: (DEFUSE) place bomb spot B</li><li>R: (DEFUSE) place blue spawn area</li><li>T: (DEFUSE) place red spawn area</li><li>N: Change Team Color</li><li>B: Load background image trace</li></ul></div>', document.body.appendChild(I), (I = document.createElement("div")).setAttribute("id", "defuse-editor-position"), document.body.appendChild(I), MainLoop.start(), document.getElementById("homepage").style.display = "none", a.view.style.display = "block", aI = 2, hs[Ts = 1] = 1, CC(Ts), bs[Ts].visible = !1, bs[Ts].position.set(HI / 2, wI / 2), ($I = new PIXI.Sprite(v["wall-line"])).anchor.set(.5), $I.height = ys, $I.alpha = .2, $I.tint = Wx(Ts), $I.visible = !1, A.addChild($I), (XI = new PIXI.Sprite(v.dot1)).anchor.set(.5), XI.width = 2 * MI, XI.height = 2 * MI, XI.alpha = .2, XI.tint = Wx(Ts), J.addChild(XI), AI = [128, 8, 8, 8, 2048, 8, 8], TZ(), window.addEventListener("wheel", function(I) {
-            I.deltaY < 0 && (QI /= 1.1, jI /= 1.1, Rs /= 1.1, fs /= 1.1, ms /= 1.1, TZ()), I.deltaY > 0 && (QI *= 1.1, jI *= 1.1, Rs *= 1.1, fs *= 1.1, ms *= 1.1, TZ())
+        }, (Z = document.createElement("div")).setAttribute("id", "defuse-editor-help"), Z.innerHTML = '<div style="text-align:center"><div id="defuse-help-hide" class="button" onclick="$(\'#defuse-help-content\').toggle();$(\'#defuse-help-hide\').toggle();$(\'#defuse-help-show\').toggle();">Hide menu</div><div style="display:none" id="defuse-help-show" class="button" onclick="$(\'#defuse-help-content\').toggle();$(\'#defuse-help-hide\').toggle();$(\'#defuse-help-show\').toggle();">Show menu</div></div><div id="defuse-help-content"><div onclick="defly.editor.downloadMap();" class="button">Download the map file</div><div onclick="defly.editor.loadMap();" class="button">Load a map file</div><div onclick="defly.editor.mapDim();" class="button">Change map dimensions</div><div onclick="defly.editor.mapShape();" class="button">Switch map shape</div><div onclick="defly.editor.kothBounds();" class="button">Edit KOTH Bounds</div><div style="margin-top:16px;">Key bindings:</div><ul><li> WASD: move</li><li>Right-Click/space: build a tower</li><li>Left-Click: remove tower/cancel wall</li><li>+/- and mouse wheel: zoom</li><li>=: Reset zoom</li><li>F: color grey enclosed area (grey areas appear on the minimap)</li><li>G: snap cursor to grid</li><li>X: view/hide helicopter</li><li>Y: (DEFUSE) place bomb spot A</li><li>U: (DEFUSE) place bomb spot B</li><li>R: (DEFUSE) place blue spawn area</li><li>T: (DEFUSE) place red spawn area</li><li>N: Change Team Color</li><li>B: Load background image trace</li></ul></div>', document.body.appendChild(Z), (Z = document.createElement("div")).setAttribute("id", "defuse-editor-position"), document.body.appendChild(Z), MainLoop.start(), document.getElementById("homepage").style.display = "none", K.view.style.display = "block", KZ = 2, bS[cS = 1] = 1, __(cS), nS[cS].visible = !1, nS[cS].position.set(dZ / 2, lZ / 2), (DZ = new PIXI.Sprite(g["wall-line"])).anchor.set(.5), DZ.height = tS, DZ.alpha = .2, DZ.tint = oY(cS), DZ.visible = !1, s.addChild(DZ), (MZ = new PIXI.Sprite(g.dot1)).anchor.set(.5), MZ.width = 2 * GZ, MZ.height = 2 * GZ, MZ.alpha = .2, MZ.tint = oY(cS), a.addChild(MZ), sZ = [128, 8, 8, 8, 2048, 8, 8], HJ(), window.addEventListener("wheel", function(Z) {
+            Z.deltaY < 0 && (qZ /= 1.1, AZ /= 1.1, VS /= 1.1, US /= 1.1, pS /= 1.1, HJ()), Z.deltaY > 0 && (qZ *= 1.1, AZ *= 1.1, VS *= 1.1, US *= 1.1, pS *= 1.1, HJ())
         }, !0);
-        var x = new PIXI.Container;
-        e.addChildAt(x, 0), window.addEventListener("keydown", function(I) {
-            if ("+" == I.key) QI /= 1.1, jI /= 1.1, TZ();
-            else if ("-" == I.key) QI *= 1.1, jI *= 1.1, TZ();
-            else if ("=" == I.key) QI = 70, jI = 40, TZ();
-            else if ("g" == I.key) GI = !GI;
-            else if ("x" == I.key) bs[Ts].visible = !bs[Ts].visible;
-            else if ("n" == I.key) {
-                var C = window.prompt("Team ID? 1=grey, 2 = blue, etc up to 13", Bs);
-                C && (Bs = C, $I.tint = Zx(Bs), XI.tint = Zx(Bs), $Z = null)
-            } else if ("b" == I.key)(r = document.createElement("input")).setAttribute("type", "file"), r.setAttribute("accept", "image/*"), r.addEventListener("change", function() {
-                var I = new FileReader;
-                I.onload = function() {
-                    var C = I.result,
-                        W = new Image;
-                    W.onload = function() {
-                        var I = new PIXI.Texture(new PIXI.BaseTexture(W));
-                        (s = new PIXI.Sprite(I)).anchor.set(.5, .5), s.width = HI, s.height = HI / I.width * I.height, s.height > wI && (s.height = wI, s.width = wI / I.height * I.width), s.x = HI / 2, s.y = wI / 2, x.removeChildren(), x.addChild(s)
-                    }, W.src = C
-                }, I.readAsDataURL(r.files[0])
+        var Y = new PIXI.Container;
+        O.addChildAt(Y, 0), window.addEventListener("keydown", function(Z) {
+            if ("+" == Z.key) qZ /= 1.1, AZ /= 1.1, HJ();
+            else if ("-" == Z.key) qZ *= 1.1, AZ *= 1.1, HJ();
+            else if ("=" == Z.key) qZ = 70, AZ = 40, HJ();
+            else if ("g" == Z.key) jZ = !jZ;
+            else if ("x" == Z.key) nS[cS].visible = !nS[cS].visible;
+            else if ("n" == Z.key) {
+                var _ = window.prompt("Team ID? 1=grey, 2 = blue, etc up to 13", yS);
+                _ && (yS = _, DZ.tint = JY(yS), MZ.tint = JY(yS), MJ = null)
+            } else if ("b" == Z.key)(v = document.createElement("input")).setAttribute("type", "file"), v.setAttribute("accept", "image/*"), v.addEventListener("change", function() {
+                var Z = new FileReader;
+                Z.onload = function() {
+                    var _ = Z.result,
+                        o = new Image;
+                    o.onload = function() {
+                        var Z = new PIXI.Texture(new PIXI.BaseTexture(o));
+                        (S = new PIXI.Sprite(Z)).anchor.set(.5, .5), S.width = dZ, S.height = dZ / Z.width * Z.height, S.height > lZ && (S.height = lZ, S.width = lZ / Z.height * Z.width), S.x = dZ / 2, S.y = lZ / 2, Y.removeChildren(), Y.addChild(S)
+                    }, o.src = _
+                }, Z.readAsDataURL(v.files[0])
             }), setTimeout(function() {
-                r.click()
+                v.click()
             }, 200);
-            else if ("y" == I.key) {
-                ao(0, nW((W = lW()).x), nW(W.y))
-            } else if ("u" == I.key) {
-                ao(1, nW((W = lW()).x), nW(W.y))
-            } else if ("r" == I.key) {
-                eo(1, nW((W = lW()).x) - 6, nW(W.y) - 6)
-            } else if ("t" == I.key) {
-                eo(2, nW((W = lW()).x) - 6, nW(W.y) - 6)
-            } else if ("f" == I.key) {
-                var W = lW(),
-                    Z = null,
-                    u = Number.MAX_VALUE;
-                for (var o in qs) {
-                    var N = Go((a = qs[o]).dot1.position, a.dot2.position, W).dst2(W);
-                    N < u && (u = N, Z = a)
+            else if ("y" == Z.key) {
+                Or(0, Wo((o = ZJ()).x), Wo(o.y))
+            } else if ("u" == Z.key) {
+                Or(1, Wo((o = ZJ()).x), Wo(o.y))
+            } else if ("r" == Z.key) {
+                jr(1, Wo((o = ZJ()).x) - 6, Wo(o.y) - 6)
+            } else if ("t" == Z.key) {
+                jr(2, Wo((o = ZJ()).x) - 6, Wo(o.y) - 6)
+            } else if ("f" == Z.key) {
+                var o = ZJ(),
+                    J = null,
+                    R = Number.MAX_VALUE;
+                for (var r in uS) {
+                    var w = Xr((K = uS[r]).dot1.position, K.dot2.position, o).dst2(o);
+                    w < R && (R = w, J = K)
                 }
-                if (Z) {
-                    var i, t = nZ(W, Z.dot1.position, Z.dot2.position) >= 0;
-                    if (t && Z.leftZoneId > 0) return (i = new DataView(new ArrayBuffer(5))).setInt32(1, Z.leftZoneId), void DW(i);
-                    if (!t && Z.rightZoneId > 0) return (i = new DataView(new ArrayBuffer(5))).setInt32(1, Z.rightZoneId), void DW(i);
-                    for (var a, e = [(a = Z).dot1], G = a, S = a.dot1, J = a.dot2, A = !1; J != S;)
-                        if (J != S) {
-                            var F = e.indexOf(J);
-                            if (-1 != F)
-                                for (; e.length > F;) e.splice(F, 1);
-                            var g = Jo(J),
-                                E = g.indexOf(G);
-                            if (-1 === E) return void console.error("currentLine not found");
-                            if (t) var d = g[(E - 1 + g.length) % g.length];
-                            else d = g[(E + 1) % g.length];
-                            if (e.push(J), G = d, (J = d.dot1 == J ? d.dot2 : d.dot1) == S)
-                                if (t == Fo(e)) {
-                                    A = !0;
+                if (J) {
+                    var E, m = dJ(o, J.dot1.position, J.dot2.position) >= 0;
+                    if (m && J.leftZoneId > 0) return (E = new DataView(new ArrayBuffer(5))).setInt32(1, J.leftZoneId), void Ho(E);
+                    if (!m && J.rightZoneId > 0) return (E = new DataView(new ArrayBuffer(5))).setInt32(1, J.rightZoneId), void Ho(E);
+                    for (var K, O = [(K = J).dot1], j = K, X = K.dot1, a = K.dot2, s = !1; a != X;)
+                        if (a != X) {
+                            var k = O.indexOf(a);
+                            if (-1 != k)
+                                for (; O.length > k;) O.splice(k, 1);
+                            var N = sr(a),
+                                C = N.indexOf(j);
+                            if (-1 === C) return void console.error("currentLine not found");
+                            if (m) var T = N[(C - 1 + N.length) % N.length];
+                            else T = N[(C + 1) % N.length];
+                            if (O.push(a), j = T, (a = T.dot1 == a ? T.dot2 : T.dot1) == X)
+                                if (m == Nr(O)) {
+                                    s = !0;
                                     break
                                 }
-                        } J == S && e.length > 2 && A && go(e)
+                        } a == X && O.length > 2 && s && Cr(O)
                 }
             }
-            var r
+            var v
         }, !0), window.defly.editor = {
             downloadMap: function() {
-                var I = "MAP_WIDTH " + HI + "\nMAP_HEIGHT " + wI + "\n";
-                es && (I += "KOTH " + Gs.x1 + " " + Gs.y1 + " " + Gs.x2 + " " + Gs.y2 + "\n");
-                for (var s = 0; s < io.length; s++) io[s] && (I += "t " + s + " " + io[s].x + " " + io[s].y + "\n");
-                for (s = 0; s < to.length; s++) to[s] && (I += "s " + s + " " + to[s].x + " " + to[s].y + "\n");
-                for (var x in zs) I += "d " + x + " " + zs[x].x + " " + zs[x].y + (1 == zs[x].owner ? "" : " " + zs[x].owner) + "\n";
-                for (var x in qs) I += "l " + qs[x].dot1.dotId + " " + qs[x].dot2.dotId + "\n";
-                for (var x in Ys) {
-                    I += "z";
-                    var C = Ys[x].linePath,
-                        W = C[C.length - 1];
-                    for (s = 0; s < C.length; s++) {
-                        var Z = C[s];
-                        I += " " + (Z.dot1 == W.dot1 || Z.dot1 == W.dot2 ? Z.dot1 : Z.dot2).dotId, W = Z
+                var Z = "MAP_WIDTH " + dZ + "\nMAP_HEIGHT " + lZ + "\n";
+                OS && (Z += "KOTH " + jS.x1 + " " + jS.y1 + " " + jS.x2 + " " + jS.y2 + "\n");
+                for (var S = 0; S < mr.length; S++) mr[S] && (Z += "t " + S + " " + mr[S].x + " " + mr[S].y + "\n");
+                for (S = 0; S < Kr.length; S++) Kr[S] && (Z += "s " + S + " " + Kr[S].x + " " + Kr[S].y + "\n");
+                for (var Y in xS) Z += "d " + Y + " " + xS[Y].x + " " + xS[Y].y + (1 == xS[Y].owner ? "" : " " + xS[Y].owner) + "\n";
+                for (var Y in uS) Z += "l " + uS[Y].dot1.dotId + " " + uS[Y].dot2.dotId + "\n";
+                for (var Y in LS) {
+                    Z += "z";
+                    var _ = LS[Y].linePath,
+                        o = _[_.length - 1];
+                    for (S = 0; S < _.length; S++) {
+                        var J = _[S];
+                        Z += " " + (J.dot1 == o.dot1 || J.dot1 == o.dot2 ? J.dot1 : J.dot2).dotId, o = J
                     }
-                    I += "\n"
+                    Z += "\n"
                 }
-                var u = new Blob([I], {
+                var R = new Blob([Z], {
                     type: "text/plain;charset=utf-8"
                 });
-                saveAs(u, (new Date).toISOString() + " defly.io defuse map.txt")
+                saveAs(R, (new Date).toISOString() + " defly.io defuse map.txt")
             },
             loadMap: function() {
-                var I = document.createElement("input");
-                I.setAttribute("type", "file"), I.setAttribute("accept", ".txt"), I.addEventListener("change", function() {
-                    var s = new FileReader;
-                    s.onload = function() {
-                        var x = s.result.split(/\r?\n/);
-                        J.removeChildren(), A.removeChildren(), F.removeChildren(), A.addChild($I), J.addChild(XI), zs = {}, qs = {}, Ys = {}, $Z = null, XI.visible = !0, $I.visible = !1, io = [], to = [], No = 1;
-                        for (var C = 0; C < x.length; C++) {
-                            var W = x[C].split(" ");
-                            switch (W[0]) {
+                var Z = document.createElement("input");
+                Z.setAttribute("type", "file"), Z.setAttribute("accept", ".txt"), Z.addEventListener("change", function() {
+                    var S = new FileReader;
+                    S.onload = function() {
+                        var Y = S.result.split(/\r?\n/);
+                        a.removeChildren(), s.removeChildren(), k.removeChildren(), s.addChild(DZ), a.addChild(MZ), xS = {}, uS = {}, LS = {}, MJ = null, MZ.visible = !0, DZ.visible = !1, mr = [], Kr = [], Er = 1;
+                        for (var _ = 0; _ < Y.length; _++) {
+                            var o = Y[_].split(" ");
+                            switch (o[0]) {
                                 case "MAP_WIDTH":
-                                    HI = parseFloat(W[1]);
+                                    dZ = parseFloat(o[1]);
                                     break;
                                 case "MAP_HEIGHT":
-                                    wI = parseFloat(W[1]), 1 == Xs ? wI > Math.sqrt(3) * HI / 2 ? HI = wI / Math.sqrt(3) * 2 : HI > wI / Math.sqrt(3) * 2 && (wI = Math.sqrt(3) * HI / 2) : 2 == Xs && (HI >= wI ? wI = HI : HI = wI), iC();
+                                    lZ = parseFloat(o[1]), 1 == MS ? lZ > Math.sqrt(3) * dZ / 2 ? dZ = lZ / Math.sqrt(3) * 2 : dZ > lZ / Math.sqrt(3) * 2 && (lZ = Math.sqrt(3) * dZ / 2) : 2 == MS && (dZ >= lZ ? lZ = dZ : dZ = lZ), E_();
                                     break;
                                 case "KOTH":
-                                    Gs = {
-                                        x1: parseFloat(W[1]),
-                                        y1: parseFloat(W[2]),
-                                        x2: parseFloat(W[3]),
-                                        y2: parseFloat(W[4])
-                                    }, es = !0;
+                                    jS = {
+                                        x1: parseFloat(o[1]),
+                                        y1: parseFloat(o[2]),
+                                        x2: parseFloat(o[3]),
+                                        y2: parseFloat(o[4])
+                                    }, OS = !0;
                                     break;
                                 case "t":
-                                    ao(parseInt(W[1]), parseFloat(W[2]), parseFloat(W[3]));
+                                    Or(parseInt(o[1]), parseFloat(o[2]), parseFloat(o[3]));
                                     break;
                                 case "s":
-                                    eo(parseInt(W[1]), parseFloat(W[2]), parseFloat(W[3]));
+                                    jr(parseInt(o[1]), parseFloat(o[2]), parseFloat(o[3]));
                                     break;
                                 case "d":
-                                    (Z = new DataView(new ArrayBuffer(27))).setInt32(1, parseInt(W[1])), Z.setInt32(5, W.length >= 5 ? parseInt(W[4]) : 1), Z.setFloat32(9, parseFloat(W[2])), Z.setFloat32(13, parseFloat(W[3])), Z.setUint8(17, 1), Z.setUint8(18, 1), Z.setFloat32(19, 0), Z.setInt32(23, 0), IW(Z), No = Math.max(No, parseInt(W[1]) + 1);
+                                    (J = new DataView(new ArrayBuffer(27))).setInt32(1, parseInt(o[1])), J.setInt32(5, o.length >= 5 ? parseInt(o[4]) : 1), J.setFloat32(9, parseFloat(o[2])), J.setFloat32(13, parseFloat(o[3])), J.setUint8(17, 1), J.setUint8(18, 1), J.setFloat32(19, 0), J.setInt32(23, 0), Zo(J), Er = Math.max(Er, parseInt(o[1]) + 1);
                                     break;
                                 case "l":
-                                    var Z, u = zs[parseInt(W[1])],
-                                        o = zs[parseInt(W[2])];
-                                    Ao(u, o) || ((Z = new DataView(new ArrayBuffer(25))).setInt32(1, No++), Z.setInt32(5, u.owner), Z.setInt32(9, u.dotId), Z.setInt32(13, o.dotId), Z.setInt32(17, 0), Z.setInt32(21, 0), CW(Z));
+                                    var J, R = xS[parseInt(o[1])],
+                                        r = xS[parseInt(o[2])];
+                                    kr(R, r) || ((J = new DataView(new ArrayBuffer(25))).setInt32(1, Er++), J.setInt32(5, R.owner), J.setInt32(9, R.dotId), J.setInt32(13, r.dotId), J.setInt32(17, 0), J.setInt32(21, 0), _o(J));
                                     break;
                                 case "z":
-                                    for (var N = [], i = 1; i < W.length; i++) {
-                                        var t = zs[parseInt(W[i])];
-                                        N.push(t)
+                                    for (var w = [], E = 1; E < o.length; E++) {
+                                        var m = xS[parseInt(o[E])];
+                                        w.push(m)
                                     }
-                                    go(N)
+                                    Cr(w)
                             }
                         }
-                        bs[Ts].position.set(HI / 2, wI / 2), TZ(), kC("File loaded: " + I.files[0].name)
-                    }, s.readAsText(I.files[0])
+                        nS[cS].position.set(dZ / 2, lZ / 2), HJ(), $_("File loaded: " + Z.files[0].name)
+                    }, S.readAsText(Z.files[0])
                 }), setTimeout(function() {
-                    I.click()
+                    Z.click()
                 }, 200)
             },
             mapDim: function() {
-                var I = parseInt(prompt("Map Width?", HI));
-                if (I) {
-                    var s = parseInt(prompt("Map Height?", wI));
-                    s && (HI = I, wI = s, bs[Ts].x > HI && (bs[Ts].x = HI), bs[Ts].y > wI && (bs[Ts].y = wI), TZ())
+                var Z = parseInt(prompt("Map Width?", dZ));
+                if (Z) {
+                    var S = parseInt(prompt("Map Height?", lZ));
+                    S && (dZ = Z, lZ = S, nS[cS].x > dZ && (nS[cS].x = dZ), nS[cS].y > lZ && (nS[cS].y = lZ), HJ())
                 }
             },
             mapShape: function() {
-                1 == (Xs = (Xs + 1) % 3) ? wI = Math.sqrt(3) * HI / 2 : 2 == Xs && (wI = HI), iC(), TZ()
+                1 == (MS = (MS + 1) % 3) ? lZ = Math.sqrt(3) * dZ / 2 : 2 == MS && (lZ = dZ), E_(), HJ()
             },
             kothBounds: function() {
-                var I = prompt("Upper-left X coordinate? (empty to remove KOTH bounds)", Gs ? Gs.x1 : "");
-                if (I) {
-                    var s = prompt("Upper-left Y coordinate?", Gs ? Gs.y1 : ""),
-                        x = prompt("Lower-right X coordinate?", Gs ? Gs.x2 : ""),
-                        C = prompt("Lower-right Y coordinate?", Gs ? Gs.y2 : "");
-                    Gs = {
-                        x1: parseFloat(I),
-                        y1: parseFloat(s),
-                        x2: parseFloat(x),
-                        y2: parseFloat(C)
-                    }, es = !0
-                } else Gs = null, es = !1;
-                for (var W in zs) {
-                    var Z = zs[W],
-                        u = 15642415 == Z.tint;
-                    if (es && Z.x >= Gs.x1 && Z.x <= Gs.x2 && Z.y >= Gs.y1 && Z.y <= Gs.y2 ? (Z.texture = v["tower-kh"], Z.tint = 15642415) : (Z.texture = v.dot1, Z.tint = 5066061), u ^ 15642415 == Z.tint)
-                        for (var o = 0; o < Z.lines.length; o++) Z.lines[o].tint = Z.tint
+                var Z = prompt("Upper-left X coordinate? (empty to remove KOTH bounds)", jS ? jS.x1 : "");
+                if (Z) {
+                    var S = prompt("Upper-left Y coordinate?", jS ? jS.y1 : ""),
+                        Y = prompt("Lower-right X coordinate?", jS ? jS.x2 : ""),
+                        _ = prompt("Lower-right Y coordinate?", jS ? jS.y2 : "");
+                    jS = {
+                        x1: parseFloat(Z),
+                        y1: parseFloat(S),
+                        x2: parseFloat(Y),
+                        y2: parseFloat(_)
+                    }, OS = !0
+                } else jS = null, OS = !1;
+                for (var o in xS) {
+                    var J = xS[o],
+                        R = 15642415 == J.tint;
+                    if (OS && J.x >= jS.x1 && J.x <= jS.x2 && J.y >= jS.y1 && J.y <= jS.y2 ? (J.texture = g["tower-kh"], J.tint = 15642415) : (J.texture = g.dot1, J.tint = 5066061), R ^ 15642415 == J.tint)
+                        for (var r = 0; r < J.lines.length; r++) J.lines[r].tint = J.tint
                 }
             }
         }
     }
 
-    function ro() {
+    function vr() {
         try {
-            if (C && (document.getElementById("server-block").style.display = "block"), document.getElementById("preferred-server-block").style.display = "none", I = null, window.location.hash.length > 0) {
-                var s = window.location.hash.replace(/^#/, "").split("-");
-                s.length >= 2 && (aI = parseInt(s.shift()), Bx(), I = s.join("-"), document.getElementById("server-block").style.display = "none", document.getElementById("preferred-server-block").style.display = "block", document.getElementById("preferred-server").innerHTML = I)
+            if (_ && (document.getElementById("server-block").style.display = "block"), document.getElementById("preferred-server-block").style.display = "none", Z = null, window.location.hash.length > 0) {
+                var S = window.location.hash.replace(/^#/, "").split("-");
+                S.length >= 2 && (KZ = parseInt(S.shift()), yY(), Z = S.join("-"), document.getElementById("server-block").style.display = "none", document.getElementById("preferred-server-block").style.display = "block", document.getElementById("preferred-server").innerHTML = Z)
             }
-        } catch (I) {
-            console.error(I)
+        } catch (Z) {
+            console.error(Z)
         }
     }
 
-    function vo() {
+    function gr() {
         document.getElementById("homepage-loading").style.display = "block", document.getElementById("homepage-loaded").style.display = "none";
-        var I = new XMLHttpRequest;
-        I.onreadystatechange = function() {
-            if (4 == I.readyState && 200 == I.status) {
-                var s = I.responseText.split("\n"),
-                    C = document.createElement("div");
-                C.className = "tourney-mgr", (W = document.createElement("div")).className = "title", W.innerHTML = "My Team", C.appendChild(W);
-                for (var W, Z = !1, u = 0; u < s.length - 1; u += 3) s[u] == _u && 1 == s[u + 2] && (Z = !0);
-                for (u = 0; u < s.length - 1; u += 3) {
-                    var o = document.createElement("div");
-                    if (o.className = "member", o.innerHTML = (1 == s[u + 2] ? "CAPTAIN - " : "") + s[u + 1], Z && 1 != s[u + 2]) {
-                        var N = document.createElement("span");
-                        N.className = "button remove", N.innerHTML = "Remove", o.appendChild(N), N.addEventListener("click", function(I) {
+        var Z = new XMLHttpRequest;
+        Z.onreadystatechange = function() {
+            if (4 == Z.readyState && 200 == Z.status) {
+                var S = Z.responseText.split("\n"),
+                    _ = document.createElement("div");
+                _.className = "tourney-mgr", (o = document.createElement("div")).className = "title", o.innerHTML = "My Team", _.appendChild(o);
+                for (var o, J = !1, R = 0; R < S.length - 1; R += 3) S[R] == xR && 1 == S[R + 2] && (J = !0);
+                for (R = 0; R < S.length - 1; R += 3) {
+                    var r = document.createElement("div");
+                    if (r.className = "member", r.innerHTML = (1 == S[R + 2] ? "CAPTAIN - " : "") + S[R + 1], J && 1 != S[R + 2]) {
+                        var w = document.createElement("span");
+                        w.className = "button remove", w.innerHTML = "Remove", r.appendChild(w), w.addEventListener("click", function(Z) {
                             return function() {
                                 if (window.confirm("Really remove this player from the team?")) {
-                                    var s = new XMLHttpRequest;
-                                    s.onreadystatechange = function() {
-                                        4 == s.readyState && 200 == s.status ? vo() : 4 == s.readyState && 200 != s.status && s.onerror(s.status)
-                                    }, s.onerror = function(I) {
-                                        kC((new Date).toLocaleTimeString() + " - Error removing member", "error")
-                                    }, s.open("GET", M + "/tourney/remove?s=" + (x || "") + "&u=" + I, !0), s.send(null)
+                                    var S = new XMLHttpRequest;
+                                    S.onreadystatechange = function() {
+                                        4 == S.readyState && 200 == S.status ? gr() : 4 == S.readyState && 200 != S.status && S.onerror(S.status)
+                                    }, S.onerror = function(Z) {
+                                        $_((new Date).toLocaleTimeString() + " - Error removing member", "error")
+                                    }, S.open("GET", G + "/tourney/remove?s=" + (Y || "") + "&u=" + Z, !0), S.send(null)
                                 }
                             }
-                        }(s[u]))
+                        }(S[R]))
                     }
-                    C.appendChild(o)
+                    _.appendChild(r)
                 }
-                if (Z)(W = document.createElement("div")).className = "bottom button", W.innerHTML = "Generate invite link", C.appendChild(W), W.addEventListener("click", function() {
-                    var I = new XMLHttpRequest;
-                    I.onreadystatechange = function() {
-                        if (4 == I.readyState && 200 == I.status) {
-                            C.removeChild(W);
-                            var s = document.createElement("div");
-                            s.className = "bottom link", s.innerHTML = "http://" + document.location.host + "?tourney-join&c=" + I.responseText, C.appendChild(s)
-                        } else 4 == I.readyState && 200 != I.status && I.onerror(I.status)
-                    }, I.onerror = function(I) {
-                        kC((new Date).toLocaleTimeString() + " - Error changing invite code", "error")
-                    }, I.open("GET", M + "/tourney/changeInviteCode?s=" + (x || ""), !0), I.send(null)
+                if (J)(o = document.createElement("div")).className = "bottom button", o.innerHTML = "Generate invite link", _.appendChild(o), o.addEventListener("click", function() {
+                    var Z = new XMLHttpRequest;
+                    Z.onreadystatechange = function() {
+                        if (4 == Z.readyState && 200 == Z.status) {
+                            _.removeChild(o);
+                            var S = document.createElement("div");
+                            S.className = "bottom link", S.innerHTML = "http://" + document.location.host + "?tourney-join&c=" + Z.responseText, _.appendChild(S)
+                        } else 4 == Z.readyState && 200 != Z.status && Z.onerror(Z.status)
+                    }, Z.onerror = function(Z) {
+                        $_((new Date).toLocaleTimeString() + " - Error changing invite code", "error")
+                    }, Z.open("GET", G + "/tourney/changeInviteCode?s=" + (Y || ""), !0), Z.send(null)
                 });
-                document.body.appendChild(C)
+                document.body.appendChild(_)
             }
-        }, I.onerror = function(I) {
-            kC((new Date).toLocaleTimeString() + " - Error fetching team members", "error")
-        }, I.open("GET", M + "/tourney/members?s=" + (x || ""), !0), I.send(null)
+        }, Z.onerror = function(Z) {
+            $_((new Date).toLocaleTimeString() + " - Error fetching team members", "error")
+        }, Z.open("GET", G + "/tourney/members?s=" + (Y || ""), !0), Z.send(null)
     }
 
-    function Uo() {
-        var I = "none";
-        a && a.view && (document.body.removeChild(a.view), I = a.view.style.display);
-        PIXI.utils.isWebGLSupported(), (a = PIXI.autoDetectRenderer(256, 256, {
+    function Br() {
+        var Z = "none";
+        K && K.view && (document.body.removeChild(K.view), Z = K.view.style.display);
+        PIXI.utils.isWebGLSupported(), (K = PIXI.autoDetectRenderer(256, 256, {
             antialias: !0,
             transparent: !1,
-            resolution: l * ix
-        })).plugins.interaction && (a.plugins.interaction.destroy(), a.plugins.interaction = null), a.plugins.accessibility && (a.plugins.accessibility.destroy(), a.plugins.accessibility = null), a.view.addEventListener("touchstart", EZ, !0), a.view.addEventListener("touchmove", EZ, !0), a.view.addEventListener("touchend", EZ, !0), a.view.addEventListener("touchcancel", EZ, !0), a.view.addEventListener("mousedown", UZ, !0), a.view.tabindex = 1, a.backgroundColor = Ws ? 0 : 15923199, a.view.style.position = "fixed", a.view.style.top = 0, a.view.style.left = 0, a.autoResize = !0, a.view.style.display = I, a.view.oncontextmenu = function(I) {
-            return I.preventDefault(), !1
-        }, document.body.appendChild(a.view), TZ(), a.view.addEventListener("webglcontextlost", function(I) {
-            console.error("WebGL context lost", I), I.preventDefault(), MainLoop.stop(), setTimeout(function() {
-                a.view.getContext("webgl").isContextLost() && (console.error("Context was not restored after 1 second, recreating"), Uo(), MainLoop.start())
+            resolution: h * EY
+        })).plugins.interaction && (K.plugins.interaction.destroy(), K.plugins.interaction = null), K.plugins.accessibility && (K.plugins.accessibility.destroy(), K.plugins.accessibility = null), K.view.addEventListener("touchstart", TJ, !0), K.view.addEventListener("touchmove", TJ, !0), K.view.addEventListener("touchend", TJ, !0), K.view.addEventListener("touchcancel", TJ, !0), K.view.addEventListener("mousedown", VJ, !0), K.view.tabindex = 1, K.backgroundColor = oS ? 0 : 15923199, K.view.style.position = "fixed", K.view.style.top = 0, K.view.style.left = 0, K.autoResize = !0, K.view.style.display = Z, K.view.oncontextmenu = function(Z) {
+            return Z.preventDefault(), !1
+        }, document.body.appendChild(K.view), HJ(), K.view.addEventListener("webglcontextlost", function(Z) {
+            console.error("WebGL context lost", Z), Z.preventDefault(), MainLoop.stop(), setTimeout(function() {
+                K.view.getContext("webgl").isContextLost() && (console.error("Context was not restored after 1 second, recreating"), Br(), MainLoop.start())
             }, 1e3)
-        }, !1), a.view.addEventListener("webglcontextrestored", function() {
-            console.error("WebGL context restored, recreating"), Uo(), MainLoop.start()
+        }, !1), K.view.addEventListener("webglcontextrestored", function() {
+            console.error("WebGL context restored, recreating"), Br(), MainLoop.start()
         }, !1)
     }
 
-    function Ro() {
-        if ("https:" === window.location.protocol.toLowerCase()) M = M.replace("http", "https");
+    function Vr() {
+        if ("https:" === window.location.protocol.toLowerCase()) G = G.replace("http", "https");
         else {
-            var I = document.getElementById("fb-login-button"),
-                s = document.createElement("div");
-            s.innerHTML = '<div>SSL is required <a class="button" style="color:white" href="' + window.location.href.replace("http", "https") + '">Reload with SSL</a></div>', I.parentNode.replaceChild(s, I)
+            var Z = document.getElementById("fb-login-button"),
+                S = document.createElement("div");
+            S.innerHTML = '<div>SSL is required <a class="button" style="color:white" href="' + window.location.href.replace("http", "https") + '">Reload with SSL</a></div>', Z.parentNode.replaceChild(S, Z)
         }
         "undefined" != typeof Raven && Raven.config && Raven.config(window.location.protocol + "//cac34828573e48f99770f28f2b29bd17@sentry.defly.io/7", {
             whitelistUrls: ["scripts.js", "game.js"]
         }).install();
         try {
-            var C = localStorage.getItem("quality");
-            C && ex(C)
-        } catch (I) {
-            console.error(I)
+            var _ = localStorage.getItem("quality");
+            _ && OY(_)
+        } catch (Z) {
+            console.error(Z)
         }
         try {
             if ("undefined" != typeof Storage) {
-                if (localStorage.getItem("username") && (document.getElementById("username").value = localStorage.getItem("username")), localStorage.getItem("sessionId") && (x = localStorage.getItem("sessionId")), localStorage.getItem("trackPadFriendlyMode") && (ss = "1" == localStorage.getItem("trackPadFriendlyMode"), document.getElementById("controls-tpfm1").checked = !ss, document.getElementById("controls-tpfm2").checked = ss), localStorage.getItem("moveWithMouse") && (xs = "1" == localStorage.getItem("moveWithMouse"), document.getElementById("controls-mwm").checked = xs, Cs = xs), localStorage.getItem("colorBlindMode") && (Ss = "1" == localStorage.getItem("colorBlindMode"), document.getElementById("controls-colorblind").checked = Ss), localStorage.getItem("darkTheme") && (Ws = "1" == localStorage.getItem("darkTheme"), document.getElementById("theme-radio1").checked = !Ws, document.getElementById("theme-radio2").checked = Ws), localStorage.getItem("chatDisabled") && (Zs = "1" == localStorage.getItem("chatDisabled"), document.getElementById("settings-disablechat").checked = Zs), localStorage.getItem("infologDisabled") && (us = "1" == localStorage.getItem("infologDisabled"), document.getElementById("settings-disableinfolog").checked = us), localStorage.getItem("chatSize")) {
-                    os = parseInt(localStorage.getItem("chatSize"));
-                    for (var W = document.getElementsByName("settings-chat-size"), Z = 0; Z < W.length; Z++) W[Z].checked = W[Z].value == os;
-                    document.getElementById("chat-history").className = "size" + os
+                if (localStorage.getItem("username") && (document.getElementById("username").value = localStorage.getItem("username")), localStorage.getItem("sessionId") && (Y = localStorage.getItem("sessionId")), localStorage.getItem("trackPadFriendlyMode") && (SS = "1" == localStorage.getItem("trackPadFriendlyMode"), document.getElementById("controls-tpfm1").checked = !SS, document.getElementById("controls-tpfm2").checked = SS), localStorage.getItem("moveWithMouse") && (YS = "1" == localStorage.getItem("moveWithMouse"), document.getElementById("controls-mwm").checked = YS, _S = YS), localStorage.getItem("colorBlindMode") && (XS = "1" == localStorage.getItem("colorBlindMode"), document.getElementById("controls-colorblind").checked = XS), localStorage.getItem("darkTheme") && (oS = "1" == localStorage.getItem("darkTheme"), document.getElementById("theme-radio1").checked = !oS, document.getElementById("theme-radio2").checked = oS), localStorage.getItem("chatDisabled") && (JS = "1" == localStorage.getItem("chatDisabled"), document.getElementById("settings-disablechat").checked = JS), localStorage.getItem("infologDisabled") && (RS = "1" == localStorage.getItem("infologDisabled"), document.getElementById("settings-disableinfolog").checked = RS), localStorage.getItem("chatSize")) {
+                    rS = parseInt(localStorage.getItem("chatSize"));
+                    for (var o = document.getElementsByName("settings-chat-size"), J = 0; J < o.length; J++) o[J].checked = o[J].value == rS;
+                    document.getElementById("chat-history").className = "size" + rS
                 }
-                localStorage.getItem("gameMode") && (aI = parseInt(localStorage.getItem("gameMode")), Bx()), localStorage.getItem("initialGameMode") ? vs = parseInt(localStorage.getItem("initialGameMode")) : localStorage.getItem("gameMode") || (vs = Math.random() < .5 ? 0 : 3, localStorage.setItem("initialGameMode", vs), localStorage.setItem("gameMode", vs), aI = vs, Bx())
+                localStorage.getItem("gameMode") && (KZ = parseInt(localStorage.getItem("gameMode")), yY()), localStorage.getItem("initialGameMode") ? gS = parseInt(localStorage.getItem("initialGameMode")) : localStorage.getItem("gameMode") || (gS = Math.random() < .5 ? 0 : 3, localStorage.setItem("initialGameMode", gS), localStorage.setItem("gameMode", gS), KZ = gS, yY())
             }
-        } catch (I) {
-            console.error(I)
+        } catch (Z) {
+            console.error(Z)
         }
-        PIXI.ticker.shared.stop(), Uo(), window.addEventListener("resize", TZ, !0), window.addEventListener("mousemove", FZ, !0), window.addEventListener("mouseup", RZ, !0), window.addEventListener("wheel", YZ, !0), window.addEventListener("keydown", pZ, !0), window.addEventListener("keyup", zZ, !0), window.oncontextmenu = function(I) {
-            return I.preventDefault(), !1
+        PIXI.ticker.shared.stop(), Br(), window.addEventListener("resize", HJ, !0), window.addEventListener("mousemove", NJ, !0), window.addEventListener("mouseup", UJ, !0), window.addEventListener("wheel", nJ, !0), window.addEventListener("keydown", eJ, !0), window.addEventListener("keyup", uJ, !0), window.oncontextmenu = function(Z) {
+            return Z.preventDefault(), !1
         }, window.addEventListener("blur", function() {
-            0 != j && (fZ = [!1, !1, !1, !1], VZ())
-        }, !0), document.getElementById("chat-input").onpaste = function(I) {
-            I.preventDefault()
-        }, e = new PIXI.Container, G = new PIXI.Container, e.addChild(G), S = new PIXI.Container, e.addChild(S), F = new PIXI.Container, e.addChild(F), A = new PIXI.Container, e.addChild(A), J = new PIXI.Container, e.addChild(J), E = new PIXI.Container, e.addChild(E), g = new PIXI.Container, e.addChild(g), d = new PIXI.Container, e.addChild(d), r = new PIXI.Container, e.addChild(r), q = new PIXI.Container, z = new PIXI.Container, MainLoop.setBegin(BZ).setUpdate(lZ).setDraw(iu).setEnd(Gu), PIXI.loader.add("img/spritesheet9.json").add("img/spritesheet92.json").add("wall-line", "img/line1.png").add("gridpixel", "img/gridpixel.png").load(function(I, s) {
-            for (var x in -1 == window.location.search.indexOf("playEpicTourney") && -1 == window.location.search.indexOf("streamEpicTourney") || (Js = !0, As = !0, aI = 1, document.getElementById("gamemode-0").style.display = "none", document.getElementById("gamemode-2").style.display = "none", document.getElementById("gamemode-3").style.display = "none", document.getElementById("gamemode-1").classList.add("selected"), document.getElementById("gamemode-4") && (document.getElementById("gamemode-4").style.display = "none")), "?streamTourney" != window.location.search && "?streamEpicTourney" != window.location.search || (Fs = !0, Js = !0), px(), s)
-                if (s[x].error) {
-                    console.error("error loading asset", s[x].error), alert(ox("Error loading game images, please reload the page. Clear your browser cache if this happens repeatedly.")), s[x].error;
+            0 != A && (pJ = [!1, !1, !1, !1], iJ())
+        }, !0), document.getElementById("chat-input").onpaste = function(Z) {
+            Z.preventDefault()
+        }, O = new PIXI.Container, j = new PIXI.Container, O.addChild(j), X = new PIXI.Container, O.addChild(X), k = new PIXI.Container, O.addChild(k), s = new PIXI.Container, O.addChild(s), a = new PIXI.Container, O.addChild(a), C = new PIXI.Container, O.addChild(C), N = new PIXI.Container, O.addChild(N), T = new PIXI.Container, O.addChild(T), v = new PIXI.Container, O.addChild(v), u = new PIXI.Container, x = new PIXI.Container, MainLoop.setBegin(bJ).setUpdate(ZR).setDraw(mR).setEnd(XR), PIXI.loader.add("img/spritesheet9.json").add("img/spritesheet92.json").add("wall-line", "img/line1.png").add("gridpixel", "img/gridpixel.png").load(function(Z, S) {
+            for (var Y in -1 == window.location.search.indexOf("playEpicTourney") && -1 == window.location.search.indexOf("streamEpicTourney") || (aS = !0, sS = !0, KZ = 1, document.getElementById("gamemode-0").style.display = "none", document.getElementById("gamemode-2").style.display = "none", document.getElementById("gamemode-3").style.display = "none", document.getElementById("gamemode-1").classList.add("selected"), document.getElementById("gamemode-4") && (document.getElementById("gamemode-4").style.display = "none")), "?streamTourney" != window.location.search && "?streamEpicTourney" != window.location.search || (kS = !0, aS = !0), zY(), S)
+                if (S[Y].error) {
+                    console.error("error loading asset", S[Y].error), alert(rY("Error loading game images, please reload the page. Clear your browser cache if this happens repeatedly.")), S[Y].error;
                     break
-                } for (var C in v = PIXI.loader.resources["img/spritesheet9.json"].textures, PIXI.loader.resources["img/spritesheet92.json"].textures) v[C] = PIXI.loader.resources["img/spritesheet92.json"].textures[C];
-            var W;
-            v.gridpixel = PIXI.loader.resources.gridpixel.texture, v.gridpixel.baseTexture.mipmap = !1, v["wall-line"] = PIXI.loader.resources["wall-line"].texture, (11 == (W = new Date).getMonth() && W.getDate() >= 21 && W.getDate() <= 27 || -1 != window.location.search.indexOf("winter")) && (v.dot1 = PIXI.Texture.fromImage("img/tower-gift.png"), v.shoot = PIXI.Texture.fromImage("img/bullet-snowflake.png"), v["death-blast"] = PIXI.Texture.fromImage("img/death-santa.png"), is = !0), -1 != window.location.search.indexOf("starwars") && (v.dot1 = PIXI.Texture.fromImage("img/tower-starwars.png"), v.shoot = PIXI.Texture.fromImage("img/bullet-laser.png"), v["death-blast"] = PIXI.Texture.fromImage("img/death-starwars.png"), ts = !0, Ws = !0, a.backgroundColor = Ws ? 0 : 15923199, TZ(), eC()), -1 != window.location.search.indexOf("paper") && (v.dot1 = PIXI.Texture.fromImage("img/tower-paper.png"), v.shoot = PIXI.Texture.fromImage("img/bullet-paper.png"), v["wall-line"] = PIXI.Texture.fromImage("img/wall-line-paper.png"), v["death-blast"] = PIXI.Texture.fromImage("img/explosion-paper.png"), as = !0), Ex && document.getElementById("youtube-live") && (document.getElementById("youtube-live").style.display = "none"), document.getElementById("homepage-loading").style.display = "none", document.getElementById("homepage-loaded").style.display = "block", ro(), $u(), (Y = new PIXI.Sprite(v.shoot)).visible = !1, Y.tint = 0, Y.alpha = .1, Y.anchor.set(.5), (b = new PIXI.Sprite(v.shoot)).visible = !1, b.tint = 0, b.alpha = .3, b.anchor.set(.5), q.addChild(Y), q.addChild(b), (T = new PIXI.Sprite(v.shoot)).visible = !1, T.tint = 0, T.alpha = .1, T.anchor.set(.5), (D = new PIXI.Sprite(v.shoot)).visible = !1, D.tint = 0, D.alpha = .3, D.anchor.set(.5), q.addChild(T), q.addChild(D), (B = new PIXI.Sprite(v.build)).visible = !1, B.anchor.set(.5), B.alpha = .5, q.addChild(B), Ns && PIXI.loader.resources.pumpkin && (v.dot1 = PIXI.loader.resources.dot1s.texture, v.debris = PIXI.loader.resources.debris.texture, v.shoot = PIXI.loader.resources.pumpkin.texture), is && PIXI.loader.resources["tower-winter"] && (v.dot1 = PIXI.loader.resources["tower-winter"].texture, v.debris = PIXI.loader.resources["debris-winter"].texture), "?skin-editor" == window.location.search && lu(), PIXI.loader.add("add-skins", "img/add-skins.js").load(function(I, s) {
-                var x = JSON.parse(s["add-skins"].data),
-                    C = [];
-                for (var W in x.images) v[W] = PIXI.Texture.fromImage(x.images[W]);
-                for (var Z in x.specs) jx[parseInt(Z)] = x.specs[Z], C.push(parseInt(Z));
+                } for (var _ in g = PIXI.loader.resources["img/spritesheet9.json"].textures, PIXI.loader.resources["img/spritesheet92.json"].textures) g[_] = PIXI.loader.resources["img/spritesheet92.json"].textures[_];
+            var o;
+            g.gridpixel = PIXI.loader.resources.gridpixel.texture, g.gridpixel.baseTexture.mipmap = !1, g["wall-line"] = PIXI.loader.resources["wall-line"].texture, (11 == (o = new Date).getMonth() && o.getDate() >= 21 && o.getDate() <= 27 || -1 != window.location.search.indexOf("winter")) && (g.dot1 = PIXI.Texture.fromImage("img/tower-gift.png"), g.shoot = PIXI.Texture.fromImage("img/bullet-snowflake.png"), g["death-blast"] = PIXI.Texture.fromImage("img/death-santa.png"), ES = !0), -1 != window.location.search.indexOf("starwars") && (g.dot1 = PIXI.Texture.fromImage("img/tower-starwars.png"), g.shoot = PIXI.Texture.fromImage("img/bullet-laser.png"), g["death-blast"] = PIXI.Texture.fromImage("img/death-starwars.png"), mS = !0, oS = !0, K.backgroundColor = oS ? 0 : 15923199, HJ(), O_()), -1 != window.location.search.indexOf("paper") && (g.dot1 = PIXI.Texture.fromImage("img/tower-paper.png"), g.shoot = PIXI.Texture.fromImage("img/bullet-paper.png"), g["wall-line"] = PIXI.Texture.fromImage("img/wall-line-paper.png"), g["death-blast"] = PIXI.Texture.fromImage("img/explosion-paper.png"), KS = !0), CY && document.getElementById("youtube-live") && (document.getElementById("youtube-live").style.display = "none"), document.getElementById("homepage-loading").style.display = "none", document.getElementById("homepage-loaded").style.display = "block", vr(), MR(), (L = new PIXI.Sprite(g.shoot)).visible = !1, L.tint = 0, L.alpha = .1, L.anchor.set(.5), (n = new PIXI.Sprite(g.shoot)).visible = !1, n.tint = 0, n.alpha = .3, n.anchor.set(.5), u.addChild(L), u.addChild(n), (c = new PIXI.Sprite(g.shoot)).visible = !1, c.tint = 0, c.alpha = .1, c.anchor.set(.5), (H = new PIXI.Sprite(g.shoot)).visible = !1, H.tint = 0, H.alpha = .3, H.anchor.set(.5), u.addChild(c), u.addChild(H), (b = new PIXI.Sprite(g.build)).visible = !1, b.anchor.set(.5), b.alpha = .5, u.addChild(b), wS && PIXI.loader.resources.pumpkin && (g.dot1 = PIXI.loader.resources.dot1s.texture, g.debris = PIXI.loader.resources.debris.texture, g.shoot = PIXI.loader.resources.pumpkin.texture), ES && PIXI.loader.resources["tower-winter"] && (g.dot1 = PIXI.loader.resources["tower-winter"].texture, g.debris = PIXI.loader.resources["debris-winter"].texture), "?skin-editor" == window.location.search && Zr(), PIXI.loader.add("add-skins", "img/add-skins.js").load(function(Z, S) {
+                var Y = JSON.parse(S["add-skins"].data),
+                    _ = [];
+                for (var o in Y.images) g[o] = PIXI.Texture.fromImage(Y.images[o]);
+                for (var J in Y.specs) AY[parseInt(J)] = Y.specs[J], _.push(parseInt(J));
                 setTimeout(function() {
-                    for (var I in $u(!0), mI)
-                        if (bs[I] && -1 !== C.indexOf(mI[I])) {
-                            var s = bs[I];
-                            r.removeChild(s), E.removeChild(s.usernameText), s.shield && r.removeChild(s.shield), s.badge && E.removeChild(s.badge), CC(I), bs[I].x = s.x, bs[I].y = s.y, bs[I].sx = s.sx, bs[I].sy = s.sy
+                    for (var Z in MR(!0), pZ)
+                        if (nS[Z] && -1 !== _.indexOf(pZ[Z])) {
+                            var S = nS[Z];
+                            v.removeChild(S), C.removeChild(S.usernameText), S.shield && v.removeChild(S.shield), S.badge && C.removeChild(S.badge), __(Z), nS[Z].x = S.x, nS[Z].y = S.y, nS[Z].sx = S.sx, nS[Z].sy = S.sy
                         }
                 })
-            }), "?defuse-editor" == window.location.search && Eo(), document.getElementById("preferred-server-block").getElementsByClassName("close")[0].addEventListener("click", function() {
-                history.replaceState("", document.title, window.location.pathname + window.location.search), ro()
+            }), "?defuse-editor" == window.location.search && Tr(), document.getElementById("preferred-server-block").getElementsByClassName("close")[0].addEventListener("click", function() {
+                history.replaceState("", document.title, window.location.pathname + window.location.search), vr()
             }), document.getElementById("redo-last-upgrade-yes-button") && document.getElementById("redo-last-upgrade-yes-button").addEventListener("click", function() {
-                aC(!0)
+                K_(!0)
             }), document.getElementById("redo-last-upgrade-no-button") && document.getElementById("redo-last-upgrade-no-button").addEventListener("click", function() {
-                aC(!1)
+                K_(!1)
             })
         }), $(function() {
-            $("#server").selectmenu().data("ui-selectmenu")._renderItem = function(I, s) {
-                var x = $("<li>"),
-                    C = $("<div>", {
-                        text: s.label
+            $("#server").selectmenu().data("ui-selectmenu")._renderItem = function(Z, S) {
+                var Y = $("<li>"),
+                    _ = $("<div>", {
+                        text: S.label
                     });
-                return s.element.attr("data-ping") && $("<span>", {
+                return S.element.attr("data-ping") && $("<span>", {
                     class: "ping",
-                    text: "(ping: " + s.element.attr("data-ping") + ")"
-                }).appendTo(C), x.append(C).appendTo(I)
+                    text: "(ping: " + S.element.attr("data-ping") + ")"
+                }).appendTo(_), Y.append(_).appendTo(Z)
             }
         });
         try {
-            "undefined" != typeof Storage && (localStorage.getItem("gamesPlayed") && (iI = localStorage.getItem("gamesPlayed")), localStorage.getItem("showTuto") && (VI = "true" == localStorage.getItem("showTuto")), localStorage.getItem("playerSkin") && (kI = parseInt(localStorage.getItem("playerSkin"))), localStorage.getItem("playerSkinColor") && (yI = parseInt(localStorage.getItem("playerSkinColor"))), localStorage.getItem("skinFacebookLiked") && (yu.skinFacebookLiked = "true" == localStorage.getItem("skinFacebookLiked")), localStorage.getItem("skinTwitterTweet") && (yu.skinTwitterTweet = "true" == localStorage.getItem("skinTwitterTweet")), localStorage.getItem("skinTwitterFollow") && (yu.skinTwitterFollow = "true" == localStorage.getItem("skinTwitterFollow")), localStorage.getItem("skinYoutubeSubscribe") && (yu.skinYoutubeSubscribe = "true" == localStorage.getItem("skinYoutubeSubscribe")), localStorage.getItem("skinFacebookShare") && (yu.skinFacebookShare = "true" == localStorage.getItem("skinFacebookShare")), localStorage.getItem("skinDiscordJoin") && (yu.skinDiscordJoin = "true" == localStorage.getItem("skinDiscordJoin")))
-        } catch (I) {
-            console.log(I)
+            "undefined" != typeof Storage && (localStorage.getItem("gamesPlayed") && (EZ = localStorage.getItem("gamesPlayed")), localStorage.getItem("showTuto") && (IZ = "true" == localStorage.getItem("showTuto")), localStorage.getItem("playerSkin") && ($Z = parseInt(localStorage.getItem("playerSkin"))), localStorage.getItem("playerSkinColor") && (tZ = parseInt(localStorage.getItem("playerSkinColor"))), localStorage.getItem("skinFacebookLiked") && (IR.skinFacebookLiked = "true" == localStorage.getItem("skinFacebookLiked")), localStorage.getItem("skinTwitterTweet") && (IR.skinTwitterTweet = "true" == localStorage.getItem("skinTwitterTweet")), localStorage.getItem("skinTwitterFollow") && (IR.skinTwitterFollow = "true" == localStorage.getItem("skinTwitterFollow")), localStorage.getItem("skinYoutubeSubscribe") && (IR.skinYoutubeSubscribe = "true" == localStorage.getItem("skinYoutubeSubscribe")), localStorage.getItem("skinFacebookShare") && (IR.skinFacebookShare = "true" == localStorage.getItem("skinFacebookShare")), localStorage.getItem("skinDiscordJoin") && (IR.skinDiscordJoin = "true" == localStorage.getItem("skinDiscordJoin")))
+        } catch (Z) {
+            console.log(Z)
         }
-        gx = function() {
-            var I = !1,
-                s = document.createElement("div");
-            if (s.setAttribute("class", "pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links ad-text adSense adBlock adContent adBanner"), s.setAttribute("style", "width: 1px ! important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px !important;"), window.document.body.appendChild(s), null !== window.document.body.getAttribute("abp") || null === s.offsetParent || 0 == s.offsetHeight || 0 == s.offsetLeft || 0 == s.offsetTop || 0 == s.offsetWidth || 0 == s.clientHeight || 0 == s.clientWidth) I = !0;
+        NY = function() {
+            var Z = !1,
+                S = document.createElement("div");
+            if (S.setAttribute("class", "pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links ad-text adSense adBlock adContent adBanner"), S.setAttribute("style", "width: 1px ! important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px !important;"), window.document.body.appendChild(S), null !== window.document.body.getAttribute("abp") || null === S.offsetParent || 0 == S.offsetHeight || 0 == S.offsetLeft || 0 == S.offsetTop || 0 == S.offsetWidth || 0 == S.clientHeight || 0 == S.clientWidth) Z = !0;
             else if (void 0 !== window.getComputedStyle) {
-                var x = window.getComputedStyle(s, null);
-                !x || "none" != x.getPropertyValue("display") && "hidden" != x.getPropertyValue("visibility") || (I = !0)
+                var Y = window.getComputedStyle(S, null);
+                !Y || "none" != Y.getPropertyValue("display") && "hidden" != Y.getPropertyValue("visibility") || (Z = !0)
             }
-            return window.document.body.removeChild(s), I
-        }(), document.getElementById("tuto-video").setAttribute("src", Ex ? "img/tutorial-mobile.mp4" : "img/tutorial.mp4"), V = document.getElementById("minimap-canvas"), K = document.getElementById("minimap-canvas").getContext("2d"), (vx || Ux || fx || Rx) && document.getElementById("portal-button") && (document.getElementById("portal-button").style.display = "none");
+            return window.document.body.removeChild(S), Z
+        }(), document.getElementById("tuto-video").setAttribute("src", CY ? "img/tutorial-mobile.mp4" : "img/tutorial.mp4"), I = document.getElementById("minimap-canvas"), i = document.getElementById("minimap-canvas").getContext("2d"), (gY || BY || UY || VY) && document.getElementById("portal-button") && (document.getElementById("portal-button").style.display = "none");
         try {
             (navigator.language.startsWith("ru") || navigator.language.startsWith("uk")) && (document.getElementById("portal-button").getElementsByTagName("a")[0].href = "http://vseigru.net", document.getElementById("portal-button").getElementsByTagName("a")[0].innerHTML = "More Games")
-        } catch (I) {
-            console.error(I)
+        } catch (Z) {
+            console.error(Z)
         }
     }
-    "loading" !== document.readyState ? Ro() : document.addEventListener("DOMContentLoaded", Ro, !1), window.addEventListener("beforeunload", function(I) {
-        if (0 != j && !R && !_I || WZ || oo) {
-            return I.returnValue = "Exit the game?", "Exit the game?"
+    "loading" !== document.readyState ? Vr() : document.addEventListener("DOMContentLoaded", Vr, !1), window.addEventListener("beforeunload", function(Z) {
+        if (0 != A && !V && !eZ || JJ || wr) {
+            return Z.returnValue = "Exit the game?", "Exit the game?"
         }
     });
-    var fo = {
-        selectMode: function(s) {
-            Js || "none" !== document.getElementById("play-button").style.display && (aI = s, Bx(), px(), I && (history.replaceState("", document.title, window.location.pathname + window.location.search), ro()))
+    var Ur = {
+        selectMode: function(S) {
+            aS || "none" !== document.getElementById("play-button").style.display && (KZ = S, yY(), zY(), Z && (history.replaceState("", document.title, window.location.pathname + window.location.search), vr()))
         },
         clickPlay: function() {
-            if (-1 == document.referrer.indexOf("deflyio.com") && -1 == document.referrer.indexOf("deflyio.net") && -1 == document.referrer.indexOf("deflyio.org") && -1 == document.referrer.indexOf("difly.io") && -1 == document.referrer.indexOf("defly-io.com") && -1 == document.referrer.indexOf("difly.io") || (window.top.location.href = "http://defly.io"), !Fs && Js && !KI && !pI) return alert("You must sign-in to participate the tournament"), void fu();
+            if (-1 == document.referrer.indexOf("deflyio.com") && -1 == document.referrer.indexOf("deflyio.net") && -1 == document.referrer.indexOf("deflyio.org") && -1 == document.referrer.indexOf("difly.io") && -1 == document.referrer.indexOf("defly-io.com") && -1 == document.referrer.indexOf("difly.io") || (window.top.location.href = "http://defly.io"), !kS && aS && !iZ && !zZ) return alert("You must sign-in to participate the tournament"), void pR();
             (function() {
                 try {
                     if (-1 === (WebSocket + "").indexOf("native code")) return !0;
                     if (-1 === (WebSocket.prototype.send + "").indexOf("native code")) return !0
-                } catch (I) {}
+                } catch (Z) {}
                 return !1
-            })(), VI ? (bx = !0, qx(), "undefined" != typeof gtag && gtag("event", "PlayShowTuto", {
+            })(), IZ ? (nY = !0, uY(), "undefined" != typeof gtag && gtag("event", "PlayShowTuto", {
                 event_category: "Click",
-                gamesPlayed: iI,
-                initialGameMode: -1 == vs ? null : vs
-            })) : (Dx(), "undefined" != typeof gtag && gtag("event", "Play", {
+                gamesPlayed: EZ,
+                initialGameMode: -1 == gS ? null : gS
+            })) : (HY(), "undefined" != typeof gtag && gtag("event", "Play", {
                 event_category: "Click",
-                gamesPlayed: iI,
-                initialGameMode: -1 == vs ? null : vs
+                gamesPlayed: EZ,
+                initialGameMode: -1 == gS ? null : gS
             }));
             try {
-                localStorage.setItem("gameMode", aI)
-            } catch (I) {
-                console.error(I)
+                localStorage.setItem("gameMode", KZ)
+            } catch (Z) {
+                console.error(Z)
             }
         },
-        backToHomepage: Xx,
-        showTutorial: qx,
+        backToHomepage: MY,
+        showTutorial: uY,
         clickTutoButton: function() {
-            if (document.getElementById("homepage").classList.remove("blurred"), document.getElementById("tuto-popup").style.display = "none", VI = !document.getElementById("tuto-checkbox").checked, "undefined" != typeof Storage) try {
-                localStorage.setItem("showTuto", VI)
-            } catch (I) {
-                console.log(I)
+            if (document.getElementById("homepage").classList.remove("blurred"), document.getElementById("tuto-popup").style.display = "none", IZ = !document.getElementById("tuto-checkbox").checked, "undefined" != typeof Storage) try {
+                localStorage.setItem("showTuto", IZ)
+            } catch (Z) {
+                console.log(Z)
             }
-            bx && Dx(), bx = !1, "undefined" != typeof gtag && gtag("event", VI ? "CloseTutoShowAgain" : "CloseTutoDotNotShowAgain", {
+            nY && HY(), nY = !1, "undefined" != typeof gtag && gtag("event", IZ ? "CloseTutoShowAgain" : "CloseTutoDotNotShowAgain", {
                 event_category: "Click"
             })
         },
         respawn: function() {
-            Yx = xZ, !Js && (tI > 600 || 2 == iI || iI > 2 && (iI - 2) % 2 == 0) && Ox() ? "undefined" != typeof gtag && gtag("event", "Respawn", {
+            LY = _J, !aS && (mZ > 600 || 2 == EZ || EZ > 2 && (EZ - 2) % 2 == 0) && FY() ? "undefined" != typeof gtag && gtag("event", "Respawn", {
                 event_category: "Click",
                 event_label: "VideoAd"
-            }) : (xZ(), "undefined" != typeof gtag && gtag("event", "Respawn", {
+            }) : (_J(), "undefined" != typeof gtag && gtag("event", "Respawn", {
                 event_category: "Click",
                 event_label: "NoVideoAd"
-            })), zI = 0, document.getElementById("respawn-spinner").style.display = "inline-block", document.getElementById("respawn-button").style.display = "none", document.getElementById("xp-bar").style.display = "block"
+            })), xZ = 0, document.getElementById("respawn-spinner").style.display = "inline-block", document.getElementById("respawn-button").style.display = "none", document.getElementById("xp-bar").style.display = "block"
         },
         spectate: function() {
-            2 == aI ? ps >= 30 ? (Yx = CZ, (2 == iI || iI > 2 && (iI - 2) % 2 == 0) && Ox() ? "undefined" != typeof gtag && gtag("event", "Spectate", {
+            2 == KZ ? zS >= 30 ? (LY = oJ, (2 == EZ || EZ > 2 && (EZ - 2) % 2 == 0) && FY() ? "undefined" != typeof gtag && gtag("event", "Spectate", {
                 event_category: "Click",
                 event_label: "VideoAd"
-            }) : CZ()) : CZ() : document.getElementById("respawn").style.display = "none"
+            }) : oJ()) : oJ() : document.getElementById("respawn").style.display = "none"
         },
-        upgrade: sZ,
-        selectSuperpower: function(I) {
+        upgrade: YJ,
+        selectSuperpower: function(Z) {
             document.getElementById("choose-superpower").style.display = "none";
-            var s = new DataView(new ArrayBuffer(2));
-            s.setUint8(0, 6), s.setUint8(1, I), i.send(s.buffer), dI = I, rI = 0, document.getElementById("superpower-fuel").style.display = "block", window.event && window.event.preventDefault()
+            var S = new DataView(new ArrayBuffer(2));
+            S.setUint8(0, 6), S.setUint8(1, Z), E.send(S.buffer), TZ = Z, vZ = 0, document.getElementById("superpower-fuel").style.display = "block", window.event && window.event.preventDefault()
         },
-        promoComplete: $x,
-        setQuality: ex,
+        promoComplete: DY,
+        setQuality: OY,
         chooseSkin: function() {
             document.getElementById("skin-popup").style.display = "block", document.getElementById("homepage").classList.add("blurred"), "undefined" != typeof gtag && gtag("event", "SelectSkin", {
                 event_category: "Click"
@@ -24556,17 +24560,17 @@ var defly = function() {
         closeSkinSelector: function() {
             document.getElementById("skin-popup").style.display = "none", document.getElementById("homepage").classList.remove("blurred"), "undefined" != typeof gtag && gtag("event", "CloseSkinPopup", {
                 event_category: "Click",
-                playerSkin: kI,
-                playerSkinColor: yI
+                playerSkin: $Z,
+                playerSkinColor: tZ
             })
         },
-        changeSkinColor: Pu,
-        changeSkinTab: hu,
-        sac: ZZ,
-        onGoogleSignIn: gu,
-        googleSignOut: du,
-        onFacebookLoginStatus: ru,
-        logout: Ru,
+        changeSkinColor: QR,
+        changeSkinTab: FR,
+        sac: RJ,
+        onGoogleSignIn: CR,
+        googleSignOut: vR,
+        onFacebookLoginStatus: gR,
+        logout: UR,
         clickGoogleLogin: function() {
             document.getElementById("privacy-policy-checkbox").checked ? gapi.load("auth2", function() {
                 gapi.auth2.init({
@@ -24574,186 +24578,186 @@ var defly = function() {
                 }).then(function() {
                     gapi.auth2.getAuthInstance().signIn({
                         scope: "profile email"
-                    }).then(function(I) {
-                        gu(I)
-                    }).catch(function(I) {
-                        console.error(I), alert("Google sign-in failed: " + I.error + " - Reload the page and try again")
+                    }).then(function(Z) {
+                        CR(Z)
+                    }).catch(function(Z) {
+                        console.error(Z), alert("Google sign-in failed: " + Z.error + " - Reload the page and try again")
                     })
-                }).catch(function(I) {
-                    console.error(I), alert("Can't use google sign-in: " + I.details + " - See FAQ on discord")
+                }).catch(function(Z) {
+                    console.error(Z), alert("Can't use google sign-in: " + Z.details + " - See FAQ on discord")
                 })
             }) : alert("You must accept the privacy policy")
         },
         clickFacebookLogin: function() {
-            document.getElementById("privacy-policy-checkbox").checked ? FB.login(ru, {
+            document.getElementById("privacy-policy-checkbox").checked ? FB.login(gR, {
                 scope: "email"
             }) : alert("You must accept the privacy policy")
         },
         showMyStats: function() {
-            var I = new XMLHttpRequest;
-            I.onreadystatechange = function() {
-                if (4 == I.readyState && 200 == I.status) {
-                    for (var s = I.responseText.split("\n"), x = JSON.parse(s[0]), C = s[1], W = "<thead><th>GameMode<th>Start</th><th>Duration</th><th>Level reached/<br/>Rounds played</th><th>Towers destroyed</th><th>Players killed</th><th>Max Map %/<br/>Rounds win%</th><th>Max Score</th><th>Coins earnings</th><th>Kill reason</th></thead><tbody>", Z = 0; Z < x.length; Z++) {
-                        var u = x[Z],
-                            o = 4 == u.game_mode ? 100 * u.max_area : 2 == u.game_mode ? 100 * u.max_area : 100 * u.max_area / (u.map_area ? u.map_area : Math.pow(3 == u.game_mode ? 500 : 800, 2));
-                        o = qW(o);
-                        var N = 4 == u.game_mode ? "" : "Disconnect";
-                        switch (u.kill_reason) {
+            var Z = new XMLHttpRequest;
+            Z.onreadystatechange = function() {
+                if (4 == Z.readyState && 200 == Z.status) {
+                    for (var S = Z.responseText.split("\n"), Y = JSON.parse(S[0]), _ = S[1], o = "<thead><th>GameMode<th>Start</th><th>Duration</th><th>Level reached/<br/>Rounds played</th><th>Towers destroyed</th><th>Players killed</th><th>Max Map %/<br/>Rounds win%</th><th>Max Score</th><th>Coins earnings</th><th>Kill reason</th></thead><tbody>", J = 0; J < Y.length; J++) {
+                        var R = Y[J],
+                            r = 4 == R.game_mode ? 100 * R.max_area : 2 == R.game_mode ? 100 * R.max_area : 100 * R.max_area / (R.map_area ? R.map_area : Math.pow(3 == R.game_mode ? 500 : 800, 2));
+                        r = uo(r);
+                        var w = 4 == R.game_mode ? "" : "Disconnect";
+                        switch (R.kill_reason) {
                             case 1:
-                                N = "Bullet";
+                                w = "Bullet";
                                 break;
                             case 2:
-                                N = "Wall";
+                                w = "Wall";
                                 break;
                             case 3:
-                                N = "Player collision";
+                                w = "Player collision";
                                 break;
                             case 4:
-                                N = "Victory";
+                                w = "Victory";
                                 break;
                             case 5:
-                                N = "Grenade"
+                                w = "Grenade"
                         }
-                        W += "<tr><td>" + uo[u.game_mode] + "</td><td>" + new Date(u.start).toLocaleString() + "</td><td>" + (i = (u.end - u.start) / 1e3, t = void 0, a = void 0, e = void 0, t = Math.floor(i / 3600), a = Math.floor((i - 3600 * t) / 60), e = Math.floor(i - 3600 * t - 60 * a), t < 10 && (t = "0" + t), a < 10 && (a = "0" + a), e < 10 && (e = "0" + e), t + "h" + a + "m" + e + "s") + "</td><td>" + u.level + "</td><td>" + u.dot_kills + "</td><td>" + u.player_kills + "</td><td>" + o + "</td><td>" + Math.round(u.max_score) + "</td><td>" + Zo(u.game_mode, u.max_score, u.dot_kills, u.player_kills) + "</td><td>" + N + "</td></tr>"
+                        o += "<tr><td>" + rr[R.game_mode] + "</td><td>" + new Date(R.start).toLocaleString() + "</td><td>" + (E = (R.end - R.start) / 1e3, m = void 0, K = void 0, O = void 0, m = Math.floor(E / 3600), K = Math.floor((E - 3600 * m) / 60), O = Math.floor(E - 3600 * m - 60 * K), m < 10 && (m = "0" + m), K < 10 && (K = "0" + K), O < 10 && (O = "0" + O), m + "h" + K + "m" + O + "s") + "</td><td>" + R.level + "</td><td>" + R.dot_kills + "</td><td>" + R.player_kills + "</td><td>" + r + "</td><td>" + Math.round(R.max_score) + "</td><td>" + Rr(R.game_mode, R.max_score, R.dot_kills, R.player_kills) + "</td><td>" + w + "</td></tr>"
                     }
-                    W += "</tbody>", document.getElementById("my-statistics-table").innerHTML = W, document.getElementById("ms-coins").innerHTML = Math.floor(C), document.getElementById("ma-coins").innerHTML = Math.floor(C), document.getElementById("ms-player-name").innerHTML = document.getElementById("username").value, document.getElementById("my-statistics").style.display = "block", document.getElementById("my-stats-button").enabled = !0, document.getElementById("my-stats-button").innerHTML = ox("My Statistics")
-                } else 4 == I.readyState && 200 != I.status && I.onerror(I.status);
-                var i, t, a, e
-            }, I.onerror = function(I) {
-                kC((new Date).toLocaleTimeString() + " - Error getting stats", "error"), console.log(I)
-            }, I.open("POST", M + "/mystats?s=" + x, !0), I.send(null), document.getElementById("my-stats-button").enabled = !1, document.getElementById("my-stats-button").innerHTML = ox("Loading...")
+                    o += "</tbody>", document.getElementById("my-statistics-table").innerHTML = o, document.getElementById("ms-coins").innerHTML = Math.floor(_), document.getElementById("ma-coins").innerHTML = Math.floor(_), document.getElementById("ms-player-name").innerHTML = document.getElementById("username").value, document.getElementById("my-statistics").style.display = "block", document.getElementById("my-stats-button").enabled = !0, document.getElementById("my-stats-button").innerHTML = rY("My Statistics")
+                } else 4 == Z.readyState && 200 != Z.status && Z.onerror(Z.status);
+                var E, m, K, O
+            }, Z.onerror = function(Z) {
+                $_((new Date).toLocaleTimeString() + " - Error getting stats", "error"), console.log(Z)
+            }, Z.open("POST", G + "/mystats?s=" + Y, !0), Z.send(null), document.getElementById("my-stats-button").enabled = !1, document.getElementById("my-stats-button").innerHTML = rY("Loading...")
         },
-        showMyAccount: Wo,
-        selectTeam: pW,
-        buyGear: function(I) {
-            var s = new DataView(new ArrayBuffer(3));
-            s.setUint8(0, 11), s.setUint8(1, I), s.setUint8(2, 0), i.send(s.buffer)
+        showMyAccount: Jr,
+        selectTeam: zo,
+        buyGear: function(Z) {
+            var S = new DataView(new ArrayBuffer(3));
+            S.setUint8(0, 11), S.setUint8(1, Z), S.setUint8(2, 0), E.send(S.buffer)
         },
-        sellGear: function(I) {
-            var s = new DataView(new ArrayBuffer(3));
-            s.setUint8(0, 11), s.setUint8(1, I), s.setUint8(2, 1), i.send(s.buffer)
+        sellGear: function(Z) {
+            var S = new DataView(new ArrayBuffer(3));
+            S.setUint8(0, 11), S.setUint8(1, Z), S.setUint8(2, 1), E.send(S.buffer)
         },
         changeControls: function() {
-            ss = document.getElementById("controls-tpfm2").checked, Ss = document.getElementById("controls-colorblind").checked, xs = document.getElementById("controls-mwm").checked, Cs = xs;
+            SS = document.getElementById("controls-tpfm2").checked, XS = document.getElementById("controls-colorblind").checked, YS = document.getElementById("controls-mwm").checked, _S = YS;
             try {
-                localStorage.setItem("trackPadFriendlyMode", ss ? 1 : 0), localStorage.setItem("moveWithMouse", xs ? 1 : 0), localStorage.setItem("colorBlindMode", Ss ? 1 : 0)
-            } catch (I) {
-                console.log(I)
+                localStorage.setItem("trackPadFriendlyMode", SS ? 1 : 0), localStorage.setItem("moveWithMouse", YS ? 1 : 0), localStorage.setItem("colorBlindMode", XS ? 1 : 0)
+            } catch (Z) {
+                console.log(Z)
             }
-            if (j > 0)
-                for (var I in zs) zs[I].texture = v[xW(zs[I].owner, zs[I].hp, zs[I].maxHP)]
+            if (A > 0)
+                for (var Z in xS) xS[Z].texture = g[Yo(xS[Z].owner, xS[Z].hp, xS[Z].maxHP)]
         },
         changeTheme: function() {
-            Ws = document.getElementById("theme-radio2").checked, a.backgroundColor = Ws ? 0 : 15923199;
+            oS = document.getElementById("theme-radio2").checked, K.backgroundColor = oS ? 0 : 15923199;
             try {
-                localStorage.setItem("darkTheme", Ws ? 1 : 0)
-            } catch (I) {
-                console.log(I)
+                localStorage.setItem("darkTheme", oS ? 1 : 0)
+            } catch (Z) {
+                console.log(Z)
             }
-            if (TZ(), j > 0) {
-                for (var I in bs) bs[I].usernameText._style.fill = Ws ? 16777215 : 0;
-                eC()
+            if (HJ(), A > 0) {
+                for (var Z in nS) nS[Z].usernameText._style.fill = oS ? 16777215 : 0;
+                O_()
             }
         },
         changeChatSettings: function() {
-            Zs = document.getElementById("settings-disablechat").checked, us = document.getElementById("settings-disableinfolog").checked;
-            for (var I = document.getElementsByName("settings-chat-size"), s = 0; s < I.length; s++) I[s].checked && (os = I[s].value);
-            document.getElementById("chat-history").className = "size" + os;
+            JS = document.getElementById("settings-disablechat").checked, RS = document.getElementById("settings-disableinfolog").checked;
+            for (var Z = document.getElementsByName("settings-chat-size"), S = 0; S < Z.length; S++) Z[S].checked && (rS = Z[S].value);
+            document.getElementById("chat-history").className = "size" + rS;
             try {
-                localStorage.setItem("chatDisabled", Zs ? 1 : 0), localStorage.setItem("infologDisabled", us ? 1 : 0), localStorage.setItem("chatSize", os)
-            } catch (I) {
-                console.log(I)
+                localStorage.setItem("chatDisabled", JS ? 1 : 0), localStorage.setItem("infologDisabled", RS ? 1 : 0), localStorage.setItem("chatSize", rS)
+            } catch (Z) {
+                console.log(Z)
             }
         },
-        showLoginPopup: fu,
+        showLoginPopup: pR,
         joinTourney: function() {
-            if (!Fs && !KI && !pI) return alert("Log-in first to participate the tournament"), void fu();
-            if (!L) {
-                L = !0, Js = !0, gs = !0, aI = 0;
-                for (var I = 0; I <= 4; I++) document.getElementById("gamemode-" + I) && (document.getElementById("gamemode-" + I).style.display = "none");
-                document.getElementById("server-block").style.display = "none", document.getElementById("play-button").style.display = "none", document.getElementById("play-spinner").style.display = "block", px()
+            if (!kS && !iZ && !zZ) return alert("Log-in first to participate the tournament"), void pR();
+            if (!f) {
+                f = !0, aS = !0, NS = !0, KZ = 0;
+                for (var Z = 0; Z <= 4; Z++) document.getElementById("gamemode-" + Z) && (document.getElementById("gamemode-" + Z).style.display = "none");
+                document.getElementById("server-block").style.display = "none", document.getElementById("play-button").style.display = "none", document.getElementById("play-spinner").style.display = "block", zY()
             }
         },
-        buyPremium: function(I) {
-            if (3 == I || 4 == I || 5 == I) {
-                var s = document.getElementById("buy-premium-button");
-                s.textContent = "Please wait...", s.disabled = !0;
-                var C = new XMLHttpRequest;
-                return C.onreadystatechange = function() {
-                    if (4 == C.readyState && 200 == C.status) {
-                        var s = C.responseText.split("\n"),
-                            x = s[0],
-                            W = s[1];
-                        console.log("Got xsolla token", W);
-                        var Z = {
-                            access_token: W,
-                            sandbox: -1 !== x.indexOf("sandbox")
+        buyPremium: function(Z) {
+            if (3 == Z || 4 == Z || 5 == Z) {
+                var S = document.getElementById("buy-premium-button");
+                S.textContent = "Please wait...", S.disabled = !0;
+                var _ = new XMLHttpRequest;
+                return _.onreadystatechange = function() {
+                    if (4 == _.readyState && 200 == _.status) {
+                        var S = _.responseText.split("\n"),
+                            Y = S[0],
+                            o = S[1];
+                        console.log("Got xsolla token", o);
+                        var J = {
+                            access_token: o,
+                            sandbox: -1 !== Y.indexOf("sandbox")
                         };
-                        if (5 == I) {
-                            let I = "https://" + (-1 !== x.indexOf("sandbox") ? "sandbox-" : "") + "secure.xsolla.com/paystation3/?access_token=" + W;
-                            var u = document.createElement("div");
-                            u.style.marginTop = "3vh", u.innerHTML = 'Payment link (valid 24 hours): <div class="button" onclick="document.getElementById(\'xsolla-share-link\').select();        document.execCommand(\'copy\');alert(\'Link copied\');">Copy</div><input id="xsolla-share-link" value="' + I + '" size="85">';
-                            let s = document.getElementById("after-buy-message");
-                            return void s.parentNode.insertBefore(u, s)
+                        if (5 == Z) {
+                            let Z = "https://" + (-1 !== Y.indexOf("sandbox") ? "sandbox-" : "") + "secure.xsolla.com/paystation3/?access_token=" + o;
+                            var R = document.createElement("div");
+                            R.style.marginTop = "3vh", R.innerHTML = 'Payment link (valid 24 hours): <div class="button" onclick="document.getElementById(\'xsolla-share-link\').select();        document.execCommand(\'copy\');alert(\'Link copied\');">Copy</div><input id="xsolla-share-link" value="' + Z + '" size="85">';
+                            let S = document.getElementById("after-buy-message");
+                            return void S.parentNode.insertBefore(R, S)
                         }
-                        var o = document.createElement("script");
-                        o.type = "text/javascript", o.async = !0, o.src = "https://static.xsolla.com/embed/paystation/1.0.7/widget.min.js", o.addEventListener("load", function(I) {
-                            XPayStationWidget.init(Z), XPayStationWidget.on("close", function() {
+                        var r = document.createElement("script");
+                        r.type = "text/javascript", r.async = !0, r.src = "https://static.xsolla.com/embed/paystation/1.0.7/widget.min.js", r.addEventListener("load", function(Z) {
+                            XPayStationWidget.init(J), XPayStationWidget.on("close", function() {
                                 window.location.search = "?my-account"
                             }), XPayStationWidget.open()
-                        }, !1), document.getElementsByTagName("head")[0].appendChild(o)
-                    } else 4 == C.readyState && 200 != C.status && C.onerror(C.status)
-                }, C.onerror = function(I) {
-                    console.log(I), alert("An error occured during the transation, please try again or contact us")
-                }, C.open("GET", M + "/account/xsollaToken?s=" + x, !0), void C.send(null)
+                        }, !1), document.getElementsByTagName("head")[0].appendChild(r)
+                    } else 4 == _.readyState && 200 != _.status && _.onerror(_.status)
+                }, _.onerror = function(Z) {
+                    console.log(Z), alert("An error occured during the transation, please try again or contact us")
+                }, _.open("GET", G + "/account/xsollaToken?s=" + Y, !0), void _.send(null)
             }
-            var W = _u > 0 ? _u : encodeURIComponent(Fu);
-            if (1 == I) var Z = window.open("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=serial@defly.io&item_name=Premium%20Account%20for%20Defly.io%20%28inside%20EU%29&item_number=" + W + "&currency_code=EUR&country=GB&lc=US&no_shipping=1&amount=5");
-            else Z = window.open("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=serial@defly.io&item_name=Premium%20Account%20for%20Defly.io%20%28outside%20EU%29&item_number=" + W + "&currency_code=USD&country=US&lc=US&no_shipping=1&amount=5");
-            var u = setInterval(function() {
-                Z.closed && (clearInterval(u), document.getElementById("after-buy-message").style.display = "block")
+            var o = xR > 0 ? xR : encodeURIComponent(NR);
+            if (1 == Z) var J = window.open("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=serial@defly.io&item_name=Premium%20Account%20for%20Defly.io%20%28inside%20EU%29&item_number=" + o + "&currency_code=EUR&country=GB&lc=US&no_shipping=1&amount=5");
+            else J = window.open("https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=serial@defly.io&item_name=Premium%20Account%20for%20Defly.io%20%28outside%20EU%29&item_number=" + o + "&currency_code=USD&country=US&lc=US&no_shipping=1&amount=5");
+            var R = setInterval(function() {
+                J.closed && (clearInterval(R), document.getElementById("after-buy-message").style.display = "block")
             }, 100)
         },
         updateReservedNickname: function() {
-            var I = document.getElementById("reserved-nickname").value,
-                s = document.getElementById("reserved-nickname-button");
-            s.disabled = !0, s.innerHTML = "Updating...";
-            var C = new XMLHttpRequest;
-            C.onreadystatechange = function() {
-                if (4 == C.readyState && 200 == C.status) {
-                    s.disabled = !1, s.innerHTML = "Update";
-                    var I = C.responseText.split("\n");
-                    "ERROR" == I[0] && alert(I[1])
-                } else 4 == C.readyState && 200 != C.status && C.onerror(C.status)
-            }, C.onerror = function(I) {
-                s.disabled = !1, s.innerHTML = "Update", alert("Error updating reserved nickname"), console.log(I)
-            }, C.open("POST", M + "/account/updateReserved?s=" + x + "&n=" + encodeURIComponent(I), !0), C.send(null)
+            var Z = document.getElementById("reserved-nickname").value,
+                S = document.getElementById("reserved-nickname-button");
+            S.disabled = !0, S.innerHTML = "Updating...";
+            var _ = new XMLHttpRequest;
+            _.onreadystatechange = function() {
+                if (4 == _.readyState && 200 == _.status) {
+                    S.disabled = !1, S.innerHTML = "Update";
+                    var Z = _.responseText.split("\n");
+                    "ERROR" == Z[0] && alert(Z[1])
+                } else 4 == _.readyState && 200 != _.status && _.onerror(_.status)
+            }, _.onerror = function(Z) {
+                S.disabled = !1, S.innerHTML = "Update", alert("Error updating reserved nickname"), console.log(Z)
+            }, _.open("POST", G + "/account/updateReserved?s=" + Y + "&n=" + encodeURIComponent(Z), !0), _.send(null)
         },
         updateDiscordID: function() {
-            var I = document.getElementById("discord-id").value;
-            if (I.match(/^[0-9]*$/)) {
-                var s = document.getElementById("discord-id-button");
-                s.disabled = !0, s.innerHTML = "Updating...";
-                var C = new XMLHttpRequest;
-                C.onreadystatechange = function() {
-                    if (4 == C.readyState && 200 == C.status) {
-                        s.disabled = !1, s.innerHTML = "Update";
-                        var I = C.responseText.split("\n");
-                        "ERROR" == I[0] && alert(I[1])
-                    } else 4 == C.readyState && 200 != C.status && C.onerror(C.status)
-                }, C.onerror = function(I) {
-                    s.disabled = !1, s.innerHTML = "Update", alert("Error updating discord ID"), console.log(I)
-                }, C.open("POST", M + "/account/updateDiscordID?s=" + x + "&id=" + encodeURIComponent(I), !0), C.send(null)
+            var Z = document.getElementById("discord-id").value;
+            if (Z.match(/^[0-9]*$/)) {
+                var S = document.getElementById("discord-id-button");
+                S.disabled = !0, S.innerHTML = "Updating...";
+                var _ = new XMLHttpRequest;
+                _.onreadystatechange = function() {
+                    if (4 == _.readyState && 200 == _.status) {
+                        S.disabled = !1, S.innerHTML = "Update";
+                        var Z = _.responseText.split("\n");
+                        "ERROR" == Z[0] && alert(Z[1])
+                    } else 4 == _.readyState && 200 != _.status && _.onerror(_.status)
+                }, _.onerror = function(Z) {
+                    S.disabled = !1, S.innerHTML = "Update", alert("Error updating discord ID"), console.log(Z)
+                }, _.open("POST", G + "/account/updateDiscordID?s=" + Y + "&id=" + encodeURIComponent(Z), !0), _.send(null)
             } else alert("Invalid Discord ID")
         },
-        showChatInput: qZ,
+        showChatInput: LJ,
         toggleChatInput: function() {
-            document.getElementById("chat-block").classList.contains("typing") ? (document.getElementById("chat-input").blur(), document.getElementById("chat-block").classList.remove("typing")) : qZ()
+            document.getElementById("chat-block").classList.contains("typing") ? (document.getElementById("chat-input").blur(), document.getElementById("chat-block").classList.remove("typing")) : LJ()
         },
-        voteForMap: function(I) {
+        voteForMap: function(Z) {
             document.getElementById("map-vote").style.display = "none";
-            var s = new DataView(new ArrayBuffer(2));
-            s.setUint8(0, 13), s.setUint8(1, bC[I].id), i.send(s.buffer)
+            var S = new DataView(new ArrayBuffer(2));
+            S.setUint8(0, 13), S.setUint8(1, n_[Z].id), E.send(S.buffer)
         },
         addStatsFilters: function() {
             $(".button.filters").hide(), $.getScript("tablefilter/tablefilter.js", function() {
@@ -24790,38 +24794,38 @@ var defly = function() {
                 }).init(), $("#ms-sums").show()
             })
         },
-        recreateRenderer: Uo,
-        select1v1Player: function(I) {
-            if (I && I != Ts) {
-                HC = I;
-                var s = Os[I];
-                if (s.challenged) return !1;
-                switch (s.status) {
+        recreateRenderer: Br,
+        select1v1Player: function(Z) {
+            if (Z && Z != cS) {
+                d_ = Z;
+                var S = FS[Z];
+                if (S.challenged) return !1;
+                switch (S.status) {
                     case 0:
                     case 2:
-                        document.getElementById("gm-1v1-confirm-duel-text").innerHTML = "Challenge " + s.name + " ?", wC = !0;
+                        document.getElementById("gm-1v1-confirm-duel-text").innerHTML = "Challenge " + S.name + " ?", l_ = !0;
                         break;
                     case 1:
-                        document.getElementById("gm-1v1-confirm-duel-text").innerHTML = "Spectate " + s.name + " ?", wC = !1
+                        document.getElementById("gm-1v1-confirm-duel-text").innerHTML = "Spectate " + S.name + " ?", l_ = !1
                 }
                 document.getElementById("gm-1v1-confirm-duel").style.visibility = "visible"
             } else document.getElementById("gm-1v1-confirm-duel").style.visibility = "hidden";
             return !1
         },
-        confirmChallenge: function(I) {
-            if (wC) {
-                if (I) {
-                    _C("You challenged " + Os[HC].name, "bold");
-                    var s = new DataView(new ArrayBuffer(5));
-                    s.setUint8(0, 14), s.setInt32(1, HC), i.send(s.buffer), Os[HC].challenged = !0, cC()
+        confirmChallenge: function(Z) {
+            if (l_) {
+                if (Z) {
+                    e_("You challenged " + FS[d_].name, "bold");
+                    var S = new DataView(new ArrayBuffer(5));
+                    S.setUint8(0, 14), S.setInt32(1, d_), E.send(S.buffer), FS[d_].challenged = !0, Q_()
                 }
-            } else I && dZ(HC);
-            HC = 0, document.getElementById("gm-1v1-confirm-duel").style.visibility = "hidden"
+            } else Z && vJ(d_);
+            d_ = 0, document.getElementById("gm-1v1-confirm-duel").style.visibility = "hidden"
         },
-        answerChallenge: function(I, s) {
-            var x = new DataView(new ArrayBuffer(6));
-            x.setUint8(0, 15), x.setInt32(1, I), x.setUint8(5, s ? 1 : 0), i.send(x.buffer), _C("You " + (s ? "accepted" : "rejected") + " the challenge from " + Os[I].name, "bold")
+        answerChallenge: function(Z, S) {
+            var Y = new DataView(new ArrayBuffer(6));
+            Y.setUint8(0, 15), Y.setInt32(1, Z), Y.setUint8(5, S ? 1 : 0), E.send(Y.buffer), e_("You " + (S ? "accepted" : "rejected") + " the challenge from " + FS[Z].name, "bold")
         }
     };
-    return fo
+    return Ur
 }();
